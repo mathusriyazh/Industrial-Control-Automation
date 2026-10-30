@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Chapter 32: Real-Time Data Acquisition and Control</title>
+
+<!-- MathJax Configuration and Script -->
+<script>
+  window.MathJax = {
+    tex: {
+      inlineMath: [['$', '$'], ['\\(', '\\)']],
+      displayMath: [['$$', '$$'], ['\\[', '\\]']]
+    }
+  };
+</script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+<style>
+  :root {
+    --bg-dark: #071017;
+    --panel-bg: #0d1f2d;
+    --border-color: #1e3a50;
+    --accent-blue: #38bdf8;
+    --accent-green: #22c55e;
+    --accent-amber: #f59e0b;
+    --accent-red: #ef4444;
+    --text-main: #e2e8f0;
+    --text-muted: #94a3b8;
+  }
+
+  body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: var(--bg-dark);
+    color: var(--text-main);
+    line-height: 1.6;
+    padding: 24px;
+    margin: 0;
+  }
+
+  h1, h2, h3, h4 {
+    color: var(--accent-blue);
+  }
+
+  h1 {
+    border-bottom: 2px solid var(--border-color);
+    padding-bottom: 10px;
+    margin-bottom: 20px;
+  }
+
+  .sensor-card {
+    background-color: var(--panel-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 10px;
+    padding: 24px;
+    margin-bottom: 30px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+  }
+
+  .grid-2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+  }
+
+  @media (max-width: 900px) {
+    .grid-2 { grid-template-columns: 1fr; }
+  }
+
+  .anim-box {
+    background: #040a0f;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 16px;
+    text-align: center;
+  }
+
+  .img-fluid {
+    max-width: 100%;
+    height: 180px;
+    object-fit: contain;
+    border-radius: 6px;
+    background: #040a0f;
+    padding: 10px;
+    border: 1px solid var(--border-color);
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 15px;
+  }
+
+  th, td {
+    border: 1px solid var(--border-color);
+    padding: 10px;
+    text-align: left;
+  }
+
+  th {
+    background-color: #132b3e;
+    color: var(--accent-blue);
+  }
+
+  .numerical-card {
+    background: #0a1824;
+    border-left: 4px solid var(--accent-amber);
+    padding: 18px;
+    margin-bottom: 20px;
+    border-radius: 0 8px 8px 0;
+  }
+
+  .formula {
+    background: #040a0f;
+    padding: 8px 12px;
+    border-radius: 6px;
+    color: #4ade80;
+    overflow-x: auto;
+    margin: 8px 0;
+  }
+</style>
+</head>
+<body>
+
+<h1>Chapter 32: Real-Time Data Acquisition and Control (DAQ & RT-Control)</h1>
+<p>This chapter explores the principles of real-time data acquisition (DAQ) and closed-loop feedback control systems in industrial automation. Topics include analog-to-digital sampling mechanics, deterministic loop response, Nyquist criteria, control jitter, and throughput calculations for high-speed control systems.</p>
+
+<!-- SECTION 1: DAQ & CONTROL ARCHITECTURE -->
+<div class="sensor-card">
+  <h2>1. DAQ Signal Pipeline & Deterministic Control Loops</h2>
+  <div class="grid-2">
+    <div>
+      <h3>Hardware & Processing Subsystems</h3>
+      <div class="anim-box">
+        <svg viewBox="0 0 300 120" width="100%" height="130">
+          <rect x="10" y="10" width="280" height="100" fill="#0d1f2d" stroke="#38bdf8" stroke-width="2" rx="5"/>
+          <!-- Sensor -->
+          <circle cx="45" cy="60" r="18" fill="#132b3e" stroke="#22c55e" stroke-width="1.5"/>
+          <text x="32" y="63" fill="#22c55e" font-size="8" font-weight="bold">Sensor</text>
+          <!-- ADC Block -->
+          <rect x="90" y="42" width="45" height="36" fill="#040a0f" stroke="#f59e0b" stroke-width="1.5" rx="3"/>
+          <text x="100" y="63" fill="#f59e0b" font-size="8" font-weight="bold">ADC</text>
+          <!-- RT Controller -->
+          <rect x="160" y="42" width="55" height="36" fill="#040a0f" stroke="#38bdf8" stroke-width="1.5" rx="3"/>
+          <text x="165" y="63" fill="#38bdf8" font-size="8" font-weight="bold">RT Controller</text>
+          <!-- Actuator -->
+          <circle cx="255" cy="60" r="18" fill="#132b3e" stroke="#ef4444" stroke-width="1.5"/>
+          <text x="238" y="63" fill="#ef4444" font-size="8" font-weight="bold">Actuator</text>
+
+          <!-- Arrows -->
+          <line x1="63" y1="60" x2="90" y2="60" stroke="#e2e8f0" stroke-width="1.5"/>
+          <line x1="135" y1="60" x2="160" y2="60" stroke="#e2e8f0" stroke-width="1.5"/>
+          <line x1="215" y1="60" x2="237" y2="60" stroke="#e2e8f0" stroke-width="1.5"/>
+        </svg>
+      </div>
+      <br>
+      <h4>Core Real-Time Components</h4>
+      <p>Real-time data acquisition and control systems bridge physical process dynamics with digital decision engines:</p>
+      <ul>
+        <li><strong>Signal Conditioning & ADC:</strong> Filters noise, amplifies weak sensor signals, and digitizes analog variables at fixed sampling intervals ($T_s$).</li>
+        <li><strong>Deterministic RTOS Task Execution:</strong> Guarantees hard real-time execution of control algorithms (e.g., PID) without dynamic jitter or missed deadlines.</li>
+        <li><strong>Actuator Output Generation:</strong> Converts calculated control outputs back to physical signals (DAC or PWM) to drive final control elements.</li>
+      </ul>
+    </div>
+
+    <div>
+      <h3>Closed-Loop Feedback Latency Breakdown</h3>
+      <div class="anim-box">
+        <svg viewBox="0 0 320 180" width="100%" height="160">
+          <!-- Timeline box -->
+          <rect x="15" y="20" width="290" height="140" fill="#0d1f2d" stroke="#1e3a50" stroke-width="2" rx="4"/>
+          <text x="80" y="40" fill="#38bdf8" font-size="9" font-weight="bold">Loop Latency $T_{loop} = t_{adc} + t_{proc} + t_{out}$</text>
+          
+          <!-- Segment t_adc -->
+          <rect x="25" y="65" width="70" height="35" fill="#f59e0b" opacity="0.8" rx="3"/>
+          <text x="35" y="86" fill="#040a0f" font-size="8" font-weight="bold">$t_{adc}$ (Sampling)</text>
+          
+          <!-- Segment t_proc -->
+          <rect x="100" y="65" width="110" height="35" fill="#38bdf8" opacity="0.8" rx="3"/>
+          <text x="110" y="86" fill="#040a0f" font-size="8" font-weight="bold">$t_{proc}$ (PID Calc)</text>
+
+          <!-- Segment t_out -->
+          <rect x="215" y="65" width="80" height="35" fill="#22c55e" opacity="0.8" rx="3"/>
+          <text x="225" y="86" fill="#040a0f" font-size="8" font-weight="bold">$t_{out}$ (DAC Update)</text>
+
+          <!-- Time axis line -->
+          <line x1="25" y1="125" x2="295" y2="125" stroke="#94a3b8" stroke-width="1.5"/>
+          <text x="25" y="140" fill="#94a3b8" font-size="7">t = 0</text>
+          <text x="260" y="140" fill="#94a3b8" font-size="7">t = $T_{loop}$</text>
+
+          <!-- Animated Pulse -->
+          <circle cx="0" cy="0" r="3" fill="#ef4444">
+            <animateMotion path="M 25 125 L 295 125" dur="2s" repeatCount="indefinite"/>
+          </circle>
+        </svg>
+        <p style="font-size:12px; color:#94a3b8;">End-to-End Latency Pipeline in a Digital Real-Time Control Loop</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SECTION 2: COMPARISON TABLE -->
+<div class="sensor-card">
+  <h2>Comparative Analysis: Real-Time Control Operating Classes</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>Execution Class</th>
+        <th>Deterministic Guarantee</th>
+        <th>Typical Loop Time ($T_s$)</th>
+        <th>Hardware Architecture</th>
+        <th>Target Application Examples</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>Hard Real-Time (HRT)</strong></td>
+        <td>Zero tolerance for deadline failure; missed deadlines cause catastrophic failure.</td>
+        <td>$10\ \mu\text{s} - 1\text{ ms}$</td>
+        <td>Microcontrollers, FPGAs, Dedicated DSPs, RTOS Kernels.</td>
+        <td>Motion control, active vibration damping, turbine overspeed prevention.</td>
+      </tr>
+      <tr>
+        <td><strong>Soft Real-Time (SRT)</strong></td>
+        <td>Performance degrades gracefully if updates are occasionally delayed.</td>
+        <td>$10\text{ ms} - 500\text{ ms}$</td>
+        <td>Industrial PCs, Standard Linux/Windows with RT patches.</td>
+        <td>Process temperature control, batch mixing, HMI trend logging.</td>
+      </tr>
+      <tr>
+        <td><strong>Non-Real-Time (NRT)</strong></td>
+        <td>Best-effort timing; no deterministic timing guarantees provided.</td>
+        <td>$> 1\text{ second}$</td>
+        <td>Standard Server OS, Cloud Historians, General DB Logging.</td>
+        <td>ERP reporting, long-term predictive analytics, inventory synchronization.</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- SECTION 3: NUMERICAL PROBLEMS -->
+<div class="sensor-card">
+  <h2>Numerical Problems: Sampling Rates & Loop Latency Budgeting</h2>
+
+  <!-- Problem 1: ADC Sampling Rate & Nyquist Sizing -->
+  <div class="numerical-card">
+    <h3>Problem 1: DAQ Nyquist Sampling Criteria and Bandwidth Throughput</h3>
+    <p><strong>Scenario:</strong> A real-time DAQ system monitors a high-speed vibration sensor mounted on a CNC spindle shaft. The highest relevant vibration harmonic occurs at $f_{max} = 12.5\text{ kHz}$. To prevent aliasing and enable accurate signal reconstruction, the system samples at $f_s = 4 \times f_{max}$. The DAQ board features a 16-bit ADC operating across 8 simultaneous differential channels.</p>
+
+    <p>Calculate:</p>
+    <ol type="a">
+      <li>The minimum required sampling frequency $f_s$ and period $T_s$.</li>
+      <li>The raw data output throughput generated by the 8-channel board in megabits per second ($\text{Mbps}$) and megabytes per second ($\text{MB/s}$).</li>
+      <li>The total buffer memory required to store $10\text{ seconds}$ of uninterrupted vibration telemetry.</li>
+    </ol>
+
+    <h4>Step-by-Step Solution:</h4>
+    <p><strong>1. Compute Sampling Rate and Period:</strong></p>
+    <div class="formula">
+      $$f_s = 4 \times 12.5\text{ kHz} = 50\text{ kHz} = 50,000\text{ samples/sec per channel}$$
+    </div>
+    <div class="formula">
+      $$T_s = \frac{1}{f_s} = \frac{1}{50,000\text{ Hz}} = 20\ \mu\text{s}$$
+    </div>
+
+    <p><strong>2. Compute System Data Throughput:</strong></p>
+    <div class="formula">
+      $$\text{Total Sample Rate} = 8\text{ channels} \times 50,000\text{ samples/sec} = 400,000\text{ samples/sec}$$
+    </div>
+    <div class="formula">
+      $$\text{Bit Rate} = 400,000\text{ samples/sec} \times 16\text{ bits/sample} = 6,400,000\text{ bits/sec} = 6.4\text{ Mbps}$$
+    </div>
+    <div class="formula">
+      $$\text{Byte Rate} = \frac{6.4\text{ Mbps}}{8} = 0.8\text{ MB/s} = 800\text{ KB/s}$$
+    </div>
+
+    <p><strong>3. Compute Buffer Storage Requirement for 10 Seconds:</strong></p>
+    <div class="formula">
+      $$\text{Storage} = 0.8\text{ MB/s} \times 10\text{ seconds} = 8.0\text{ MB}$$
+    </div>
+  </div>
+
+  <!-- Problem 2: Control Loop Timing & Max Execution Speed -->
+  <div class="numerical-card">
+    <h3>Problem 2: Real-Time Closed-Loop Latency Budget</h3>
+    <p><strong>Scenario:</strong> A hard real-time motion controller executes a digital PID algorithm. The dynamic process requires a control loop update rate of $f_{loop} = 2\text{ kHz}$ ($T_{loop} = 500\ \mu\text{s}$). The timing components within each loop iteration are:</p>
+    <ul>
+      <li>Analog-to-Digital Conversion Time: $t_{adc} = 35\ \mu\text{s}$</li>
+      <li>Sensor Signal Filtering & Conditioning: $t_{filt} = 45\ \mu\text{s}$</li>
+      <li>Digital-to-Analog Output Update: $t_{dac} = 20\ \mu\text{s}$</li>
+      <li>Bus Communication Delay (Fieldbus): $t_{comm} = 110\ \mu\text{s}$</li>
+    </ul>
+
+    <p>Calculate:</p>
+    <ol type="a">
+      <li>The maximum time available ($t_{proc\_max}$) for the processor to execute the PID control code without missing its execution deadline.</li>
+      <li>The maximum CPU load percentage consumed strictly by input/output and communication overhead ($t_{overhead} = t_{adc} + t_{filt} + t_{dac} + t_{comm}$).</li>
+    </ol>
+
+    <h4>Step-by-Step Solution:</h4>
+    <p><strong>1. Compute Maximum Allowed Computation Time ($t_{proc\_max}$):</strong></p>
+    <div class="formula">
+      $$T_{loop} = 500\ \mu\text{s}$$
+    </div>
+    <div class="formula">
+      $$t_{overhead} = t_{adc} + t_{filt} + t_{dac} + t_{comm} = 35\ \mu\text{s} + 45\ \mu\text{s} + 20\ \mu\text{s} + 110\ \mu\text{s} = 210\ \mu\text{s}$$
+    </div>
+    <div class="formula">
+      $$t_{proc\_max} = T_{loop} - t_{overhead} = 500\ \mu\text{s} - 210\ \mu\text{s} = 290\ \mu\text{s}$$
+    </div>
+
+    <p><strong>2. Compute Percentage of Loop Time Spent on I/O Overhead:</strong></p>
+    <div class="formula">
+      $$\text{Overhead Percentage} = \left( \frac{t_{overhead}}{T_{loop}} \right) \times 100\% = \left( \frac{210\ \mu\text{s}}{500\ \mu\text{s}} \right) \times 100\% = 42.0\%$$
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Chapter 28: Introduction to SCADA Systems</title>
+
+<!-- MathJax Configuration and Script -->
+<script>
+  window.MathJax = {
+    tex: {
+      inlineMath: [['$', '$'], ['\\(', '\\)']],
+      displayMath: [['$$', '$$'], ['\\[', '\\]']]
+    }
+  };
+</script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+<style>
+  :root {
+    --bg-dark: #071017;
+    --panel-bg: #0d1f2d;
+    --border-color: #1e3a50;
+    --accent-blue: #38bdf8;
+    --accent-green: #22c55e;
+    --accent-amber: #f59e0b;
+    --accent-red: #ef4444;
+    --text-main: #e2e8f0;
+    --text-muted: #94a3b8;
+  }
+
+  body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: var(--bg-dark);
+    color: var(--text-main);
+    line-height: 1.6;
+    padding: 24px;
+    margin: 0;
+  }
+
+  h1, h2, h3, h4 {
+    color: var(--accent-blue);
+  }
+
+  h1 {
+    border-bottom: 2px solid var(--border-color);
+    padding-bottom: 10px;
+    margin-bottom: 20px;
+  }
+
+  .sensor-card {
+    background-color: var(--panel-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 10px;
+    padding: 24px;
+    margin-bottom: 30px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+  }
+
+  .grid-2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+  }
+
+  @media (max-width: 900px) {
+    .grid-2 { grid-template-columns: 1fr; }
+  }
+
+  .anim-box {
+    background: #040a0f;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 16px;
+    text-align: center;
+  }
+
+  .img-fluid {
+    max-width: 100%;
+    height: 180px;
+    object-fit: contain;
+    border-radius: 6px;
+    background: #040a0f;
+    padding: 10px;
+    border: 1px solid var(--border-color);
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 15px;
+  }
+
+  th, td {
+    border: 1px solid var(--border-color);
+    padding: 10px;
+    text-align: left;
+  }
+
+  th {
+    background-color: #132b3e;
+    color: var(--accent-blue);
+  }
+
+  .numerical-card {
+    background: #0a1824;
+    border-left: 4px solid var(--accent-amber);
+    padding: 18px;
+    margin-bottom: 20px;
+    border-radius: 0 8px 8px 0;
+  }
+
+  .formula {
+    background: #040a0f;
+    padding: 8px 12px;
+    border-radius: 6px;
+    color: #4ade80;
+    overflow-x: auto;
+    margin: 8px 0;
+  }
+</style>
+</head>
+<body>
+
+<h1>Chapter 28: Supervisory Control and Data Acquisition (SCADA) Systems</h1>
+<p>This chapter introduces the architecture, operational framework, and telemetry mechanics of SCADA systems. Topics include Master Terminal Units (MTU), Remote Terminal Units (RTU), Human-Machine Interfaces (HMI), polling cycle dynamics, and industrial network bandwidth analysis.</p>
+
+<!-- SECTION 1: SYSTEM ARCHITECTURE -->
+<div class="sensor-card">
+  <h2>1. SCADA System Hierarchy & Core Hardware Elements</h2>
+  <div class="grid-2">
+    <div>
+      <h3>Hardware Reference & Functional Overview</h3>
+      <img src="images/scada_architecture.jpg" class="img-fluid" alt="SCADA Control Center Master Terminal Unit and HMI Interface Console">
+      <br>
+      <h4>Level 1 to Level 3 Automation Hierarchy</h4>
+      <p>A SCADA system provides high-level supervisory monitoring and centralized control across geographically dispersed industrial assets. Its four-tier hierarchy comprises:</p>
+      <ul>
+        <li><strong>Field Instrumentation (Level 0):</strong> Sensors, transducers, and control actuators physically connected to processes.</li>
+        <li><strong>Remote Terminal Units & PLCs (Level 1):</strong> Field-level controllers executing localized closed-loop control algorithms.</li>
+        <li><strong>Master Terminal Unit / SCADA Server (Level 2):</strong> Centralized control software collecting field data, logging alarms, and executing supervisory commands.</li>
+        <li><strong>HMI Workstations & Enterprise Historians (Level 3):</strong> Graphical monitoring consoles for human operators and long-term databases.</li>
+      </ul>
+      <p>The system update delay across telemetric channels is governed by the total response cycle:</p>
+      <div class="formula">
+        $$T_{response} = T_{poll} + T_{rtu\_proc} + T_{comm\_latency} + T_{mtu\_update}$$
+      </div>
+    </div>
+
+    <div>
+      <h3>Interactive Telemetry & Polling Loop Animation</h3>
+      <div class="anim-box">
+        <svg viewBox="0 0 400 220" width="100%" height="200">
+          <!-- Central Master Terminal Unit (MTU) -->
+          <rect x="140" y="20" width="120" height="50" fill="#0d1f2d" stroke="#38bdf8" stroke-width="2" rx="6"/>
+          <text x="150" y="42" fill="#38bdf8" font-size="10" font-weight="bold">SCADA MASTER (MTU)</text>
+          <text x="165" y="58" fill="#94a3b8" font-size="8">Central HMI / Historian</text>
+
+          <!-- Telemetry WAN / Network Cloud -->
+          <ellipse cx="200" cy="115" rx="70" ry="20" fill="#040a0f" stroke="#f59e0b" stroke-width="1.5" stroke-dasharray="4,2"/>
+          <text x="165" y="118" fill="#f59e0b" font-size="8">WAN / Cellular / Fiber</text>
+
+          <!-- Field Node 1: Remote Terminal Unit (RTU) -->
+          <rect x="30" y="150" width="100" height="50" fill="#0d1f2d" stroke="#22c55e" stroke-width="2" rx="6"/>
+          <text x="45" y="172" fill="#22c55e" font-size="9" font-weight="bold">RTU / PLC 1</text>
+          <text x="42" y="188" fill="#94a3b8" font-size="8">Pumping Station</text>
+
+          <!-- Field Node 2: Remote Terminal Unit (RTU) -->
+          <rect x="270" y="150" width="100" height="50" fill="#0d1f2d" stroke="#22c55e" stroke-width="2" rx="6"/>
+          <text x="285" y="172" fill="#22c55e" font-size="9" font-weight="bold">RTU / PLC 2</text>
+          <text x="282" y="188" fill="#94a3b8" font-size="8">Substation Grid</text>
+
+          <!-- Interconnect Lines -->
+          <line x1="170" y1="70" x2="170" y2="150" stroke="#38bdf8" stroke-width="1.5"/>
+          <line x1="230" y1="70" x2="320" y2="150" stroke="#38bdf8" stroke-width="1.5"/>
+          <line x1="170" y1="150" x2="80" y2="150" stroke="#38bdf8" stroke-width="1.5"/>
+
+          <!-- Animated Polling Data Packets -->
+          <circle cx="0" cy="0" r="3.5" fill="#38bdf8">
+            <animateMotion path="M 170 70 L 170 95 L 80 150" dur="2.5s" repeatCount="indefinite"/>
+          </circle>
+          <circle cx="0" cy="0" r="3.5" fill="#22c55e">
+            <animateMotion path="M 320 150 L 230 95 L 230 70" dur="2.5s" repeatCount="indefinite"/>
+          </circle>
+        </svg>
+        <p style="font-size:12px; color:#94a3b8;">Bi-Directional Telemetry Loop: Master Polling & RTU Response</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SECTION 2: SCADA VS DCS VS PLC -->
+<div class="sensor-card">
+  <h2>2. Architectural Differences: SCADA, DCS, and PLC Systems</h2>
+  <div class="grid-2">
+    <div>
+      <h3>Supervisory Control vs. Localized Automation</h3>
+      <p>Industrial facilities utilize distinct automation platforms depending on spatial coverage, control latency, and processing requirements:</p>
+      <ul>
+        <li><strong>PLC (Programmable Logic Controller):</strong> Microsecond-level real-time discrete control optimized for local machinery and automated cells.</li>
+        <li><strong>DCS (Distributed Control System):</strong> Process-driven architecture with tightly integrated controllers deployed across a single localized plant (e.g., oil refinery).</li>
+        <li><strong>SCADA (Supervisory Control and Data Acquisition):</strong> Event-driven supervisory architecture spanning large geographical areas (e.g., electrical grids, pipeline networks) connected via long-distance telemetry.</li>
+      </ul>
+    </div>
+
+    <div>
+      <h3>Comparative System Domain Schematic</h3>
+      <div class="anim-box">
+        <svg viewBox="0 0 380 160" width="100%" height="150">
+          <!-- PLC Boundary -->
+          <rect x="20" y="30" width="90" height="100" fill="#0d1f2d" stroke="#ef4444" stroke-width="1.5" rx="4"/>
+          <text x="35" y="50" fill="#ef4444" font-size="9" font-weight="bold">PLC LEVEL</text>
+          <text x="30" y="70" fill="#94a3b8" font-size="7">Fast Response</text>
+          <text x="30" y="85" fill="#94a3b8" font-size="7">(&lt; 10 ms)</text>
+          <text x="30" y="110" fill="#22c55e" font-size="7">Local Machine</text>
+
+          <!-- DCS Boundary -->
+          <rect x="135" y="30" width="100" height="100" fill="#0d1f2d" stroke="#f59e0b" stroke-width="1.5" rx="4"/>
+          <text x="155" y="50" fill="#f59e0b" font-size="9" font-weight="bold">DCS LEVEL</text>
+          <text x="145" y="70" fill="#94a3b8" font-size="7">Process Oriented</text>
+          <text x="145" y="85" fill="#94a3b8" font-size="7">(10 - 100 ms)</text>
+          <text x="145" y="110" fill="#22c55e" font-size="7">Single Plant Unit</text>
+
+          <!-- SCADA Boundary -->
+          <rect x="255" y="30" width="105" height="100" fill="#0d1f2d" stroke="#38bdf8" stroke-width="1.5" rx="4"/>
+          <text x="270" y="50" fill="#38bdf8" font-size="9" font-weight="bold">SCADA LEVEL</text>
+          <text x="265" y="70" fill="#94a3b8" font-size="7">Geographic Scale</text>
+          <text x="265" y="85" fill="#94a3b8" font-size="7">(0.5 - 5 sec)</text>
+          <text x="265" y="110" fill="#22c55e" font-size="7">Regional Grid</text>
+        </svg>
+        <p style="font-size:12px; color:#94a3b8;">Spatial and Timing Domains of PLC, DCS, and SCADA Platforms</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SECTION 3: COMPARISON TABLE -->
+<div class="sensor-card">
+  <h2>Comparative Analysis: Industrial Control Architectures</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>Attribute</th>
+        <th>Programmable Logic Controller (PLC)</th>
+        <th>Distributed Control System (DCS)</th>
+        <th>SCADA System</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>Primary Focus</strong></td>
+        <td>Discrete logic and high-speed motion control.</td>
+        <td>Continuous process loop control (PID batch control).</td>
+        <td>Supervisory monitoring and remote telemetry acquisition.</td>
+      </tr>
+      <tr>
+        <td><strong>Geographic Extent</strong></td>
+        <td>Localized (Single panel or production line).</td>
+        <td>Plant-wide (Single physical facility campus).</td>
+        <td>Wide-Area Network (Hundreds of kilometers).</td>
+      </tr>
+      <tr>
+        <td><strong>Response Latency</strong></td>
+        <td>Deterministic ($1\text{ to } 10\text{ ms}$).</td>
+        <td>Deterministic ($10\text{ to } 100\text{ ms}$).</td>
+        <td>Non-deterministic ($500\text{ ms to } 5\text{ s}$).</td>
+      </tr>
+      <tr>
+        <td><strong>Communication Medium</strong></td>
+        <td>Backplane bus, Fieldbus (PROFINET, EtherCAT).</td>
+        <td>High-speed redundant control networks.</td>
+        <td>WAN, Cellular 4G/5G, Satellite, Serial Modbus/DNP3.</td>
+      </tr>
+      <tr>
+        <td><strong>Control Philosophy</strong></td>
+        <td>Direct automatic loop execution.</td>
+        <td>Distributed autonomous controller nodes.</td>
+        <td>Centralized monitoring with remote manual/supervisory intervention.</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- SECTION 4: NUMERICAL PROBLEMS -->
+<div class="sensor-card">
+  <h2>Numerical Problems: Telemetry Polling Cycles & Bandwidth Computation</h2>
+
+  <!-- Problem 1: SCADA Polling Loop Bandwidth Calculation -->
+  <div class="numerical-card">
+    <h3>Problem 1: Master Terminal Unit Polling Cycle Duration</h3>
+    <p><strong>Scenario:</strong> A regional water distribution SCADA master station polls $N = 48\text{ Remote Terminal Units (RTUs)}$ over a serial RS-485 telemetry network operating at a baud rate of $9600\text{ bits/second}$. Each RTU polling sequence consists of:</p>
+    <ul>
+      <li>Master Request Packet: $12\text{ bytes}$</li>
+      <li>RTU Data Response Packet: $64\text{ bytes}$</li>
+      <li>RTU Processing & Transceiver Turnaround Time: $T_{turn} = 15\text{ ms per node}$</li>
+    </ul>
+    <p>Assuming 1 start bit, 8 data bits, and 1 stop bit (10 bits per byte framing), calculate:</p>
+    <ol type="a">
+      <li>The time required to transmit one request-response frame $T_{frame}$ for a single RTU in milliseconds.</li>
+      <li>The total system polling sweep cycle time $T_{sweep}$ for all 48 RTUs.</li>
+      <li>The maximum update frequency $f_{update}$ for any single field sensor in Hertz ($\text{Hz}$).</li>
+    </ol>
+
+    <h4>Step-by-Step Solution:</h4>
+    <p><strong>1. Compute Single Frame Transmission Time ($T_{frame}$):</strong></p>
+    <div class="formula">
+      $$\text{Total Bytes per Cycle} = 12\text{ bytes (Request)} + 64\text{ bytes (Response)} = 76\text{ bytes}$$
+    </div>
+    <div class="formula">
+      $$\text{Total Bits per Cycle} = 76\text{ bytes} \times 10\text{ bits/byte} = 760\text{ bits}$$
+    </div>
+    <div class="formula">
+      $$T_{comm} = \frac{760\text{ bits}}{9600\text{ bps}} = 0.079167\text{ seconds} = 79.17\text{ ms}$$
+    </div>
+    <div class="formula">
+      $$T_{frame} = T_{comm} + T_{turn} = 79.17\text{ ms} + 15.0\text{ ms} = 94.17\text{ ms per RTU}$$
+    </div>
+
+    <p><strong>2. Compute Total Master Sweep Time ($T_{sweep}$):</strong></p>
+    <div class="formula">
+      $$T_{sweep} = N \times T_{frame} = 48 \times 94.17\text{ ms} = 4520.16\text{ ms} \approx 4.52\text{ seconds}$$
+    </div>
+
+    <p><strong>3. Compute Maximum Update Frequency ($f_{update}$):</strong></p>
+    <div class="formula">
+      $$f_{update} = \frac{1}{T_{sweep}} = \frac{1}{4.52016\text{ s}} \approx 0.221\text{ Hz}$$
+    </div>
+  </div>
+
+  <!-- Problem 2: Exception-Based Telemetry Bandwidth Reduction -->
+  <div class="numerical-card">
+    <h3>Problem 2: Report-by-Exception (RBE) Bandwidth Efficiency</h3>
+    <p><strong>Scenario:</strong> To improve update times, the SCADA system is upgraded to a <em>Report-by-Exception (RBE)</em> protocol (such as DNP3 or MQTT). Under normal operating conditions, only $10\%$ of the RTUs report changed data during any 1-second interval. The RBE event packet size is $32\text{ bytes}$.</p>
+    <p>Calculate:</p>
+    <ol type="a">
+      <li>The average required network data rate in bits per second ($\text{bps}$) under RBE operation.</li>
+      <li>The percentage reduction in bandwidth utilization compared to the continuous polling scheme from Problem 1.</li>
+    </ol>
+
+    <h4>Step-by-Step Solution:</h4>
+    <p><strong>1. Calculate Average Data Rate under RBE:</strong></p>
+    <div class="formula">
+      $$\text{Reporting RTUs per second} = 48 \times 0.10 = 4.8\text{ nodes/second}$$
+    </div>
+    <div class="formula">
+      $$\text{Data Transfer Rate} = 4.8\text{ nodes/s} \times 32\text{ bytes/node} \times 10\text{ bits/byte} = 1536\text{ bps}$$
+    </div>
+
+    <p><strong>2. Compute Bandwidth Reduction Percentage:</strong></p>
+    <div class="formula">
+      $$\text{Continuous Polling Data Rate} = \frac{48 \times 760\text{ bits}}{4.52\text{ s}} \approx 8070.8\text{ bps}$$
+    </div>
+    <div class="formula">
+      $$\text{Bandwidth Reduction} = \left(1 - \frac{1536\text{ bps}}{8070.8\text{ bps}}\right) \times 100\% = (1 - 0.1903) \times 100\% \approx 80.97\%$$
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Chapter 9: Proximity Sensors & Motor Interfacing</title>
+<!-- ADD THIS SCRIPT TO RENDER LATEX MATH PROPERLY -->
+<!-- MATHJAX SETUP (NO POLYFILL NEEDED) -->
+<script>
+  window.MathJax = {
+    tex: {
+      inlineMath: [['$', '$'], ['\\(', '\\)']]
+    }
+  };
+</script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+<style>
+  :root {
+    --bg-dark: #071017;
+    --panel-bg: #0d1f2d;
+    --border-color: #1e3a50;
+    --accent-blue: #38bdf8;
+    --accent-green: #22c55e;
+    --accent-amber: #f59e0b;
+    --text-main: #e2e8f0;
+    --text-muted: #94a3b8;
+  }
+
+  body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: var(--bg-dark);
+    color: var(--text-main);
+    line-height: 1.6;
+    padding: 24px;
+    margin: 0;
+  }
+
+  h1, h2, h3 {
+    color: var(--accent-blue);
+  }
+
+  h1 {
+    border-bottom: 2px solid var(--border-color);
+    padding-bottom: 10px;
+    margin-bottom: 20px;
+  }
+
+  .sensor-card {
+    background-color: var(--panel-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 10px;
+    padding: 24px;
+    margin-bottom: 30px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+  }
+
+  .grid-2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+  }
+
+  @media (max-width: 900px) {
+    .grid-2 { grid-template-columns: 1fr; }
+  }
+
+  .anim-box {
+    background: #040a0f;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 16px;
+    text-align: center;
+  }
+
+  .image-attribution {
+    font-size: 11px;
+    color: var(--text-muted);
+    margin-top: 6px;
+  }
+
+  .image-attribution a {
+    color: var(--accent-blue);
+    text-decoration: none;
+  }
+
+  .img-fluid {
+    max-width: 100%;
+    height: 180px;
+    object-fit: contain;
+    border-radius: 6px;
+    background: #000;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 15px;
+  }
+
+  th, td {
+    border: 1px solid var(--border-color);
+    padding: 10px;
+    text-align: left;
+  }
+
+  th {
+    background-color: #132b3e;
+    color: var(--accent-blue);
+  }
+
+  .numerical-card {
+    background: #0a1824;
+    border-left: 4px solid var(--accent-amber);
+    padding: 18px;
+    margin-bottom: 20px;
+    border-radius: 0 8px 8px 0;
+  }
+
+  .formula {
+    font-family: 'Courier New', Courier, monospace;
+    background: #040a0f;
+    padding: 4px 8px;
+    border-radius: 4px;
+    color: #4ade80;
+  }
+</style>
+</head>
+<body>
+
+<h1>Chapter 9: Proximity Sensors & Motor Interfacing</h1>
+<p>This chapter covers the operating mechanics, electrical block architecture, hardware visual representations, practical industrial applications, and numerical calculations for <strong>Inductive</strong>, <strong>Capacitive</strong>, and <strong>Photoelectric</strong> proximity sensors interfaced with various electric motor drives.</p>
+
+<!-- SECTION 1: INDUCTIVE SENSOR -->
+<div class="sensor-card">
+  <h2>1. Inductive Proximity Sensor</h2>
+  <div class="grid-2">
+    <div>
+      <h3>Industrial Hardware Image</h3>
+      <img src="https://encrypted-tbn0.gstatic.com/licensed-image?q=tbn:ANd9GcSFrsKB5QGZJz91C4v30kykhZhlrXeuCaz4a-hz_aqaaLHSwLGLrvZCH3Rp1D-MEcbSi3gYBz9e7aVZnvA" class="img-fluid" alt="Inductive Proximity Sensor">
+      <div class="image-attribution">
+        Source / Royalty-Free License: <a href="https://www.gettyimages.com/detail/photo/inductive-proximity-sensor-or-proximity-switch-royalty-free-image/664564128" target="_blank">Getty Images (Stock Photo 664564128)</a>
+      </div>
+      <br>
+      <h4>Working Principle</h4>
+      <p>Inductive proximity sensors detect <strong>ferrous and non-ferrous metallic targets</strong> using electromagnetic field induction. The internal oscillator creates a high-frequency alternating magnetic field at the sensing face. When a metallic object enters this field, <strong>eddy currents</strong> are induced inside the metal, causing energy loss and reducing oscillator amplitude. The trigger circuit detects this dampening and toggles the output stage.</p>
+    </div>
+
+    <div>
+      <h3>Interactive Circuit & Principle Animation</h3>
+      <div class="anim-box">
+        <svg viewBox="0 0 400 200" width="100%" height="180">
+          <!-- Sensor Housing -->
+          <rect x="20" y="60" width="140" height="80" fill="#1e293b" stroke="#38bdf8" stroke-width="2" rx="5"/>
+          <text x="30" y="80" fill="#94a3b8" font-size="10">LC Coil</text>
+          <text x="30" y="105" fill="#94a3b8" font-size="10">Oscillator</text>
+          <text x="30" y="130" fill="#94a3b8" font-size="10">Schmitt Trigger</text>
+
+          <!-- Magnetic Fields -->
+          <path d="M 160 80 Q 200 60 160 120" fill="none" stroke="#eab308" stroke-width="2" stroke-dasharray="4">
+            <animate attributeName="stroke-dashoffset" from="10" to="0" dur="1s" repeatCount="indefinite" />
+          </path>
+          <path d="M 160 70 Q 220 50 160 130" fill="none" stroke="#eab308" stroke-width="2" stroke-dasharray="4">
+            <animate attributeName="stroke-dashoffset" from="10" to="0" dur="1s" repeatCount="indefinite" />
+          </path>
+
+          <!-- Metallic Target (Animated) -->
+          <rect x="270" y="65" width="40" height="70" fill="#94a3b8" stroke="#f87171" stroke-width="2" rx="3">
+            <animate attributeName="x" values="320; 200; 320" dur="4s" repeatCount="indefinite" />
+          </rect>
+          <text x="275" y="105" fill="#0f172a" font-size="10" font-weight="bold">METAL</text>
+
+          <!-- Output Switch -->
+          <circle id="ind-led" cx="370" cy="100" r="10" fill="#ef4444"/>
+          <text x="355" y="125" fill="#e2e8f0" font-size="9">OUTPUT</text>
+        </svg>
+        <p style="font-size:12px; color:#94a3b8;">High-Frequency Field Dampening by Induced Eddy Currents</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SECTION 2: CAPACITIVE SENSOR -->
+<div class="sensor-card">
+  <h2>2. Capacitive Proximity Sensor</h2>
+  <div class="grid-2">
+    <div>
+      <h3>Industrial Hardware Image</h3>
+      <img src="images/capacitive_proximity_sensor.jpg" class="img-fluid" alt="capacitive_proximity_sensor Circuit Diagram">
+      </div>
+      <br>
+      <h4>Working Principle</h4>
+      <p>Capacitive proximity sensors detect both <strong>metallic and non-metallic targets</strong> (liquids, plastics, wood, grain). The sensing face incorporates two concentric metallic electrodes forming an open capacitor ($C$). As a target approaches, its dielectric constant ($\epsilon_r$) alters the capacitance between the plates. This shifts the internal RC oscillator circuit into oscillation, which is converted into an output signal.</p>
+    </div>
+
+    <div>
+      <h3>Interactive Circuit & Principle Animation</h3>
+      <div class="anim-box">
+        <svg viewBox="0 0 400 200" width="100%" height="180">
+          <!-- Sensor Probe -->
+          <rect x="20" y="60" width="130" height="80" fill="#1e293b" stroke="#38bdf8" stroke-width="2" rx="5"/>
+          <!-- Electrodes -->
+          <line x1="150" y1="70" x2="150" y2="130" stroke="#38bdf8" stroke-width="6"/>
+          <line x1="140" y1="75" x2="140" y2="125" stroke="#f43f5e" stroke-width="4"/>
+
+          <!-- Dielectric Target (Animated) -->
+          <rect x="260" y="60" width="40" height="80" fill="#3b82f6" opacity="0.8" rx="3">
+            <animate attributeName="x" values="320; 170; 320" dur="4s" repeatCount="indefinite" />
+          </rect>
+          <text x="265" y="105" fill="#ffffff" font-size="9" font-weight="bold">LIQUID/FLUID</text>
+
+          <!-- Electric Field lines -->
+          <path d="M 150 85 C 180 85, 180 115, 150 115" fill="none" stroke="#38bdf8" stroke-dasharray="3">
+            <animate attributeName="stroke-dashoffset" from="6" to="0" dur="0.8s" repeatCount="indefinite" />
+          </path>
+
+          <!-- Output LED -->
+          <circle cx="370" cy="100" r="10" fill="#22c55e"/>
+          <text x="355" y="125" fill="#e2e8f0" font-size="9">ACTIVE</text>
+        </svg>
+        <p style="font-size:12px; color:#94a3b8;">Capacitance Change Driven by Dielectric Constant ($\epsilon_r$)</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SECTION 3: PHOTOELECTRIC SENSOR -->
+<div class="sensor-card">
+  <h2>3. Photoelectric Proximity Sensor</h2>
+  <div class="grid-2">
+    <div>
+      <h3>Industrial Hardware Image</h3>
+      <img src="https://encrypted-tbn3.gstatic.com/licensed-image?q=tbn:ANd9GcQqGO_7yQSDeSHYiM-3BmqrNPkagTtenGju1AgU3i1NIDN5ZUyrBrhNmIlKwoouy1mpXV4iJOmbp2qArvk" class="img-fluid" alt="Photoelectric Proximity Sensor">
+      <div class="image-attribution">
+        Source / Royalty-Free License: <a href="https://www.gettyimages.com/detail/photo/sensor-on-metal-plate-royalty-free-image/153162056" target="_blank">Getty Images (Stock Photo 153162056)</a>
+      </div>
+      <br>
+      <h4>Working Principle</h4>
+      <p>Photoelectric sensors use an optical beam (Infrared or Laser) generated by an LED transmitter and received by a phototransistor. Operating modes include:</p>
+      <ul>
+        <li><strong>Through-Beam:</strong> Emitter and receiver face each other. Target breaks beam.</li>
+        <li><strong>Retro-Reflective:</strong> Emitter/receiver in one housing; beam reflects off reflector target.</li>
+        <li><strong>Diffuse-Reflective:</strong> Light reflects directly off the object surface.</li>
+      </ul>
+    </div>
+
+    <div>
+      <h3>Interactive Circuit & Principle Animation</h3>
+      <div class="anim-box">
+        <svg viewBox="0 0 400 200" width="100%" height="180">
+          <!-- Emitter -->
+          <rect x="20" y="50" width="80" height="40" fill="#1e293b" stroke="#38bdf8" stroke-width="2"/>
+          <text x="35" y="75" fill="#38bdf8" font-size="10">Emitter</text>
+          <!-- Receiver -->
+          <rect x="20" y="110" width="80" height="40" fill="#1e293b" stroke="#38bdf8" stroke-width="2"/>
+          <text x="30" y="135" fill="#38bdf8" font-size="10">Receiver</text>
+
+          <!-- Light Beam (Diffuse) -->
+          <polygon points="100,70 240,40 240,160 100,130" fill="#ef4444" opacity="0.3"/>
+          <line x1="100" y1="70" x2="240" y2="100" stroke="#ef4444" stroke-width="2" stroke-dasharray="5">
+            <animate attributeName="stroke-dashoffset" from="10" to="0" dur="0.5s" repeatCount="indefinite"/>
+          </line>
+
+          <!-- Passing Box -->
+          <rect x="220" y="60" width="30" height="80" fill="#f59e0b" stroke="#fff">
+            <animate attributeName="y" values="-80; 60; 200" dur="3.5s" repeatCount="indefinite"/>
+          </rect>
+        </svg>
+        <p style="font-size:12px; color:#94a3b8;">Diffuse Optical Beam Reflection Principle</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SECTION 4: COMPARISON MATRIX -->
+<div class="sensor-card">
+  <h2>Practical Applications, Advantages & Disadvantages</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>Sensor Type</th>
+        <th>Target Compatibility</th>
+        <th>Practical Applications</th>
+        <th>Key Advantages</th>
+        <th>Disadvantages</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>Inductive</strong></td>
+        <td>Ferrous / Non-ferrous Metals only</td>
+        <td>CNC machine home positioning, gear speed counting, metal can line detection.</td>
+        <td>Immune to dirt, water, and oil. High switching rate, highly durable.</td>
+        <td>Zero detection range for non-metals. Short sensing distance (1–20mm).</td>
+      </tr>
+      <tr>
+        <td><strong>Capacitive</strong></td>
+        <td>Metals, Plastics, Liquids, Glass, Wood</td>
+        <td>Tank liquid level detection through non-metallic walls, box fill verification.</td>
+        <td>Detects target material through non-metallic package walls. Adjustable gain.</td>
+        <td>Sensitive to humidity, moisture buildup, and dust. Requires periodic calibration.</td>
+      </tr>
+      <tr>
+        <td><strong>Photoelectric</strong></td>
+        <td>Any opaque/reflective object</td>
+        <td>Long-range conveyor package counting, safety light curtains, sorting lines.</td>
+        <td>Extremely long range (up to 50+ meters). High response rate. Small target detection.</td>
+        <td>Lens lens contamination degrades performance. Highly susceptible to ambient light noise.</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- SECTION 5: NUMERICAL PROBLEMS WITH MOTOR INTERFACING -->
+<div class="sensor-card">
+  <h2>Numerical Problems: Sensor Interfacing & Motor Control</h2>
+
+  <!-- Problem 1: DC Motor -->
+  <div class="numerical-card">
+    <h3>Problem 1: Inductive Sensor Interfaced with PMDC Conveyor Motor</h3>
+    <p><strong>Scenario:</strong> An inductive proximity sensor detects teeth on a steel gear mounted on a conveyor shaft driven by a PMDC Motor. The gear has $N = 30$ teeth. The sensor output feeds a digital tachometer counter. If the time interval between consecutive sensor pulses is $t = 2.5\text{ ms}$, calculate:</p>
+    <ol type="a">
+      <li>The motor shaft speed in RPM ($N_m$).</li>
+      <li>The line speed ($v$) of the conveyor belt if the motor drives a drum pulley of diameter $D = 0.2\text{ m}$.</li>
+    </ol>
+
+    <h4>Step-by-Step Solution:</h4>
+    <p><strong>1. Pulse Frequency ($f$):</strong></p>
+    <p class="formula">f = 1 / t = 1 / (2.5 × 10⁻³ s) = 400 Hz</p>
+
+    <p><strong>2. Motor Revolutions Per Second ($n$):</strong> Since 1 revolution yields 30 pulses from 30 teeth:</p>
+    <p class="formula">n = f / N = 400 / 30 = 13.333 rev/s</p>
+
+    <p><strong>3. Shaft Speed in RPM ($N_m$):</strong></p>
+    <p class="formula">N_m = n × 60 = 13.333 × 60 = 800 RPM</p>
+
+    <p><strong>4. Conveyor Line Speed ($v$):</strong></p>
+    <p class="formula">v = π × D × (N_m / 60) = π × 0.2 × 13.333 = 8.377 m/s</p>
+  </div>
+
+  <!-- Problem 2: BLDC Motor -->
+  <div class="numerical-card">
+    <h3>Problem 2: Photoelectric Sensor & BLDC Motor Automated Gate</h3>
+    <p><strong>Scenario:</strong> A BLDC motor drives an automated barrier gate operating at $N_m = 3000\text{ RPM}$ through a $GR = 50:1$ reduction gearbox. A retro-reflective photoelectric sensor acts as a safety stop edge. The gate arm length is $L = 3\text{ m}$. The sensor detects an obstacle and sends an emergency stop signal. The BLDC driver takes $t_r = 15\text{ ms}$ electronic response time and then decelerates at $\alpha = 120\text{ rad/s}^2$. Calculate the total linear arc distance traveled by the tip of the gate arm before stopping.</p>
+
+    <h4>Step-by-Step Solution:</h4>
+    <p><strong>1. Gearbox Output Speed ($\omega_{out}$):</strong></p>
+    <p class="formula">N_out = N_m / GR = 3000 / 50 = 60 RPM</p>
+    <p class="formula">ω_out = (2 × π × 60) / 60 = 6.283 rad/s</p>
+
+    <p><strong>2. Angular Displacement during Response Time ($\theta_1$):</strong></p>
+    <p class="formula">θ_1 = ω_out × t_r = 6.283 rad/s × 0.015 s = 0.0942 rad</p>
+
+    <p><strong>3. Angular Displacement during Deceleration ($\theta_2$):</strong> Using $\omega_f^2 = \omega_i^2 - 2\alpha\theta_2$ where output deceleration $\alpha_{out} = \alpha / GR = 120 / 50 = 2.4\text{ rad/s}^2$:</p>
+    <p class="formula">0 = (6.283)² - 2 × 2.4 × θ_2  ==>  θ_2 = 39.476 / 4.8 = 8.224 rad</p>
+
+    <p><strong>4. Total Arc Distance at Gate Tip ($S_{total}$):</strong></p>
+    <p class="formula">θ_total = θ_1 + θ_2 = 0.0942 + 8.224 = 8.318 rad</p>
+    <p class="formula">S_total = L × θ_total = 3 m × 8.318 rad = 24.954 meters</p>
+  </div>
+
+  <!-- Problem 3: Induction Motor -->
+  <div class="numerical-card">
+    <h3>Problem 3: Capacitive Sensor Interfaced with 3-Phase Induction Motor Bottling Plant</h3>
+    <p><strong>Scenario:</strong> A 4-pole, $50\text{ Hz}$ Three-Phase AC Induction Motor drives a fluid packaging conveyor running at a slip $s = 4\%$. A capacitive proximity sensor monitors fluid volume inside plastic bottles. The sensor requires a minimum dwell time of $t_d = 20\text{ ms}$ over the $w = 5\text{ cm}$ target area of the bottle cap to make a valid dielectric measurement. Calculate:</p>
+    <ol type="a">
+      <li>The actual motor shaft speed ($N_r$).</li>
+      <li>The maximum allowable drive roller diameter ($D_{max}$) so that the conveyor speed does not cause sense errors.</li>
+    </ol>
+
+    <h4>Step-by-Step Solution:</h4>
+    <p><strong>1. Synchronous Speed ($N_s$) & Rotor Speed ($N_r$):</strong></p>
+    <p class="formula">N_s = (120 × f) / P = (120 × 50) / 4 = 1500 RPM</p>
+    <p class="formula">N_r = N_s × (1 - s) = 1500 × (1 - 0.04) = 1440 RPM</p>
+
+    <p><strong>2. Maximum Conveyor Linear Velocity ($v_{max}$):</strong></p>
+    <p class="formula">v_max = Target Width / Dwell Time = (0.05 m) / (0.020 s) = 2.5 m/s</p>
+
+    <p><strong>3. Maximum Roller Diameter ($D_{max}$):</strong></p>
+    <p class="formula">v = π × D × (N_r / 60)  ==>  2.5 = π × D_max × (1440 / 60)</p>
+    <p class="formula">D_max = 2.5 / (24 × π) = 0.0331 m = 33.16 mm</p>
+  </div>
+
+  <!-- Problem 4: Stepper Motor -->
+  <div class="numerical-card">
+    <h3>Problem 4: Inductive Home Indexing on a Stepper Motor Axis</h3>
+    <p><strong>Scenario:</strong> A 1.8° hybrid stepper motor drives a precision lead screw with pitch $p = 5\text{ mm/rev}$. An inductive sensor serves as the zero-position (HOME) limit switch. The motor operates in quarter-stepping mode ($1/4$ microstepping). If the controller searches for the home position at a velocity of $v = 15\text{ mm/s}$, determine:</p>
+    <ol type="a">
+      <li>The step frequency (pulse rate in Hz) sent to the stepper driver.</li>
+      <li>The positional resolution achieved per quarter-step pulse.</li>
+    </ol>
+
+    <h4>Step-by-Step Solution:</h4>
+    <p><strong>1. Full Steps Per Revolution:</strong></p>
+    <p class="formula">Steps/rev = 360° / 1.8° = 200 full steps</p>
+
+    <p><strong>2. Microsteps Per Revolution ($N_{micro}$):</strong></p>
+    <p class="formula">N_micro = 200 × 4 = 800 microsteps/rev</p>
+
+    <p><strong>3. Rotational Velocity ($n_{rev}$):</strong></p>
+    <p class="formula">n_rev = Velocity / Pitch = (15 mm/s) / (5 mm/rev) = 3 rev/s</p>
+
+    <p><strong>4. Pulse Frequency ($f_{pulse}$):</strong></p>
+    <p class="formula">f_pulse = n_rev × N_micro = 3 × 800 = 2400 Hz (2.4 kHz)</p>
+
+    <p><strong>5. Position Resolution ($Res$):</strong></p>
+    <p class="formula">Res = Pitch / N_micro = (5 mm) / 800 = 0.00625 mm = 6.25 µm</p>
+  </div>
+
+  <!-- Problem 5: Servo Motor -->
+  <div class="numerical-card">
+    <h3>Problem 5: Photoelectric Safety Sensor Interfaced with AC Servo Pick-and-Place</h3>
+    <p><strong>Scenario:</strong> An AC Servo Motor moves a high-speed pick-and-place robot arm carrying a payload. A through-beam photoelectric sensor curtain forms a safety boundary. The servo is traveling at full speed $V_0 = 2.0\text{ m/s}$. When an operator interrupts the beam, the sensor responds in $t_s = 2\text{ ms}$. The servo drive receives the signal, processes it in $t_d = 1\text{ ms}$, and applies maximum deceleration dynamic braking torque ($a = 25\text{ m/s}^2$). Compute the minimum safe mounting distance ($S_{safety}$) for the optical curtain away from the hazard zone.</p>
+
+    <h4>Step-by-Step Solution:</h4>
+    <p><strong>1. Total Reaction Lag Time ($T_{reaction}$):</strong></p>
+    <p class="formula">T_reaction = t_s + t_d = 0.002 s + 0.001 s = 0.003 s (3 ms)</p>
+
+    <p><strong>2. Distance Traveled During Reaction Time ($S_1$):</strong></p>
+    <p class="formula">S_1 = V_0 × T_reaction = 2.0 m/s × 0.003 s = 0.006 m (6 mm)</p>
+
+    <p><strong>3. Distance Traveled During Dynamic Braking Deceleration ($S_2$):</strong></p>
+    <p class="formula">V_f² = V_0² - 2 × a × S_2  ==>  0 = (2.0)² - 2(25) × S_2</p>
+    <p class="formula">S_2 = 4.0 / 50 = 0.08 m (80 mm)</p>
+
+    <p><strong>4. Minimum Safety Separation Distance ($S_{safety}$):</strong></p>
+    <p class="formula">S_safety = S_1 + S_2 = 0.006 m + 0.08 m = 0.086 m = 86 mm</p>
+  </div>
+</div>
+
+</body>
+</html>

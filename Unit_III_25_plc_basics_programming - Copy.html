@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Chapter 26: Basics of PLC Programming – Logic Gates, Timers, Counters & Sequencers</title>
+
+<!-- MathJax Configuration and Script -->
+<script>
+  window.MathJax = {
+    tex: {
+      inlineMath: [['$', '$'], ['\\(', '\\)']],
+      displayMath: [['$$', '$$'], ['\\[', '\\]']]
+    }
+  };
+</script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+<style>
+  :root {
+    --bg-dark: #071017;
+    --panel-bg: #0d1f2d;
+    --border-color: #1e3a50;
+    --accent-blue: #38bdf8;
+    --accent-green: #22c55e;
+    --accent-amber: #f59e0b;
+    --accent-red: #ef4444;
+    --text-main: #e2e8f0;
+    --text-muted: #94a3b8;
+  }
+
+  body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: var(--bg-dark);
+    color: var(--text-main);
+    line-height: 1.6;
+    padding: 24px;
+    margin: 0;
+  }
+
+  h1, h2, h3, h4 {
+    color: var(--accent-blue);
+  }
+
+  h1 {
+    border-bottom: 2px solid var(--border-color);
+    padding-bottom: 10px;
+    margin-bottom: 20px;
+  }
+
+  .sensor-card {
+    background-color: var(--panel-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 10px;
+    padding: 24px;
+    margin-bottom: 30px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+  }
+
+  .grid-2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+  }
+
+  @media (max-width: 900px) {
+    .grid-2 { grid-template-columns: 1fr; }
+  }
+
+  .anim-box {
+    background: #040a0f;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 16px;
+    text-align: center;
+  }
+
+  .img-fluid {
+    max-width: 100%;
+    height: 180px;
+    object-fit: contain;
+    border-radius: 6px;
+    background: #040a0f;
+    padding: 10px;
+    border: 1px solid var(--border-color);
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 15px;
+  }
+
+  th, td {
+    border: 1px solid var(--border-color);
+    padding: 10px;
+    text-align: left;
+  }
+
+  th {
+    background-color: #132b3e;
+    color: var(--accent-blue);
+  }
+
+  .numerical-card {
+    background: #0a1824;
+    border-left: 4px solid var(--accent-amber);
+    padding: 18px;
+    margin-bottom: 20px;
+    border-radius: 0 8px 8px 0;
+  }
+
+  .formula {
+    background: #040a0f;
+    padding: 8px 12px;
+    border-radius: 6px;
+    color: #4ade80;
+    overflow-x: auto;
+    margin: 8px 0;
+  }
+</style>
+</head>
+<body>
+
+<h1>Chapter 26: Core PLC Instructions – Logic Gates, Timers, Counters & Sequencers</h1>
+<p>This chapter examines fundamental PLC programming building blocks, including digital logic gate implementations in Ladder Diagrams, On/Off-Delay Timers, Up/Down Counters, and Sequencer Output (SQO) instructions for state-machine process control.</p>
+
+<!-- SECTION 1: LOGIC GATES IN LADDER LOGIC -->
+<div class="sensor-card">
+  <h2>1. Fundamental Digital Logic Gates in Ladder Diagrams</h2>
+  <div class="grid-2">
+    <div>
+      <h3>Hardware Hardware Image Reference</h3>
+      <img src="images/plc_programming.jpg" class="img-fluid" alt="Industrial PLC Ladder Logic Programming Console Interface">
+      <br>
+      <h4>Combinational Boolean Logic</h4>
+      <p>Digital logic circuits are constructed in PLC Ladder Logic using combinations of Normally Open (NO) and Normally Closed (NC) contacts:</p>
+      <ul>
+        <li><strong>AND Gate:</strong> Inputs connected in <em>series</em>. Output $Y = A \cdot B$.</li>
+        <li><strong>OR Gate:</strong> Inputs connected in <em>parallel</em>. Output $Y = A + B$.</li>
+        <li><strong>NAND Gate:</strong> Parallel Normally Closed contacts. Output $Y = \overline{A \cdot B} = \bar{A} + \bar{B}$.</li>
+        <li><strong>NOR Gate:</strong> Series Normally Closed contacts. Output $Y = \overline{A + B} = \bar{A} \cdot \bar{B}$.</li>
+        <li><strong>XOR Gate:</strong> Combination of NO and NC contacts in parallel branches. Output $Y = A\bar{B} + \bar{A}B$.</li>
+      </ul>
+    </div>
+
+    <div>
+      <h3>Interactive Logic Gate Rung Visualizer</h3>
+      <div class="anim-box">
+        <svg viewBox="0 0 400 200" width="100%" height="180">
+          <!-- Power Rails -->
+          <line x1="30" y1="20" x2="30" y2="180" stroke="#ef4444" stroke-width="4"/>
+          <text x="10" y="15" fill="#ef4444" font-size="9" font-weight="bold">24V</text>
+
+          <line x1="370" y1="20" x2="370" y2="180" stroke="#38bdf8" stroke-width="4"/>
+          <text x="360" y="15" fill="#38bdf8" font-size="9" font-weight="bold">0V</text>
+
+          <!-- XOR Rung Structure -->
+          <!-- Branch 1: A AND NOT B -->
+          <path d="M 30 60 L 90 60" stroke="#22c55e" stroke-width="2"/>
+          <!-- NO Contact A -->
+          <line x1="90" y1="50" x2="90" y2="70" stroke="#22c55e" stroke-width="2"/>
+          <line x1="105" y1="50" x2="105" y2="70" stroke="#22c55e" stroke-width="2"/>
+          <text x="92" y="42" fill="#38bdf8" font-size="8">In_A</text>
+          
+          <line x1="105" y1="60" x2="170" y2="60" stroke="#22c55e" stroke-width="2"/>
+          <!-- NC Contact B -->
+          <line x1="170" y1="50" x2="170" y2="70" stroke="#22c55e" stroke-width="2"/>
+          <line x1="185" y1="50" x2="185" y2="70" stroke="#22c55e" stroke-width="2"/>
+          <line x1="165" y1="72" x2="190" y2="48" stroke="#ef4444" stroke-width="2"/>
+          <text x="172" y="42" fill="#f59e0b" font-size="8">In_B</text>
+
+          <!-- Branch 2: NOT A AND B (Parallel) -->
+          <path d="M 60 60 L 60 120 L 90 120" fill="none" stroke="#22c55e" stroke-width="2"/>
+          <!-- NC Contact A -->
+          <line x1="90" y1="110" x2="90" y2="130" stroke="#22c55e" stroke-width="2"/>
+          <line x1="105" y1="110" x2="105" y2="130" stroke="#22c55e" stroke-width="2"/>
+          <line x1="85" y1="132" x2="110" y2="108" stroke="#ef4444" stroke-width="2"/>
+
+          <line x1="105" y1="120" x2="170" y2="120" stroke="#22c55e" stroke-width="2"/>
+          <!-- NO Contact B -->
+          <line x1="170" y1="110" x2="170" y2="130" stroke="#22c55e" stroke-width="2"/>
+          <line x1="185" y1="110" x2="185" y2="130" stroke="#22c55e" stroke-width="2"/>
+
+          <path d="M 185 120 L 220 120 L 220 60" fill="none" stroke="#22c55e" stroke-width="2"/>
+          <line x1="185" y1="60" x2="310" y2="60" stroke="#22c55e" stroke-width="2"/>
+
+          <!-- Output Coil -->
+          <circle cx="320" cy="60" r="10" fill="#0d1f2d" stroke="#22c55e" stroke-width="2"/>
+          <line x1="330" y1="60" x2="370" y2="60" stroke="#22c55e" stroke-width="2"/>
+          <text x="312" y="63" fill="#22c55e" font-size="8" font-weight="bold">XOR</text>
+
+          <text x="120" y="165" fill="#38bdf8" font-size="9" font-weight="bold">XOR Gate: Y = (A · B') + (A' · B)</text>
+        </svg>
+        <p style="font-size:12px; color:#94a3b8;">XOR Logic Function Implemented using Dual Parallel Ladder Branches</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SECTION 2: TIMERS, COUNTERS & SEQUENCERS -->
+<div class="sensor-card">
+  <h2>2. Industrial Timers, Counters & Sequencer Functions</h2>
+  <div class="grid-2">
+    <div>
+      <h3>Timer & Counter Architecture</h3>
+      <p>PLC control software includes built-in timing and counting instructions:</p>
+      <ul>
+        <li><strong>On-Delay Timer (TON):</strong> Begins incrementing its Accumulated value ($ACC$) when the rung becomes TRUE. The Done bit ($DN$) sets TRUE when $ACC \ge Preset\ (PRE)$.</li>
+        <li><strong>Off-Delay Timer (TOF):</strong> Rung goes FALSE $\rightarrow$ Timer begins counting down the off-delay duration.</li>
+        <li><strong>Up Counter (CTU):</strong> Increments $ACC$ by 1 on every OFF-to-ON false-to-true rung transition.</li>
+        <li><strong>Sequencer Output (SQO):</strong> Steps through an array of memory words (masks) to output multi-step bit patterns to field actuators sequentially.</li>
+      </ul>
+      <div class="formula">
+        $$T_{delay} = PRE \times \text{Time Base}$$
+      </div>
+    </div>
+
+    <div>
+      <h3>Timer & Counter Block Diagram Animation</h3>
+      <div class="anim-box">
+        <svg viewBox="0 0 380 180" width="100%" height="160">
+          <!-- TON Function Block -->
+          <rect x="30" y="30" width="140" height="110" fill="#0d1f2d" stroke="#38bdf8" stroke-width="2" rx="6"/>
+          <text x="75" y="50" fill="#38bdf8" font-size="10" font-weight="bold">TON - TIMER</text>
+          <text x="40" y="70" fill="#94a3b8" font-size="8">Timer: T4:1</text>
+          <text x="40" y="85" fill="#94a3b8" font-size="8">Time Base: 0.01 s</text>
+          <text x="40" y="100" fill="#f59e0b" font-size="8">Preset (PRE): 500</text>
+          <text x="40" y="115" fill="#22c55e" font-size="8">Accum (ACC): 250</text>
+
+          <!-- CTU Function Block -->
+          <rect x="210" y="30" width="140" height="110" fill="#0d1f2d" stroke="#22c55e" stroke-width="2" rx="6"/>
+          <text x="245" y="50" fill="#22c55e" font-size="10" font-weight="bold">CTU - COUNTER</text>
+          <text x="220" y="70" fill="#94a3b8" font-size="8">Counter: C5:0</text>
+          <text x="220" y="85" fill="#f59e0b" font-size="8">Preset (PRE): 100</text>
+          <text x="220" y="100" fill="#22c55e" font-size="8">Accum (ACC): 42</text>
+          <text x="220" y="115" fill="#38bdf8" font-size="8">DN Bit: 0 (FALSE)</text>
+
+          <!-- Signal Pulse Animation -->
+          <circle cx="15" cy="70" r="4" fill="#38bdf8">
+            <animate attributeName="cx" values="15;30;15" dur="2s" repeatCount="indefinite"/>
+          </circle>
+        </svg>
+        <p style="font-size:12px; color:#94a3b8;">Standard IEC Function Blocks for Timer (TON) and Up-Counter (CTU)</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SECTION 3: COMPARISON TABLE -->
+<div class="sensor-card">
+  <h2>Comparative Analysis: PLC Instruction Functional Characteristics</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>Instruction</th>
+        <th>Trigger Condition</th>
+        <th>Reset Action</th>
+        <th>Key Parameter Registers</th>
+        <th>Typical Industrial Applications</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>On-Delay Timer (TON)</strong></td>
+        <td>Continuous Rung TRUE state.</td>
+        <td>Rung goes FALSE ($ACC \rightarrow 0$).</td>
+        <td>Timer ID, Time Base, $PRE$, $ACC$, $EN$, $DN$.</td>
+        <td>Motor star-delta starting, purge cycles, delay-on alarm triggers.</td>
+      </tr>
+      <tr>
+        <td><strong>Retentive Timer (RTO)</strong></td>
+        <td>Continuous Rung TRUE state.</td>
+        <td>Requires explicit <strong>RES</strong> (Reset) instruction.</td>
+        <td>Timer ID, $PRE$, $ACC$, $DN$.</td>
+        <td>Tracking machine runtime, maintenance interval alerts.</td>
+      </tr>
+      <tr>
+        <td><strong>Up-Counter (CTU)</strong></td>
+        <td>OFF-to-ON False-to-True transition.</td>
+        <td>Requires explicit <strong>RES</strong> instruction.</td>
+        <td>Counter ID, $PRE$, $ACC$, $CU$, $DN$.</td>
+        <td>Product batch counting, conveyor indexing, rotary shaft pulse counting.</td>
+      </tr>
+      <tr>
+        <td><strong>Sequencer Output (SQO)</strong></td>
+        <td>Pulse edge trigger (Step change).</td>
+        <td>Resets position pointer back to Start Step.</td>
+        <td>Array File, Mask, Destination, Control, Length.</td>
+        <td>Traffic light phase control, automated washing machine cycles, batching plants.</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- SECTION 4: NUMERICAL PROBLEMS -->
+<div class="sensor-card">
+  <h2>Numerical Problems: Timer Parameter Calculations & Counter Batching</h2>
+
+  <!-- Problem 1: Cascaded Timer Delay Calculations -->
+  <div class="numerical-card">
+    <h3>Problem 1: Cascaded TON Timer Delay Calculation</h3>
+    <p><strong>Scenario:</strong> A conveyor system uses three cascaded On-Delay Timers ($T_1, T_2, T_3$) to sequentially start three conveyor drives. The parameters are:</p>
+    <ul>
+      <li>$T_1$: Time Base $= 0.1\text{ s}$, $PRE_1 = 150$</li>
+      <li>$T_2$: Time Base $= 0.01\text{ s}$, $PRE_2 = 2500$</li>
+      <li>$T_3$: Time Base $= 1.0\text{ s}$, $PRE_3 = 12$</li>
+    </ul>
+    <p>Calculate:</p>
+    <ol type="a">
+      <li>The time delay of each individual timer ($t_1, t_2, t_3$) in seconds.</li>
+      <li>The total sequence time delay $T_{total}$ from initial start command to motor 3 energization.</li>
+    </ol>
+
+    <h4>Step-by-Step Solution:</h4>
+    <p><strong>1. Compute Individual Delays:</strong></p>
+    <div class="formula">
+      $$t_1 = PRE_1 \times \text{Time Base}_1 = 150 \times 0.1\text{ s} = 15.0\text{ seconds}$$
+    </div>
+    <div class="formula">
+      $$t_2 = PRE_2 \times \text{Time Base}_2 = 2500 \times 0.01\text{ s} = 25.0\text{ seconds}$$
+    </div>
+    <div class="formula">
+      $$t_3 = PRE_3 \times \text{Time Base}_3 = 12 \times 1.0\text{ s} = 12.0\text{ seconds}$$
+    </div>
+
+    <p><strong>2. Compute Total Cumulative Delay ($T_{total}$):</strong></p>
+    <div class="formula">
+      $$T_{total} = t_1 + t_2 + t_3 = 15.0\text{ s} + 25.0\text{ s} + 12.0\text{ s} = 52.0\text{ seconds}$$
+    </div>
+  </div>
+
+  <!-- Problem 2: Counter Preset for Bottling Line -->
+  <div class="numerical-card">
+    <h3>Problem 2: Conveyor Batch Packing Counter Calculations</h3>
+    <p><strong>Scenario:</strong> A high-speed bottling line uses a proximity sensor attached to a CTU Up-Counter instruction ($C5:0$) to pack bottles into cases of 24. A second CTU counter ($C5:1$) tracks total packed cases per shift. The conveyor belt speed is $1.2\text{ m/s}$ with a bottle spacing of $0.15\text{ m}$.</p>
+    <p>Calculate:</p>
+    <ol type="a">
+      <li>The pulse frequency $f_{sensor}$ from the proximity sensor in Hertz ($\text{Hz}$).</li>
+      <li>The time required $t_{case}$ to fill one case of 24 bottles.</li>
+      <li>The total count value in $C5:1$ after an 8-hour shift.</li>
+    </ol>
+
+    <h4>Step-by-Step Solution:</h4>
+    <p><strong>1. Calculate Proximity Sensor Pulse Frequency ($f_{sensor}$):</strong></p>
+    <div class="formula">
+      $$f_{sensor} = \frac{\text{Conveyor Speed}}{\text{Bottle Spacing}} = \frac{1.2\text{ m/s}}{0.15\text{ m}} = 8.0\text{ Hz}\quad (8\text{ bottles/second})$$
+    </div>
+
+    <p><strong>2. Calculate Time Per Case ($t_{case}$):</strong></p>
+    <div class="formula">
+      $$t_{case} = \frac{\text{Bottles per Case}}{f_{sensor}} = \frac{24\text{ bottles}}{8.0\text{ bottles/s}} = 3.0\text{ seconds}$$
+    </div>
+
+    <p><strong>3. Calculate Total Cases Packed in 8 Hours:</strong></p>
+    <div class="formula">
+      $$\text{Total Seconds} = 8\text{ hrs} \times 3600\text{ s/hr} = 28,800\text{ seconds}$$
+    </div>
+    <div class="formula">
+      $$\text{Cases Count (C5:1)} = \frac{28,800\text{ s}}{3.0\text{ s/case}} = 9,600\text{ cases}$$
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

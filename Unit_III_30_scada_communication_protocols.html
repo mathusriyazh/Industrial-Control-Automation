@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Chapter 30: Industrial Communication Protocols</title>
+
+<!-- MathJax Configuration and Script -->
+<script>
+  window.MathJax = {
+    tex: {
+      inlineMath: [['$', '$'], ['\\(', '\\)']],
+      displayMath: [['$$', '$$'], ['\\[', '\\]']]
+    }
+  };
+</script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+<style>
+  :root {
+    --bg-dark: #071017;
+    --panel-bg: #0d1f2d;
+    --border-color: #1e3a50;
+    --accent-blue: #38bdf8;
+    --accent-green: #22c55e;
+    --accent-amber: #f59e0b;
+    --accent-red: #ef4444;
+    --text-main: #e2e8f0;
+    --text-muted: #94a3b8;
+  }
+
+  body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: var(--bg-dark);
+    color: var(--text-main);
+    line-height: 1.6;
+    padding: 24px;
+    margin: 0;
+  }
+
+  h1, h2, h3, h4 {
+    color: var(--accent-blue);
+  }
+
+  h1 {
+    border-bottom: 2px solid var(--border-color);
+    padding-bottom: 10px;
+    margin-bottom: 20px;
+  }
+
+  .sensor-card {
+    background-color: var(--panel-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 10px;
+    padding: 24px;
+    margin-bottom: 30px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+  }
+
+  .grid-2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+  }
+
+  @media (max-width: 900px) {
+    .grid-2 { grid-template-columns: 1fr; }
+  }
+
+  .anim-box {
+    background: #040a0f;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 16px;
+    text-align: center;
+  }
+
+  .img-fluid {
+    max-width: 100%;
+    height: 180px;
+    object-fit: contain;
+    border-radius: 6px;
+    background: #040a0f;
+    padding: 10px;
+    border: 1px solid var(--border-color);
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 15px;
+  }
+
+  th, td {
+    border: 1px solid var(--border-color);
+    padding: 10px;
+    text-align: left;
+  }
+
+  th {
+    background-color: #132b3e;
+    color: var(--accent-blue);
+  }
+
+  .numerical-card {
+    background: #0a1824;
+    border-left: 4px solid var(--accent-amber);
+    padding: 18px;
+    margin-bottom: 20px;
+    border-radius: 0 8px 8px 0;
+  }
+
+  .formula {
+    background: #040a0f;
+    padding: 8px 12px;
+    border-radius: 6px;
+    color: #4ade80;
+    overflow-x: auto;
+    margin: 8px 0;
+  }
+</style>
+</head>
+<body>
+
+<h1>Chapter 30: Industrial Communication Protocols (Modbus, PROFIBUS & EtherNet/IP)</h1>
+<p>This chapter explores industrial field networks and communication protocols that form the backbone of SCADA and PLC data exchange. Topics include Modbus RTU/TCP register maps, PROFIBUS DP token-ring master-slave mechanics, Common Industrial Protocol (CIP) over EtherNet/IP, frame overheads, and network throughput calculations.</p>
+
+<!-- SECTION 1: PROTOCOL MECHANICS & FRAME STRUCTURES -->
+<div class="sensor-card">
+  <h2>1. Protocol Architectures & Telegram Frame Layouts</h2>
+  <div class="grid-2">
+    <div>
+      <h3>Hardware Network Reference</h3>
+      <img src="images/industrial_fieldbus_gateway.jpg" class="img-fluid" alt="Industrial Communication Gateway, Serial RS485 and Ethernet Switches">
+      <br>
+      <h4>Industrial Networking Paradigms</h4>
+      <p>Field networks translate real-world process variables into digital packet streams across three distinct protocol generations:</p>
+      <ul>
+        <li><strong>Modbus (RTU / TCP):</strong> Open master-slave protocol using 16-bit registers. Simple, ubiquitous, but lacks native timestamping or object modeling.</li>
+        <li><strong>PROFIBUS (DP / PA):</strong> Token-ring multi-master, master-slave protocol operating over RS-485 (DP) or Manchester Bus Powered (PA) physical layers up to $12\text{ Mbps}$.</li>
+        <li><strong>EtherNet/IP:</strong> Modern industrial Ethernet protocol utilizing CIP (Common Industrial Protocol) over standard TCP/IP and UDP transport layers for producer/consumer data exchange.</li>
+      </ul>
+    </div>
+
+    <div>
+      <h3>Interactive Modbus RTU Frame Structure</h3>
+      <div class="anim-box">
+        <svg viewBox="0 0 400 200" width="100%" height="180">
+          <!-- Frame Border Container -->
+          <rect x="10" y="30" width="380" height="80" fill="#0d1f2d" stroke="#38bdf8" stroke-width="2" rx="6"/>
+          <text x="130" y="20" fill="#38bdf8" font-size="10" font-weight="bold">MODBUS RTU TELEGRAM FRAME</text>
+
+          <!-- Field Blocks -->
+          <!-- Slave Address -->
+          <rect x="20" y="45" width="50" height="50" fill="#040a0f" stroke="#ef4444" stroke-width="1.5" rx="3"/>
+          <text x="28" y="68" fill="#ef4444" font-size="8" font-weight="bold">Slave ID</text>
+          <text x="32" y="83" fill="#94a3b8" font-size="7">1 Byte</text>
+
+          <!-- Function Code -->
+          <rect x="75" y="45" width="60" height="50" fill="#040a0f" stroke="#f59e0b" stroke-width="1.5" rx="3"/>
+          <text x="81" y="68" fill="#f59e0b" font-size="8" font-weight="bold">Func Code</text>
+          <text x="90" y="83" fill="#94a3b8" font-size="7">1 Byte</text>
+
+          <!-- Data Payload -->
+          <rect x="140" y="45" width="170" height="50" fill="#040a0f" stroke="#22c55e" stroke-width="1.5" rx="3"/>
+          <text x="180" y="68" fill="#22c55e" font-size="8" font-weight="bold">Data Field Payload</text>
+          <text x="165" y="83" fill="#94a3b8" font-size="7">(Address, Register Count, Data) N Bytes</text>
+
+          <!-- CRC16 Checksum -->
+          <rect x="315" y="45" width="65" height="50" fill="#040a0f" stroke="#38bdf8" stroke-width="1.5" rx="3"/>
+          <text x="322" y="68" fill="#38bdf8" font-size="8" font-weight="bold">CRC-16</text>
+          <text x="328" y="83" fill="#94a3b8" font-size="7">2 Bytes</text>
+
+          <!-- Inter-frame Silent Interval Indicator -->
+          <line x1="10" y1="130" x2="390" y2="130" stroke="#94a3b8" stroke-width="1.5" stroke-dasharray="4,2"/>
+          <text x="110" y="150" fill="#f59e0b" font-size="8">3.5 Character Silent Interval (t3.5) Boundary</text>
+
+          <!-- Animated Byte Transmission Pulse -->
+          <circle cx="0" cy="0" r="3" fill="#22c55e">
+            <animateMotion path="M 20 70 L 380 70" dur="2s" repeatCount="indefinite"/>
+          </circle>
+        </svg>
+        <p style="font-size:12px; color:#94a3b8;">Modbus RTU Transmission Telegram Field Layout</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SECTION 2: COMPARISON TABLE -->
+<div class="sensor-card">
+  <h2>Comparative Analysis: Industrial Protocol Specifications</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>Protocol</th>
+        <th>Physical Layer</th>
+        <th>Network Topology</th>
+        <th>Max Baud Rate / Speed</th>
+        <th>Max Node Count</th>
+        <th>Data Transfer Paradigm</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>Modbus RTU</strong></td>
+        <td>RS-485 / RS-232 Differential Serial.</td>
+        <td>Daisy-Chain Bus.</td>
+        <td>Up to $115.2\text{ kbps}$.</td>
+        <td>247 Slaves.</td>
+        <td>Master / Slave Polling.</td>
+      </tr>
+      <tr>
+        <td><strong>Modbus TCP</strong></td>
+        <td>100Base-TX / 1000Base-T Ethernet.</td>
+        <td>Star / Tree / Ring (Switched).</td>
+        <td>$100\text{ Mbps} / 1\text{ Gbps}$.</td>
+        <td>Limited by IP subnet.</td>
+        <td>Client / Server (TCP Port 502).</td>
+      </tr>
+      <tr>
+        <td><strong>PROFIBUS DP</strong></td>
+        <td>Shielded Twisted Pair (RS-485).</td>
+        <td>Active Bus with Termination.</td>
+        <td>Up to $12\text{ Mbps}$.</td>
+        <td>126 Nodes.</td>
+        <td>Token Ring Master-Master / Master-Slave.</td>
+      </tr>
+      <tr>
+        <td><strong>EtherNet/IP</strong></td>
+        <td>Standard IEEE 802.3 Ethernet.</td>
+        <td>Star / Device Level Ring (DLR).</td>
+        <td>$100\text{ Mbps} / 1\text{ Gbps}$.</td>
+        <td>Unlimited (Standard IP).</td>
+        <td>CIP Producer / Consumer (Implicit & Explicit).</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- SECTION 3: NUMERICAL PROBLEMS -->
+<div class="sensor-card">
+  <h2>Numerical Problems: Protocol Overhead & Line Throughput Sizing</h2>
+
+  <!-- Problem 1: Modbus RTU vs Modbus TCP Efficiency -->
+  <div class="numerical-card">
+    <h3>Problem 1: Modbus RTU vs. Modbus TCP Protocol Overhead & Transfer Time</h3>
+    <p><strong>Scenario:</strong> A SCADA master needs to read $N = 50\text{ Holding Registers}$ ($100\text{ bytes}$ of data) from a remote PLC using Function Code 03 (Read Holding Registers).</p>
+    <p>Compare the transmission time for:</p>
+
+    <ol type="a">
+      <li><strong>Modbus RTU:</strong> Operating at $19,200\text{ baud}$, 11 bits per byte framing (1 start, 8 data, 1 parity, 1 stop). Include the required 3.5 character silent interval ($t_{3.5}$) before and after the message.</li>
+      <li><strong>Modbus TCP:</strong> Operating over a $100\text{ Mbps}$ Switched Ethernet link. Frame overhead comprises: MBAP Header ($7\text{ bytes}$), TCP Header ($20\text{ bytes}$), IP Header ($20\text{ bytes}$), and Ethernet Frame Header/Trailer ($26\text{ bytes}$).</li>
+    </ol>
+
+    <h4>Step-by-Step Solution:</h4>
+
+    <p><strong>1. Compute Modbus RTU Transmission Time:</strong></p>
+    <div class="formula">
+      $$\text{RTU Request Packet Size} = 1\text{ (ID)} + 1\text{ (Func)} + 2\text{ (Addr)} + 2\text{ (Count)} + 2\text{ (CRC)} = 8\text{ bytes}$$
+    </div>
+    <div class="formula">
+      $$\text{RTU Response Packet Size} = 1\text{ (ID)} + 1\text{ (Func)} + 1\text{ (Byte Count)} + 100\text{ (Data)} + 2\text{ (CRC)} = 105\text{ bytes}$$
+    </div>
+    <div class="formula">
+      $$\text{Total RTU Bytes} = 8 + 105 = 113\text{ bytes}$$
+    </div>
+    <div class="formula">
+      $$t_{3.5} = \frac{3.5 \times 11\text{ bits}}{19,200\text{ bps}} \approx 2.005\text{ ms}$$
+    </div>
+    <div class="formula">
+      $$T_{RTU\_comm} = \frac{113\text{ bytes} \times 11\text{ bits/byte}}{19,200\text{ bps}} = \frac{1243\text{ bits}}{19,200\text{ bps}} \approx 64.74\text{ ms}$$
+    </div>
+    <div class="formula">
+      $$T_{RTU\_total} = T_{RTU\_comm} + (2 \times t_{3.5}) = 64.74\text{ ms} + 4.01\text{ ms} = 68.75\text{ ms}$$
+    </div>
+
+    <p><strong>2. Compute Modbus TCP Transmission Time:</strong></p>
+    <div class="formula">
+      $$\text{Modbus TCP Overhead} = 26\text{ (Eth)} + 20\text{ (IP)} + 20\text{ (TCP)} + 7\text{ (MBAP)} = 73\text{ bytes overhead}$$
+    </div>
+    <div class="formula">
+      $$\text{TCP Request Data} = 2\text{ bytes (PDU)} \implies \text{Total Request Size} = 73 + 2 = 75\text{ bytes}$$
+    </div>
+    <div class="formula">
+      $$\text{TCP Response Data} = 2\text{ (Func/Byte Count)} + 100\text{ (Data)} = 102\text{ bytes} \implies \text{Total Response Size} = 73 + 102 = 175\text{ bytes}$$
+    </div>
+    <div class="formula">
+      $$\text{Total TCP Bytes} = 75 + 175 = 250\text{ bytes} = 2000\text{ bits}$$
+    </div>
+    <div class="formula">
+      $$T_{TCP} = \frac{2000\text{ bits}}{100,000,000\text{ bps}} = 0.000020\text{ seconds} = 0.020\text{ ms}\quad (20\ \mu\text{s})$$
+    </div>
+  </div>
+
+  <!-- Problem 2: PROFIBUS DP Cycle Time Calculation -->
+  <div class="numerical-card">
+    <h3>Problem 2: PROFIBUS DP Bus Cycle Time Sizing</h3>
+    <p><strong>Scenario:</strong> A PROFIBUS DP network operates at a baud rate of $1.5\text{ Mbps}$ connecting 1 Class-1 Master to $N = 16\text{ Slave Devices}$. Each slave exchanges an 11-byte telegram (6-byte header + 5-byte I/O data). PROFIBUS uses 11-bit UART framing per byte.</p>
+    <p>Calculate:</p>
+    <ol type="a">
+      <li>The raw message transmission time $T_{msg}$ per slave node.</li>
+      <li>The total bus cycle time $T_{cycle}$ assuming a station delay $T_{slot} = 15\ \mu\text{s}$ per node.</li>
+    </ol>
+
+    <h4>Step-by-Step Solution:</h4>
+    <p><strong>1. Calculate Transmission Time per Slave ($T_{msg}$):</strong></p>
+    <div class="formula">
+      $$\text{Frame Bytes per Node (Req + Resp)} = 11\text{ bytes (Req)} + 11\text{ bytes (Resp)} = 22\text{ bytes}$$
+    </div>
+    <div class="formula">
+      $$\text{Bits per Node} = 22\text{ bytes} \times 11\text{ bits/byte} = 242\text{ bits}$$
+    </div>
+    <div class="formula">
+      $$T_{msg} = \frac{242\text{ bits}}{1,500,000\text{ bps}} = 1.6133 \times 10^{-4}\text{ seconds} = 161.33\ \mu\text{s}$$
+    </div>
+
+    <p><strong>2. Compute Total Bus Cycle Time ($T_{cycle}$):</strong></p>
+    <div class="formula">
+      $$T_{node} = T_{msg} + T_{slot} = 161.33\ \mu\text{s} + 15.0\ \mu\text{s} = 176.33\ \mu\text{s}$$
+    </div>
+    <div class="formula">
+      $$T_{cycle} = N \times T_{node} = 16 \times 176.33\ \mu\text{s} = 2821.28\ \mu\text{s} \approx 2.82\text{ ms}$$
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

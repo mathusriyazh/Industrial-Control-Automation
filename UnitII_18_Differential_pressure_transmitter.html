@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Chapter 18: Differential Pressure (DP) Transmitters</title>
+
+<!-- MathJax Configuration and Script -->
+<script>
+  window.MathJax = {
+    tex: {
+      inlineMath: [['$', '$'], ['\\(', '\\)']],
+      displayMath: [['$$', '$$'], ['\\[', '\\]']]
+    }
+  };
+</script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+<style>
+  :root {
+    --bg-dark: #071017;
+    --panel-bg: #0d1f2d;
+    --border-color: #1e3a50;
+    --accent-blue: #38bdf8;
+    --accent-green: #22c55e;
+    --accent-amber: #f59e0b;
+    --text-main: #e2e8f0;
+    --text-muted: #94a3b8;
+  }
+
+  body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: var(--bg-dark);
+    color: var(--text-main);
+    line-height: 1.6;
+    padding: 24px;
+    margin: 0;
+  }
+
+  h1, h2, h3, h4 {
+    color: var(--accent-blue);
+  }
+
+  h1 {
+    border-bottom: 2px solid var(--border-color);
+    padding-bottom: 10px;
+    margin-bottom: 20px;
+  }
+
+  .sensor-card {
+    background-color: var(--panel-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 10px;
+    padding: 24px;
+    margin-bottom: 30px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+  }
+
+  .grid-2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+  }
+
+  @media (max-width: 900px) {
+    .grid-2 { grid-template-columns: 1fr; }
+  }
+
+  .anim-box {
+    background: #040a0f;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 16px;
+    text-align: center;
+  }
+
+  .img-fluid {
+    max-width: 100%;
+    height: 180px;
+    object-fit: contain;
+    border-radius: 6px;
+    background: #040a0f;
+    padding: 10px;
+    border: 1px solid var(--border-color);
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 15px;
+  }
+
+  th, td {
+    border: 1px solid var(--border-color);
+    padding: 10px;
+    text-align: left;
+  }
+
+  th {
+    background-color: #132b3e;
+    color: var(--accent-blue);
+  }
+
+  .numerical-card {
+    background: #0a1824;
+    border-left: 4px solid var(--accent-amber);
+    padding: 18px;
+    margin-bottom: 20px;
+    border-radius: 0 8px 8px 0;
+  }
+
+  .formula {
+    background: #040a0f;
+    padding: 8px 12px;
+    border-radius: 6px;
+    color: #4ade80;
+    overflow-x: auto;
+    margin: 8px 0;
+  }
+</style>
+</head>
+<body>
+
+<h1>Chapter 18: Differential Pressure (DP) Transmitters</h1>
+<p>This chapter examines industrial Differential Pressure (DP) transmitters used for measuring pressure drop across flow primary elements, closed-tank liquid levels, and filter degradation. Topics include high/low pressure ports ($P_H, P_L$), internal sensing cell mechanics, square-root extraction for flow rate, 4–20 mA current loop conversion, and wet/dry leg installations.</p>
+
+<!-- SECTION 1: DP TRANSMITTER SENSOR -->
+<div class="sensor-card">
+  <h2>1. Differential Pressure (DP) Transmitter Fundamentals</h2>
+  <div class="grid-2">
+    <div>
+      <h3>Industrial Hardware Image</h3>
+      <img src="images/Differential Pressure Transmitter.jpg" class="img-fluid" alt="Industrial Differential Pressure Transmitter">
+      <br>
+      <h4>Working Principle</h4>
+      <p>A Differential Pressure (DP) Transmitter measures the difference between two process pressures applied to its High-Pressure ($P_H$) and Low-Pressure ($P_L$) ports. The net differential pressure is defined as:</p>
+      <div class="formula">
+        $$\Delta P = P_H - P_L$$
+      </div>
+      <p>Process fluid exerts force on dual flexible isolating diaphragms. A fill fluid (typically silicone oil or fluorolube) transfers this differential force to a central sensing diaphragm (piezoresistive or capacitive cell). The resulting deflection alters capacitance or resistance proportional to $\Delta P$. Electronics then condition this into a standardized <strong>4–20 mA DC</strong> industrial current loop signal.</p>
+
+      <p>When used with primary flow elements like an Orifice Plate, fluid flow velocity ($Q$) relates to differential pressure according to <strong>Bernoulli's Principle</strong>:</p>
+      <div class="formula">
+        $$Q = K \cdot \sqrt{\Delta P} = K \cdot \sqrt{P_H - P_L}$$
+      </div>
+    </div>
+
+    <div>
+      <h3>Interactive Sensing Cell Deflection Animation</h3>
+      <div class="anim-box">
+        <svg viewBox="0 0 400 200" width="100%" height="180">
+          <!-- Outer Transmitter Housing Body -->
+          <rect x="30" y="20" width="340" height="160" fill="#091a24" stroke="#1e3a50" stroke-width="2" rx="6"/>
+
+          <!-- High Pressure Port (Left) -->
+          <rect x="50" y="140" width="40" height="40" fill="#132b3e" stroke="#ef4444" stroke-width="2"/>
+          <text x="60" y="165" fill="#ef4444" font-size="10" font-weight="bold">P_H</text>
+          
+          <!-- Low Pressure Port (Right) -->
+          <rect x="310" y="140" width="40" height="40" fill="#132b3e" stroke="#38bdf8" stroke-width="2"/>
+          <text x="320" y="165" fill="#38bdf8" font-size="10" font-weight="bold">P_L</text>
+
+          <!-- Fluid Pressure Arrows -->
+          <path d="M 70 140 L 70 95" stroke="#ef4444" stroke-width="3" marker-end="url(#arrow-red)">
+            <animate attributeName="opacity" values="0.3;1;0.3" dur="1.5s" repeatCount="indefinite"/>
+          </path>
+          <path d="M 330 140 L 330 95" stroke="#38bdf8" stroke-width="2" marker-end="url(#arrow-blue)">
+            <animate attributeName="opacity" values="0.3;1;0.3" dur="1.5s" repeatCount="indefinite"/>
+          </path>
+
+          <!-- Central Sensing Cell Chamber -->
+          <circle cx="200" cy="90" r="50" fill="#040a0f" stroke="#94a3b8" stroke-width="2"/>
+
+          <!-- Center Deflectable Diaphragm Animation -->
+          <path d="M 200 40 Q 200 90 200 140" fill="none" stroke="#22c55e" stroke-width="4">
+            <animate attributeName="d" 
+                     values="M 200 40 Q 200 90 200 140; 
+                             M 200 40 Q 220 90 200 140; 
+                             M 200 40 Q 200 90 200 140" 
+                     dur="2.5s" repeatCount="indefinite"/>
+          </path>
+
+          <!-- Signal Converter & 4-20mA Output -->
+          <rect x="150" y="25" width="100" height="25" fill="#132b3e" stroke="#22c55e" stroke-width="1.5" rx="4"/>
+          <text x="160" y="42" fill="#4ade80" font-size="10" font-weight="bold">4-20mA Output</text>
+
+          <!-- Marker Definitions -->
+          <defs>
+            <marker id="arrow-red" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+              <path d="M 0 0 L 10 5 L 0 10 z" fill="#ef4444"/>
+            </marker>
+            <marker id="arrow-blue" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+              <path d="M 0 0 L 10 5 L 0 10 z" fill="#38bdf8"/>
+            </marker>
+          </defs>
+        </svg>
+        <p style="font-size:12px; color:#94a3b8;">DP Cell Diaphragm Deflection under High ($P_H$) vs Low ($P_L$) Pressure Loading</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SECTION 2: SIGNAL CONDITIONING & APPLICATIONS -->
+<div class="sensor-card">
+  <h2>2. Signal Scaling & Closed-Tank Level Measurement</h2>
+  <div class="grid-2">
+    <div>
+      <h3>Square-Root Extraction & 4–20 mA Output</h3>
+      <p>For differential pressure flow measurement, the raw signal from the DP cell is non-linear ($\Delta P \propto Q^2$). Modern smart transmitters apply internal <strong>Square-Root Extraction</strong> to linearize the 4–20 mA current output:</p>
+
+      <div class="formula">
+        $$I_{out} = 4\text{ mA} + 16\text{ mA} \times \sqrt{\frac{\Delta P}{\Delta P_{max}}}$$
+      </div>
+
+      <p>In pressurized tank level applications, a **Wet Leg** or **Dry Leg** compensates for upper vapor pressure ($P_{gas}$):</p>
+      <div class="formula">
+        $$\Delta P = P_H - P_L = (\rho_{liquid} \cdot g \cdot h + P_{gas}) - P_{gas} = \rho_{liquid} \cdot g \cdot h$$
+      </div>
+    </div>
+
+    <div>
+      <h3>Pressurized Tank Level Setup Diagram</h3>
+      <div class="anim-box">
+        <svg viewBox="0 0 400 200" width="100%" height="180">
+          <!-- Pressurized Vessel Body -->
+          <rect x="100" y="20" width="140" height="130" fill="none" stroke="#1e3a50" stroke-width="3" rx="8"/>
+
+          <!-- Liquid Level inside Vessel -->
+          <rect x="102" y="70" width="136" height="78" fill="#38bdf8" opacity="0.4"/>
+          <text x="140" y="110" fill="#e2e8f0" font-size="11">Liquid (ρ)</text>
+
+          <!-- Vapor space -->
+          <text x="140" y="45" fill="#f59e0b" font-size="10">Vapor (P_gas)</text>
+
+          <!-- High Pressure Tapping (Bottom) -->
+          <line x1="80" y1="130" x2="100" y2="130" stroke="#ef4444" stroke-width="3"/>
+          <line x1="80" y1="130" x2="80" y2="170" stroke="#ef4444" stroke-width="3"/>
+          <line x1="80" y1="170" x2="250" y2="170" stroke="#ef4444" stroke-width="3"/>
+          <text x="45" y="135" fill="#ef4444" font-size="10" font-weight="bold">High (P_H)</text>
+
+          <!-- Low Pressure Tapping (Top Gas Space - Dry Leg) -->
+          <line x1="240" y1="35" x2="280" y2="35" stroke="#38bdf8" stroke-width="3"/>
+          <line x1="280" y1="35" x2="280" y2="170" stroke="#38bdf8" stroke-width="3"/>
+          <line x1="280" y1="170" x2="270" y2="170" stroke="#38bdf8" stroke-width="3"/>
+          <text x="290" y="40" fill="#38bdf8" font-size="10" font-weight="bold">Low (P_L)</text>
+
+          <!-- DP Transmitter Unit -->
+          <rect x="245" y="160" width="30" height="25" fill="#22c55e" rx="3"/>
+          <text x="250" y="177" fill="#040a0f" font-size="9" font-weight="bold">DP</text>
+        </svg>
+        <p style="font-size:12px; color:#94a3b8;">Closed Tank Level Measurement via Dry-Leg Differential Pressure Tap</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SECTION 3: COMPARISON TABLE -->
+<div class="sensor-card">
+  <h2>Comparative Analysis: Pressure & Flow Transmitter Types</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>Transmitter Type</th>
+        <th>Measured Variable</th>
+        <th>Reference Point</th>
+        <th>Key Advantage</th>
+        <th>Primary Industrial Application</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>Differential Pressure (DP)</strong></td>
+        <td>$\Delta P = P_H - P_L$</td>
+        <td>Low-pressure port ($P_L$)</td>
+        <td>Highly versatile (Flow, Level, Filter $\Delta P$).</td>
+        <td>Orifice plate flow measurement, closed tank level.</td>
+      </tr>
+      <tr>
+        <td><strong>Gauge Pressure (GP)</strong></td>
+        <td>$P_{gauge} = P_{abs} - P_{atm}$</td>
+        <td>Ambient Atmospheric Pressure ($P_{atm}$)</td>
+        <td>Simple single-port installation.</td>
+        <td>Hydraulic line pressure, steam main lines.</td>
+      </tr>
+      <tr>
+        <td><strong>Absolute Pressure (AP)</strong></td>
+        <td>$P_{abs} = P_{gauge} + P_{atm}$</td>
+        <td>Perfect Vacuum ($0\text{ Pa}$)</td>
+        <td>Unaffected by barometric weather shifts.</td>
+        <td>Distillation columns, vacuum condensers.</td>
+      </tr>
+      <tr>
+        <td><strong>Multivariable DP</strong></td>
+        <td>$\Delta P$, Line Static $P$, and Temp $T$</td>
+        <td>Dual ports + integrated RTD</td>
+        <td>Dynamic mass flow compensation in real time.</td>
+        <td>Custody transfer of natural gas and steam.</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- SECTION 4: NUMERICAL PROBLEMS -->
+<div class="sensor-card">
+  <h2>Numerical Problems: Differential Pressure & Current Loop Scaling</h2>
+
+  <!-- Problem 1: 4-20 mA Signal Scaling for Flow Rate -->
+  <div class="numerical-card">
+    <h3>Problem 1: DP Flowmeter Current Loop Output Calculation</h3>
+    <p><strong>Scenario:</strong> A Differential Pressure transmitter is calibrated across an Orifice Plate to measure water flow from $0$ to $500\text{ m}^3/\text{h}$, corresponding to a full-scale differential pressure range of $0$ to $100\text{ kPa}$. The transmitter utilizes built-in <strong>Square-Root Extraction</strong> and outputs a standard $4\text{--}20\text{ mA}$ signal.</p>
+    <p>Calculate the transmitter output current $I_{out}$ when the measured differential pressure is $\Delta P = 36\text{ kPa}$.</p>
+
+    <h4>Step-by-Step Solution:</h4>
+    <p><strong>1. Calculate Normalized DP Ratio ($\Delta P / \Delta P_{max}$):</strong></p>
+    <div class="formula">
+      $$\text{Ratio} = \frac{36\text{ kPa}}{100\text{ kPa}} = 0.36$$
+    </div>
+
+    <p><strong>2. Apply Square-Root Linearization for Flow Rate:</strong></p>
+    <div class="formula">
+      $$\text{Flow Ratio} = \sqrt{\frac{\Delta P}{\Delta P_{max}}} = \sqrt{0.36} = 0.60 \quad (60\%\text{ of max flow})$$
+    </div>
+
+    <p><strong>3. Calculate 4–20 mA Output Current ($I_{out}$):</strong></p>
+    <div class="formula">
+      $$I_{out} = I_{min} + (I_{max} - I_{min}) \times \text{Flow Ratio}$$
+    </div>
+    <div class="formula">
+      $$I_{out} = 4.0\text{ mA} + (16.0\text{ mA}) \times 0.60 = 4.0 + 9.6 = 13.6\text{ mA}$$
+    </div>
+  </div>
+
+  <!-- Problem 2: Pressurized Tank Level Calculation (Wet Leg Setup) -->
+  <div class="numerical-card">
+    <h3>Problem 2: Pressurized Boiler Level with Wet-Leg Compensation</h3>
+    <p><strong>Scenario:</strong> A pressurized steam boiler vessel operates with a wet leg connected to the low-pressure port ($P_L$) filled with condensate water ($\rho_{ref} = 1000\text{ kg/m}^3$) up to a fixed height $H = 4.0\text{ meters}$. The High-Pressure port ($P_H$) connects to the bottom of the boiler, where process fluid height $h$ varies from $0$ to $3.0\text{ meters}$ ($\rho_{process} = 950\text{ kg/m}^3$).</p>
+    <p>Calculate the net differential pressure $\Delta P = P_H - P_L$ sensed by the transmitter when the boiler liquid level is at $h = 2.0\text{ meters}$. (Assume $g = 9.81\text{ m/s}^2$).</p>
+
+    <h4>Step-by-Step Solution:</h4>
+    <p><strong>1. Express Pressure at High Port ($P_H$):</strong></p>
+    <div class="formula">
+      $$P_H = P_{vapor} + (\rho_{process} \cdot g \cdot h)$$
+    </div>
+
+    <p><strong>2. Express Pressure at Low Port ($P_L$):</strong> (Reference Wet Leg constant height $H = 4.0\text{ m}$)</p>
+    <div class="formula">
+      $$P_L = P_{vapor} + (\rho_{ref} \cdot g \cdot H)$$
+    </div>
+
+    <p><strong>3. Calculate Net Differential Pressure ($\Delta P = P_H - P_L$):</strong> Note that $P_{vapor}$ cancels out:</p>
+    <div class="formula">
+      $$\Delta P = (\rho_{process} \cdot g \cdot h) - (\rho_{ref} \cdot g \cdot H)$$
+    </div>
+    <div class="formula">
+      $$\Delta P = (950 \times 9.81 \times 2.0) - (1000 \times 9.81 \times 4.0)$$
+    </div>
+    <div class="formula">
+      $$\Delta P = 18639\text{ Pa} - 39240\text{ Pa} = -20601\text{ Pa} = -20.601\text{ kPa}$$
+    </div>
+    <p><em>(Note: Negative $\Delta P$ is standard for wet-leg installations; zero tank level corresponds to maximum negative differential pressure).</em></p>
+  </div>
+
+  <!-- Problem 3: Filter Clogging & Differential Pressure Alarm -->
+  <div class="numerical-card">
+    <h3>Problem 3: Industrial Filter Clogging Differential Pressure Threshold</h3>
+    <p><strong>Scenario:</strong> A hydraulic oil filtration unit uses a DP transmitter to monitor filter clogging. Clean filter baseline differential pressure is $\Delta P_{clean} = 15\text{ kPa}$ at nominal flow. Process safety protocols dictate replacing the filter cartridge when the differential pressure reaches $\Delta P_{clogged} = 85\text{ kPa}$. The DP transmitter has a calibrated span of $0$ to $100\text{ kPa}$ ($4\text{ mA} = 0\text{ kPa}$, $20\text{ mA} = 100\text{ kPa}$ linear mode).</p>
+    <p>Determine the threshold current signal $I_{alarm}$ that must trigger a PLC maintenance alarm.</p>
+
+    <h4>Step-by-Step Solution:</h4>
+    <p><strong>1. Determine Linear Scaling Slope ($S$):</strong></p>
+    <div class="formula">
+      $$S = \frac{20\text{ mA} - 4\text{ mA}}{\Delta P_{span}} = \frac{16\text{ mA}}{100\text{ kPa}} = 0.16\text{ mA/kPa}$$
+    </div>
+
+    <p><strong>2. Calculate Current Output at Filter Clogging Point ($85\text{ kPa}$):</strong></p>
+    <div class="formula">
+      $$I_{alarm} = 4\text{ mA} + (S \times \Delta P_{clogged}) = 4\text{ mA} + (0.16\text{ mA/kPa} \times 85\text{ kPa})$$
+    </div>
+    <div class="formula">
+      $$I_{alarm} = 4.0 + 13.6 = 17.6\text{ mA}$$
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

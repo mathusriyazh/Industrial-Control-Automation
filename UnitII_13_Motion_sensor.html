@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Chapter 13: Motion Detection – Passive Infrared (PIR) Sensor</title>
+
+<!-- MathJax Configuration and Script -->
+<script>
+  window.MathJax = {
+    tex: {
+      inlineMath: [['$', '$'], ['\\(', '\\)']],
+      displayMath: [['$$', '$$'], ['\\[', '\\]']]
+    }
+  };
+</script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+<style>
+  :root {
+    --bg-dark: #071017;
+    --panel-bg: #0d1f2d;
+    --border-color: #1e3a50;
+    --accent-blue: #38bdf8;
+    --accent-green: #22c55e;
+    --accent-amber: #f59e0b;
+    --text-main: #e2e8f0;
+    --text-muted: #94a3b8;
+  }
+
+  body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: var(--bg-dark);
+    color: var(--text-main);
+    line-height: 1.6;
+    padding: 24px;
+    margin: 0;
+  }
+
+  h1, h2, h3, h4 {
+    color: var(--accent-blue);
+  }
+
+  h1 {
+    border-bottom: 2px solid var(--border-color);
+    padding-bottom: 10px;
+    margin-bottom: 20px;
+  }
+
+  .sensor-card {
+    background-color: var(--panel-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 10px;
+    padding: 24px;
+    margin-bottom: 30px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+  }
+
+  .grid-2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+  }
+
+  @media (max-width: 900px) {
+    .grid-2 { grid-template-columns: 1fr; }
+  }
+
+  .anim-box {
+    background: #040a0f;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 16px;
+    text-align: center;
+  }
+
+  .img-fluid {
+    max-width: 100%;
+    height: 180px;
+    object-fit: contain;
+    border-radius: 6px;
+    background: #040a0f;
+    padding: 10px;
+    border: 1px solid var(--border-color);
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 15px;
+  }
+
+  th, td {
+    border: 1px solid var(--border-color);
+    padding: 10px;
+    text-align: left;
+  }
+
+  th {
+    background-color: #132b3e;
+    color: var(--accent-blue);
+  }
+
+  .numerical-card {
+    background: #0a1824;
+    border-left: 4px solid var(--accent-amber);
+    padding: 18px;
+    margin-bottom: 20px;
+    border-radius: 0 8px 8px 0;
+  }
+
+  .formula {
+    background: #040a0f;
+    padding: 8px 12px;
+    border-radius: 6px;
+    color: #4ade80;
+    overflow-x: auto;
+    margin: 8px 0;
+  }
+</style>
+</head>
+<body>
+
+<h1>Chapter 13: Motion Detection – Passive Infrared (PIR) Sensors</h1>
+<p>This chapter examines non-contact thermal radiation motion detection devices. Topics include pyroelectric charge generation, optical beam splitting using <strong>Fresnel Lenses</strong>, differential sensing element topology, amplification and window comparator electronics, and numerical problems for automated motor drive activation.</p>
+
+<!-- SECTION 1: PIR SENSOR -->
+<div class="sensor-card">
+  <h2>1. Passive Infrared (PIR) Motion Transducer</h2>
+  <div class="grid-2">
+    <div>
+      <h3>Industrial Hardware Image</h3>
+      <img src="images/Motion sensor.jpg" class="img-fluid" alt="PIR Motion Sensor Module">
+      <br>
+      <h4>Working Principle</h4>
+      <p>A Passive Infrared (PIR) sensor measures blackbody thermal radiation emitted by warm objects (humans, animals, vehicles) in the far-infrared spectrum (wavelengths around $8\text{ to }14\ \mu\text{m}$). According to the <strong>Stefan-Boltzmann Law</strong>, radiant power density $E$ increases with absolute temperature $T$:</p>
+      <div class="formula">
+        $$E = \epsilon \cdot \sigma \cdot T^4$$
+      </div>
+      <p>Where $\sigma = 5.67 \times 10^{-8}\text{ W/m}^2\text{K}^4$ and $\epsilon$ is emissivity. The sensor contains two pyroelectric slots connected in <strong>voltage-series opposition</strong>. A segmented <strong>Fresnel Lens</strong> focuses ambient infrared radiation into multiple detection zones.</p>
+
+      <p>When a human walks past, they cross slot A first (causing a positive voltage spike $+V_{pyro}$) and then slot B (causing a negative voltage spike $-V_{pyro}$). Static background radiation affects both slots equally, cancelling out and preventing false triggers:</p>
+      <div class="formula">
+        $$\Delta V_{out} = V_{slotA} - V_{slotB}$$
+      </div>
+    </div>
+
+    <div>
+      <h3>Interactive Fresnel Lens & Dual-Element Differential Animation</h3>
+      <div class="anim-box">
+        <svg viewBox="0 0 400 200" width="100%" height="180">
+          <!-- Sensor Housing with Dual Slots -->
+          <rect x="20" y="50" width="60" height="100" fill="#1e293b" stroke="#38bdf8" stroke-width="2" rx="4"/>
+          <!-- Slot A & Slot B -->
+          <rect x="40" y="65" width="20" height="30" fill="#ef4444" stroke="#fff" stroke-width="1"/>
+          <text x="47" y="83" fill="#fff" font-size="9" font-weight="bold">A</text>
+
+          <rect x="40" y="105" width="20" height="30" fill="#3b82f6" stroke="#fff" stroke-width="1"/>
+          <text x="47" y="123" fill="#fff" font-size="9" font-weight="bold">B</text>
+
+          <!-- Fresnel Lens Facets -->
+          <path d="M 100 30 C 110 70 110 130 100 170" fill="none" stroke="#f59e0b" stroke-width="4"/>
+          <text x="90" y="22" fill="#f59e0b" font-size="9">Fresnel Lens</text>
+
+          <!-- Moving IR Source (Human Body) -->
+          <g>
+            <circle cx="340" cy="100" r="18" fill="#ff6b6b" opacity="0.8">
+              <animateTransform attributeName="transform" type="translate" values="0,-60; 0,60; 0,-60" dur="4s" repeatCount="indefinite"/>
+            </circle>
+            <text x="333" y="104" fill="#fff" font-size="10" font-weight="bold">IR</text>
+            <animateTransform attributeName="transform" type="translate" values="0,-60; 0,60; 0,-60" dur="4s" repeatCount="indefinite"/>
+          </g>
+
+          <!-- Focused Rays -->
+          <line x1="105" y1="50" x2="50" y2="80" stroke="#ef4444" stroke-width="1.5" stroke-dasharray="3">
+            <animate attributeName="opacity" values="1;0.2;1" dur="2s" repeatCount="indefinite"/>
+          </line>
+          <line x1="105" y1="150" x2="50" y2="120" stroke="#3b82f6" stroke-width="1.5" stroke-dasharray="3">
+            <animate attributeName="opacity" values="0.2;1;0.2" dur="2s" repeatCount="indefinite"/>
+          </line>
+
+          <!-- Differential Signal Waveform -->
+          <rect x="150" y="55" width="130" height="90" fill="#091a24" stroke="#22c55e" rx="4"/>
+          <path d="M 160 100 Q 185 60 210 100 T 260 100" fill="none" stroke="#4ade80" stroke-width="2">
+            <animate attributeName="d" values="M 160 100 Q 185 60 210 100 T 260 100; M 160 100 Q 185 140 210 100 T 260 100; M 160 100 Q 185 60 210 100 T 260 100" dur="4s" repeatCount="indefinite"/>
+          </path>
+          <text x="165" y="132" fill="#94a3b8" font-size="9">Differential Voltage ΔV</text>
+        </svg>
+        <p style="font-size:12px; color:#94a3b8;">Differential Pyroelectric Signal Generation across Lens Zones</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SECTION 2: ARCHITECTURE & SIGNAL CONDITIONING -->
+<div class="sensor-card">
+  <h2>Internal Signal Conditioning Circuitry</h2>
+  <div class="grid-2">
+    <div>
+      <h4>BISS0001 Processing Pipeline</h4>
+      <p>The micro-volt differential signal generated by the pyroelectric element cannot directly trigger a digital controller or motor relay. Commercial modules (e.g., HC-SR501) process the signal through an integrated ASIC (like BISS0001):</p>
+      <ul>
+        <li><strong>Stage 1 - High-Gain Bandpass Amplifier:</strong> Amplifies small AC thermal pulses ($100\ \mu\text{V} - 1\text{ mV}$) while filtering out DC static drift and high-frequency electrical noise (typical bandwidth $0.3\text{ Hz} - 10\text{ Hz}$).</li>
+        <li><strong>Stage 2 - Window Comparator:</strong> Compares amplified voltage against upper ($V_{THH}$) and lower ($V_{THL}$) threshold limits.</li>
+        <li><strong>Stage 3 - Delay & Repeatable Trigger Logic:</strong> Holds output HIGH ($3.3\text{V}$) for a user-adjustable delay duration $T_{delay}$ to energize actuators or motors.</li>
+      </ul>
+    </div>
+
+    <div>
+      <h4>Key Operating Parameters</h4>
+      <table>
+        <thead>
+          <tr>
+            <th>Parameter</th>
+            <th>Typical Industrial / Commercial Value</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>IR Wavelength Sensitivity</strong></td>
+            <td>$7\ \mu\text{m} - 14\ \mu\text{m}$ (Matches human peak emission ~ $9.4\ \mu\text{m}$)</td>
+          </tr>
+          <tr>
+            <td><strong>Detection Distance</strong></td>
+            <td>$3\text{ meters} - 7\text{ meters}$ (Adjustable via trimmer)</td>
+          </tr>
+          <tr>
+            <td><strong>Field of View (FOV)</strong></td>
+            <td>$< 110^\circ$ cone angle</td>
+          </tr>
+          <tr>
+            <td><strong>Output Delay Time ($T_{delay}$)</strong></td>
+            <td>$2\text{ seconds} - 200\text{ seconds}$</td>
+          </tr>
+          <tr>
+            <td><strong>Triggering Modes</strong></td>
+            <td>Non-repeatable (L) vs. Repeatable (H)</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- SECTION 3: COMPARISON TABLE -->
+<div class="sensor-card">
+  <h2>Comparative Analysis: Motion & Proximity Sensors</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>Sensor Technology</th>
+        <th>Sensing Mechanism</th>
+        <th>Power Consumption</th>
+        <th>Environmental Immunity</th>
+        <th>Primary Use Cases</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>Passive Infrared (PIR)</strong></td>
+        <td>Passively detects changes in thermal IR radiation focused by Fresnel lens.</td>
+        <td><strong>Ultra-low</strong> ($< 50\ \mu\text{A}$ standby); ideal for battery operation.</td>
+        <td>Affected by ambient heat sources ($> 37^\circ\text{C}$), HVAC airflow, direct sunlight.</td>
+        <td>Occupancy sensing, automatic door motors, security alarms, smart lighting.</td>
+      </tr>
+      <tr>
+        <td><strong>Microwave Radar Motion</strong></td>
+        <td>Emits high-frequency electromagnetic waves ($5.8\text{ GHz}$ or $24\text{ GHz}$) and measures Doppler shift.</td>
+        <td><strong>Moderate to High</strong> ($30\text{ mA} - 50\text{ mA}$).</td>
+        <td>Penetrates plastic, glass, and thin drywall; sensitive to mechanical vibrations.</td>
+        <td>High-security perimeter monitoring, automatic sliding door opening.</td>
+      </tr>
+      <tr>
+        <td><strong>Ultrasonic Motion</strong></td>
+        <td>Emits $40\text{ kHz}$ acoustic pulses and monitors Doppler frequency shift.</td>
+        <td><strong>Moderate</strong> ($15\text{ mA} - 30\text{ mA}$).</td>
+        <td>Fails in vacuum/high wind; affected by sound-absorbing fabrics.</td>
+        <td>Robotic obstacle detection, liquid level motion monitoring.</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- SECTION 4: NUMERICAL PROBLEMS -->
+<div class="sensor-card">
+  <h2>Numerical Problems: Motion Detection & Automated Actuator Drives</h2>
+
+  <!-- Problem 1: Stefan-Boltzmann Thermal Radiation -->
+  <div class="numerical-card">
+    <h3>Problem 1: Radiant Thermal Power Detection</h3>
+    <p><strong>Scenario:</strong> A human body with skin surface area $A = 1.8\text{ m}^2$, skin temperature $T_h = 34^\circ\text{C}$ ($307.15\text{ K}$), and emissivity $\epsilon = 0.98$ walks into an air-conditioned room with background temperature $T_b = 20^\circ\text{C}$ ($293.15\text{ K}$). Calculate:</p>
+    <ol type="a">
+      <li>The net radiant thermal power $\Delta P_{rad}$ emitted by the human body relative to the background environment.</li>
+      <li>The peak emission wavelength $\lambda_{max}$ of the human body using Wien’s Displacement Law ($b = 2898\ \mu\text{m}\cdot\text{K}$).</li>
+    </ol>
+
+    <h4>Step-by-Step Solution:</h4>
+    <p><strong>1. Net Radiant Thermal Power ($\Delta P_{rad}$):</strong> Applying Stefan-Boltzmann Law:</p>
+    <div class="formula">
+      $$\Delta P_{rad} = \epsilon \cdot \sigma \cdot A \cdot \left( T_h^4 - T_b^4 \right)$$
+    </div>
+    <div class="formula">
+      $$T_h^4 = (307.15)^4 = 8.900 \times 10^9\text{ K}^4$$
+    </div>
+    <div class="formula">
+      $$T_b^4 = (293.15)^4 = 7.385 \times 10^9\text{ K}^4$$
+    </div>
+    <div class="formula">
+      $$\Delta P_{rad} = 0.98 \times (5.67 \times 10^{-8}) \times 1.8 \times \left( 8.900 \times 10^9 - 7.385 \times 10^9 \right)$$
+    </div>
+    <div class="formula">
+      $$\Delta P_{rad} = 1.0002 \times 10^{-7} \times 1.515 \times 10^9 = 151.53\text{ Watts}$$
+    </div>
+
+    <p><strong>2. Peak Emission Wavelength ($\lambda_{max}$):</strong> Applying Wien’s Displacement Law:</p>
+    <div class="formula">
+      $$\lambda_{max} = \frac{b}{T_h} = \frac{2898\ \mu\text{m}\cdot\text{K}}{307.15\text{ K}} = 9.435\ \mu\text{m}$$
+    </div>
+    <p><em>(This falls directly within the $8 - 14\ \mu\text{m}$ band pass filter window of the PIR optical lens).</em></p>
+  </div>
+
+  <!-- Problem 2: PIR Automated Door Motor Actuation -->
+  <div class="numerical-card">
+    <h3>Problem 2: PIR Triggered Motorized Automatic Sliding Door</h3>
+    <p><strong>Scenario:</strong> A PIR sensor mounted above an automatic store door has a conical field-of-view angle $\theta = 90^\circ$ and is mounted at height $h = 3.0\text{ meters}$. A person approaches the door at walking velocity $v = 1.4\text{ m/s}$. When the PIR detects motion, its internal timer holds output HIGH, turning on a DC motor drive that opens the door stroke ($L_{door} = 1.2\text{ meters}$) at speed $v_{door} = 0.6\text{ m/s}$. Calculate:</p>
+    <ol type="a">
+      <li>The floor detection coverage radius $R_{coverage}$ of the PIR sensor.</li>
+      <li>The time available $t_{approach}$ from the moment the person enters detection coverage until they reach the door plane.</li>
+      <li>The time required by the motor drive to open the door fully ($t_{open}$), and verify if the person can walk through safely without stopping.</li>
+    </ol>
+
+    <h4>Step-by-Step Solution:</h4>
+    <p><strong>1. Floor Detection Radius ($R_{coverage}$):</strong> For cone angle $\theta = 90^\circ$, half angle $\alpha = 45^\circ$:</p>
+    <div class="formula">
+      $$R_{coverage} = h \times \tan(\alpha) = 3.0\text{ m} \times \tan(45^\circ) = 3.0\text{ meters}$$
+    </div>
+
+    <p><strong>2. Person Approach Time ($t_{approach}$):</strong></p>
+    <div class="formula">
+      $$t_{approach} = \frac{R_{coverage}}{v} = \frac{3.0\text{ m}}{1.4\text{ m/s}} = 2.143\text{ seconds}$$
+    </div>
+
+    <p><strong>3. Door Opening Time ($t_{open}$):</strong></p>
+    <div class="formula">
+      $$t_{open} = \frac{L_{door}}{v_{door}} = \frac{1.2\text{ m}}{0.6\text{ m/s}} = 2.000\text{ seconds}$$
+    </div>
+
+    <p><strong>Safety Verdict:</strong> Since $t_{open} = 2.00\text{ s} < t_{approach} = 2.14\text{ s}$, the door opens completely before the walking person reaches the threshold.</p>
+  </div>
+
+  <!-- Problem 3: BISS0001 Delay Timing Calculation -->
+  <div class="numerical-card">
+    <h3>Problem 3: BISS0001 Hardware Delay Capacitor/Resistor Timing Calculation</h3>
+    <p><strong>Scenario:</strong> The output pulse delay time $T_{delay}$ of a PIR controller IC (BISS0001) is set by external timing components $R_x$ and $C_x$ according to the design equation:</p>
+    <div class="formula">
+      $$T_{delay} \approx 24576 \times R_x \times C_x$$
+    </div>
+    <p>An industrial conveyor motor drive requires the PIR sensor output to remain active for exactly $t = 12\text{ seconds}$ after motion ceases. If a capacitor $C_x = 0.1\ \mu\text{F}$ is selected, calculate the required timing resistor value $R_x$ in kilohms ($\text{k}\Omega$).</p>
+
+    <h4>Step-by-Step Solution:</h4>
+    <p><strong>1. Rearrange Formula for $R_x$:</strong></p>
+    <div class="formula">
+      $$R_x = \frac{T_{delay}}{24576 \times C_x}$$
+    </div>
+
+    <p><strong>2. Calculate $R_x$:</strong></p>
+    <div class="formula">
+      $$R_x = \frac{12\text{ s}}{24576 \times (0.1 \times 10^{-6}\text{ F})} = \frac{12}{0.0024576} = 4882.8\ \Omega = 4.883\text{ k}\Omega$$
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

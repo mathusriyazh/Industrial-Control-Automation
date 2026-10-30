@@ -1,0 +1,2259 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>
+Industrial Control and Automation - Unit I
+</title>
+
+<!-- ADD THIS SCRIPT TO RENDER LATEX MATH PROPERLY -->
+<!-- MATHJAX SETUP (NO POLYFILL NEEDED) -->
+<script>
+  window.MathJax = {
+    tex: {
+      inlineMath: [['$', '$'], ['\\(', '\\)']]
+    }
+  };
+</script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+
+<style>
+
+*{
+    box-sizing:border-box;
+}
+
+body{
+    margin:0;
+    font-family:Arial,Helvetica,sans-serif;
+    background:#071018;
+    color:#eaf6fb;
+}
+
+/* HEADER */
+
+header{
+    background:#0d2635;
+    border-bottom:3px solid #2495bd;
+    padding:18px 25px;
+    position:sticky;
+    top:0;
+    z-index:100;
+}
+
+header h1{
+    margin:0;
+    font-size:25px;
+}
+
+header p{
+    margin:6px 0 0;
+    color:#9ed7e9;
+}
+
+/* NAVIGATION */
+
+nav{
+    background:#0a1822;
+    padding:10px;
+    text-align:center;
+    border-bottom:1px solid #294b5c;
+}
+
+nav button{
+    background:#123548;
+    color:white;
+    border:1px solid #39728a;
+    padding:9px 15px;
+    margin:3px;
+    border-radius:5px;
+    cursor:pointer;
+}
+
+nav button:hover{
+    background:#1d5a70;
+}
+
+/* CONTAINER */
+
+.container{
+    max-width:1400px;
+    margin:auto;
+    padding:20px;
+}
+
+.card{
+    background:#0c1b26;
+    border:1px solid #294858;
+    border-radius:10px;
+    padding:22px;
+    margin-bottom:20px;
+}
+
+h2{
+    color:#7dd3fc;
+}
+
+h3{
+    color:#8bd9ef;
+}
+
+p{
+    line-height:1.7;
+}
+
+.highlight{
+    background:#103344;
+    border-left:5px solid #38bdf8;
+    padding:15px;
+    margin:15px 0;
+}
+
+/* OBJECTIVES */
+
+.objectives{
+    display:grid;
+    grid-template-columns:repeat(4,1fr);
+    gap:12px;
+}
+
+.objective{
+    background:#102c3b;
+    padding:18px;
+    border-radius:8px;
+    border:1px solid #315c6c;
+}
+
+/* IMAGE */
+
+.realImage{
+    width:100%;
+    max-height:480px;
+    object-fit:contain;
+    background:#020609;
+    border-radius:8px;
+    border:2px solid #35596a;
+}
+
+.caption{
+    text-align:center;
+    font-size:13px;
+    color:#9db8c3;
+    margin-top:8px;
+}
+
+/* FLOW */
+
+.flow{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:8px;
+    flex-wrap:wrap;
+    margin:25px 0;
+}
+
+.block{
+    min-width:150px;
+    padding:20px;
+    text-align:center;
+    border:2px solid #456c7d;
+    border-radius:9px;
+    background:#102b39;
+    transition:.5s;
+}
+
+.block.active{
+    border-color:#22c55e;
+    background:#103d2c;
+    box-shadow:0 0 25px rgba(34,197,94,.7);
+    transform:scale(1.06);
+}
+
+.arrow{
+    font-size:32px;
+    color:#51879d;
+}
+
+.arrow.active{
+    color:#22c55e;
+    text-shadow:0 0 15px #22c55e;
+}
+
+/* PROCESS SIMULATION */
+
+.simulation{
+    background:#061017;
+    border:2px solid #315466;
+    border-radius:10px;
+    padding:20px;
+}
+
+.simGrid{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:20px;
+}
+
+.controlPanel{
+    background:#10212c;
+    padding:20px;
+    border-radius:8px;
+}
+
+.controlPanel label{
+    display:block;
+    margin-top:15px;
+    margin-bottom:5px;
+}
+
+input[type=range]{
+    width:100%;
+}
+
+button.control{
+    padding:12px 20px;
+    margin:5px;
+    border:0;
+    border-radius:6px;
+    color:white;
+    font-weight:bold;
+    cursor:pointer;
+}
+
+.start{
+    background:#15803d;
+}
+
+.stop{
+    background:#b91c1c;
+}
+
+.reset{
+    background:#2563eb;
+}
+
+/* TANK */
+
+.tankArea{
+    text-align:center;
+}
+
+.tank{
+    width:250px;
+    height:300px;
+    margin:auto;
+    border:5px solid #78909c;
+    border-radius:0 0 20px 20px;
+    position:relative;
+    overflow:hidden;
+    background:#02090d;
+}
+
+.water{
+    position:absolute;
+    bottom:0;
+    left:0;
+    width:100%;
+    height:40%;
+    background:#1593bd;
+    transition:height .5s;
+}
+
+.water::after{
+    content:"";
+    position:absolute;
+    top:0;
+    left:0;
+    width:100%;
+    height:10px;
+    background:#67d7f5;
+    animation:wave 1s linear infinite;
+}
+
+@keyframes wave{
+
+    0%{
+        transform:translateX(-20px);
+    }
+
+    50%{
+        transform:translateX(20px);
+    }
+
+    100%{
+        transform:translateX(-20px);
+    }
+
+}
+
+.levelText{
+    position:absolute;
+    width:100%;
+    top:45%;
+    text-align:center;
+    z-index:3;
+    font-size:25px;
+    font-weight:bold;
+}
+
+/* SENSOR */
+
+.sensor{
+    margin:20px auto;
+    width:130px;
+    padding:15px;
+    background:#263b45;
+    border:3px solid #78909c;
+    border-radius:8px;
+}
+
+.sensor.active{
+    border-color:#22c55e;
+    box-shadow:0 0 18px #22c55e;
+}
+
+/* PUMP */
+
+.pump{
+    width:130px;
+    height:100px;
+    margin:20px auto;
+    background:#243b45;
+    border:4px solid #6e8792;
+    border-radius:12px;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    font-size:35px;
+}
+
+.pump.running{
+    border-color:#22c55e;
+    box-shadow:0 0 25px #22c55e;
+    animation:pulse .7s infinite alternate;
+}
+
+@keyframes pulse{
+
+    from{
+        transform:scale(1);
+    }
+
+    to{
+        transform:scale(1.08);
+    }
+
+}
+
+/* GAUGE */
+
+.gauge{
+    width:180px;
+    height:180px;
+    margin:20px auto;
+    border-radius:50%;
+    border:12px solid #345565;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    font-size:30px;
+}
+
+/* STATUS */
+
+.status{
+    padding:15px;
+    text-align:center;
+    border-radius:7px;
+    background:#123a29;
+    color:#8ef0ad;
+    margin-top:15px;
+}
+
+.status.warning{
+    background:#4a3212;
+    color:#ffd580;
+}
+
+.status.error{
+    background:#481b1b;
+    color:#ffaaaa;
+}
+
+/* TABLE */
+
+table{
+    width:100%;
+    border-collapse:collapse;
+}
+
+th,td{
+    border:1px solid #365563;
+    padding:12px;
+    text-align:left;
+}
+
+th{
+    background:#123548;
+}
+
+/* QUIZ */
+
+.quiz{
+    background:#091923;
+    border:1px solid #345d6e;
+    border-radius:8px;
+    padding:18px;
+    margin-top:15px;
+}
+
+.quiz button{
+    display:block;
+    margin:8px 0;
+    padding:10px 15px;
+    width:100%;
+    text-align:left;
+    background:#123548;
+    color:white;
+    border:1px solid #416b7b;
+    border-radius:5px;
+    cursor:pointer;
+}
+
+.correct{
+    background:#14532d !important;
+}
+
+.wrong{
+    background:#7f1d1d !important;
+}
+
+/* RESPONSIVE */
+
+@media(max-width:900px){
+
+.objectives{
+    grid-template-columns:1fr 1fr;
+}
+
+.simGrid{
+    grid-template-columns:1fr;
+}
+
+}
+
+@media(max-width:600px){
+
+.objectives{
+    grid-template-columns:1fr;
+}
+
+header h1{
+    font-size:19px;
+}
+
+}
+
+</style>
+
+</head>
+
+
+<body>
+
+
+<header>
+
+<h1>
+📘 INDUSTRIAL CONTROL AND AUTOMATION
+</h1>
+
+<p>
+UNIT – I | Basics of Industrial Automation and Control
+</p>
+
+</header>
+
+
+<nav>
+
+<button onclick="go('intro')">
+Introduction
+</button>
+
+<button onclick="go('automation')">
+Automation
+</button>
+
+<button onclick="go('control')">
+Control Loop
+</button>
+
+<button onclick="go('simulation')">
+Simulation
+</button>
+
+<button onclick="go('applications')">
+Applications
+</button>
+
+<button onclick="go('quiz')">
+Quiz
+</button>
+
+</nav>
+
+
+<div class="container">
+
+
+<!-- =================================================
+COURSE OBJECTIVES
+================================================= -->
+
+<section id="intro" class="card">
+
+<h2>
+1. Course Introduction
+</h2>
+
+<p>
+
+Industrial automation is the use of control systems,
+computers, sensors, communication networks and actuators
+to operate industrial processes with minimum continuous
+human intervention.
+
+</p>
+
+<div class="highlight">
+
+<strong>Simple idea:</strong>
+
+A human operator observes a process, makes a decision
+and operates an actuator.
+
+In an automated system:
+
+<strong>
+Sensor → Controller → Actuator → Process
+</strong>
+
+performs this operation continuously.
+
+</div>
+
+
+<h3>
+Course Objectives
+</h3>
+
+
+<div class="objectives">
+
+<div class="objective">
+
+<strong>1</strong>
+
+<p>
+Develop automation systems for continuous and discrete
+manufacturing industries.
+</p>
+
+</div>
+
+
+<div class="objective">
+
+<strong>2</strong>
+
+<p>
+Integrate sensors and actuators into control systems for
+real-time monitoring and control.
+</p>
+
+</div>
+
+
+<div class="objective">
+
+<strong>3</strong>
+
+<p>
+Develop hands-on skills with automation hardware and
+software tools.
+</p>
+
+</div>
+
+
+<div class="objective">
+
+<strong>4</strong>
+
+<p>
+Establish seamless communication between devices and
+industrial systems.
+</p>
+
+</div>
+
+</div>
+
+</section>
+
+
+<!-- =================================================
+REAL INDUSTRY
+================================================= -->
+
+<section class="card">
+
+<h2>
+2. Automation in a Real Industrial Environment
+</h2>
+
+<p>
+
+Industrial automation can be observed in manufacturing
+plants, power plants, chemical industries, automobile
+industries, water treatment plants and process industries.
+
+</p>
+
+<img
+class="realImage"
+src="https://commons.wikimedia.org/wiki/Special:FilePath/Automation%20of%20foundry%20with%20robot.jpg"
+alt="Industrial automation robot">
+
+<div class="caption">
+
+Real industrial automation example:
+robot-based manufacturing system.
+
+</div>
+
+<div class="highlight">
+
+<strong>Observe the image:</strong>
+
+The robot performs a repetitive manufacturing operation.
+In an actual automation system, sensors detect the position
+of the workpiece, the controller executes the control logic,
+and actuators move the robot or machine.
+
+</div>
+
+</section>
+
+
+<!-- =================================================
+WHAT IS AUTOMATION
+================================================= -->
+
+<section id="automation" class="card">
+
+<h2>
+3. What is Industrial Automation?
+</h2>
+
+<p>
+
+Automation is the technology by which a process or machine
+performs its intended operation automatically using
+controllers, sensors, actuators and communication systems.
+
+</p>
+
+
+<h3>
+Basic Automation Chain
+</h3>
+
+
+<div class="flow">
+
+<div id="sensorBlock" class="block">
+
+📡<br>
+
+<strong>SENSOR</strong>
+
+<br><br>
+
+Measures process
+variable
+
+</div>
+
+
+<div id="arrow1" class="arrow">
+
+→
+
+</div>
+
+
+<div id="controllerBlock" class="block">
+
+🧠<br>
+
+<strong>CONTROLLER</strong>
+
+<br><br>
+
+PLC / DCS /
+Industrial PC
+
+</div>
+
+
+<div id="arrow2" class="arrow">
+
+→
+
+</div>
+
+
+<div id="actuatorBlock" class="block">
+
+⚙️<br>
+
+<strong>ACTUATOR</strong>
+
+<br><br>
+
+Motor / Valve /
+Cylinder
+
+</div>
+
+
+<div id="arrow3" class="arrow">
+
+→
+
+</div>
+
+
+<div id="processBlock" class="block">
+
+🏭<br>
+
+<strong>PROCESS</strong>
+
+<br><br>
+
+Industrial machine
+
+</div>
+
+</div>
+
+
+<div class="highlight">
+
+The sensor provides information to the controller.
+The controller compares the measured condition with
+the required condition and generates an output command.
+The actuator then changes the process.
+
+</div>
+
+</section>
+
+
+<!-- =================================================
+OPEN LOOP CLOSED LOOP
+================================================= -->
+
+<section class="card">
+
+<h2>
+4. Open-Loop and Closed-Loop Automation
+</h2>
+
+
+<table>
+
+<tr>
+
+<th>
+Feature
+</th>
+
+<th>
+Open-Loop
+</th>
+
+<th>
+Closed-Loop
+</th>
+
+</tr>
+
+
+<tr>
+
+<td>
+Feedback
+</td>
+
+<td>
+Not used
+</td>
+
+<td>
+Used
+</td>
+
+</tr>
+
+
+<tr>
+
+<td>
+Controller decision
+</td>
+
+<td>
+Based mainly on command/time
+</td>
+
+<td>
+Based on measured process output
+</td>
+
+</tr>
+
+
+<tr>
+
+<td>
+Accuracy
+</td>
+
+<td>
+Generally lower
+</td>
+
+<td>
+Generally higher
+</td>
+
+</tr>
+
+
+<tr>
+
+<td>
+Example
+</td>
+
+<td>
+Timer-controlled water pump
+</td>
+
+<td>
+Temperature-controlled heater
+</td>
+
+</tr>
+
+
+<tr>
+
+<td>
+Complexity
+</td>
+
+<td>
+Lower
+</td>
+
+<td>
+Higher
+</td>
+
+</tr>
+
+</table>
+
+
+<h3>
+Closed-Loop Control
+</h3>
+
+
+<div class="flow">
+
+<div class="block">
+REFERENCE
+<br>
+Set Point
+</div>
+
+<div class="arrow">
+→
+</div>
+
+<div class="block">
+CONTROLLER
+<br>
+PLC / PID
+</div>
+
+<div class="arrow">
+→
+</div>
+
+<div class="block">
+ACTUATOR
+</div>
+
+<div class="arrow">
+→
+</div>
+
+<div class="block">
+PROCESS
+</div>
+
+<div class="arrow">
+→
+</div>
+
+<div class="block">
+SENSOR
+</div>
+
+</div>
+
+<p style="text-align:center">
+
+↖────────────── FEEDBACK ──────────────↩
+
+</p>
+
+</section>
+
+
+<!-- =================================================
+ANIMATED CONTROL LOOP
+================================================= -->
+
+<section id="control" class="card">
+
+<h2>
+5. Animated Closed-Loop Control
+</h2>
+
+<p>
+
+The following animation demonstrates a practical
+water-level control system.
+
+The desired tank level is continuously compared with
+the measured level. The controller decides whether
+the pump should operate.
+
+</p>
+
+
+<div class="simulation">
+
+<div class="flow">
+
+<div id="aSensor" class="block">
+📡<br>
+LEVEL SENSOR
+</div>
+
+<div id="aArrow1" class="arrow">
+→
+</div>
+
+<div id="aController" class="block">
+🧠<br>
+PLC
+</div>
+
+<div id="aArrow2" class="arrow">
+→
+</div>
+
+<div id="aPump" class="block">
+⚙️<br>
+PUMP
+</div>
+
+<div id="aArrow3" class="arrow">
+→
+</div>
+
+<div id="aTank" class="block">
+🏭<br>
+TANK
+</div>
+
+</div>
+
+
+<div class="simGrid">
+
+
+<div class="controlPanel">
+
+<h3>
+Controller Settings
+</h3>
+
+
+<label>
+Desired Level:
+<span id="setPointText">
+70
+</span> %
+</label>
+
+<input
+type="range"
+id="setPoint"
+min="20"
+max="90"
+value="70"
+>
+
+
+<label>
+Process Disturbance:
+<span id="disturbanceText">
+0
+</span> %
+</label>
+
+<input
+type="range"
+id="disturbance"
+min="0"
+max="50"
+value="0"
+>
+
+
+<br><br>
+
+
+<button
+class="control start"
+onclick="startSimulation()">
+
+▶ START
+
+</button>
+
+
+<button
+class="control stop"
+onclick="stopSimulation()">
+
+■ STOP
+
+</button>
+
+
+<button
+class="control reset"
+onclick="resetSimulation()">
+
+↻ RESET
+
+</button>
+
+
+<div id="simStatus"
+class="status">
+
+SYSTEM READY
+
+</div>
+
+</div>
+
+
+<div class="tankArea">
+
+<h3>
+Industrial Tank Process
+</h3>
+
+
+<div class="tank">
+
+<div
+id="water"
+class="water">
+</div>
+
+<div
+id="levelText"
+class="levelText">
+
+40 %
+
+</div>
+
+</div>
+
+
+<div
+id="levelSensor"
+class="sensor">
+
+📡
+
+<br>
+
+LEVEL SENSOR
+
+</div>
+
+
+<div
+id="pump"
+class="pump">
+
+⚙️
+
+</div>
+
+
+<div class="gauge">
+
+<span id="gauge">
+40
+</span>%
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+</section>
+
+
+<!-- =================================================
+HOW AUTOMATION WORKS
+================================================= -->
+
+<section class="card">
+
+<h2>
+6. Step-by-Step Working of Automation
+</h2>
+
+
+<div class="highlight">
+
+<strong>Step 1 – Measurement</strong>
+
+<p>
+The sensor measures the actual process condition.
+</p>
+
+</div>
+
+
+<div class="highlight">
+
+<strong>Step 2 – Signal Transmission</strong>
+
+<p>
+The sensor signal is transmitted to the controller.
+The signal may be digital or analog.
+</p>
+
+</div>
+
+
+<div class="highlight">
+
+<strong>Step 3 – Controller Decision</strong>
+
+<p>
+The controller executes the programmed control algorithm.
+</p>
+
+</div>
+
+
+<div class="highlight">
+
+<strong>Step 4 – Output Command</strong>
+
+<p>
+The controller sends an output signal to the actuator.
+</p>
+
+</div>
+
+
+<div class="highlight">
+
+<strong>Step 5 – Process Response</strong>
+
+<p>
+The actuator changes the process condition.
+</p>
+
+</div>
+
+
+<div class="highlight">
+
+<strong>Step 6 – Feedback</strong>
+
+<p>
+The sensor measures the new process condition and the
+cycle repeats.
+</p>
+
+</div>
+
+</section>
+
+
+<!-- =================================================
+CONTROL SYSTEM COMPONENTS
+================================================= -->
+
+<section class="card">
+
+<h2>
+7. Major Components of an Industrial Automation System
+</h2>
+
+
+<table>
+
+<tr>
+
+<th>
+Component
+</th>
+
+<th>
+Typical Examples
+</th>
+
+<th>
+Function
+</th>
+
+</tr>
+
+
+<tr>
+
+<td>
+Sensor
+</td>
+
+<td>
+Proximity sensor, RTD, pressure transmitter
+</td>
+
+<td>
+Measure physical variables
+</td>
+
+</tr>
+
+
+<tr>
+
+<td>
+Controller
+</td>
+
+<td>
+PLC, DCS, industrial PC
+</td>
+
+<td>
+Execute control logic
+</td>
+
+</tr>
+
+
+<tr>
+
+<td>
+Actuator
+</td>
+
+<td>
+Motor, valve, pneumatic cylinder
+</td>
+
+<td>
+Perform physical action
+</td>
+
+</tr>
+
+
+<tr>
+
+<td>
+HMI
+</td>
+
+<td>
+Touch panel
+</td>
+
+<td>
+Operator interaction
+</td>
+
+</tr>
+
+
+<tr>
+
+<td>
+SCADA
+</td>
+
+<td>
+Supervisory computer system
+</td>
+
+<td>
+Monitoring, alarms and data acquisition
+</td>
+
+</tr>
+
+
+<tr>
+
+<td>
+Network
+</td>
+
+<td>
+Ethernet/IP, Modbus, PROFIBUS
+</td>
+
+<td>
+Device communication
+</td>
+
+</tr>
+
+</table>
+
+</section>
+
+
+<!-- =================================================
+PLC SCADA DCS
+================================================= -->
+
+<section class="card">
+
+<h2>
+8. PLC, SCADA and DCS – Basic Relationship
+</h2>
+
+
+<div class="flow">
+
+<div class="block">
+
+👨‍🔧<br>
+
+OPERATOR
+
+</div>
+
+<div class="arrow">
+
+↓
+
+</div>
+
+<div class="block">
+
+🖥️<br>
+
+HMI / SCADA
+
+</div>
+
+<div class="arrow">
+
+↓
+
+</div>
+
+<div class="block">
+
+🧠<br>
+
+PLC / DCS
+
+</div>
+
+<div class="arrow">
+
+↓
+
+</div>
+
+<div class="block">
+
+📡<br>
+
+SENSORS
+
+</div>
+
+<div class="arrow">
+
+↓
+
+</div>
+
+<div class="block">
+
+⚙️<br>
+
+ACTUATORS
+
+</div>
+
+<div class="arrow">
+
+↓
+
+</div>
+
+<div class="block">
+
+🏭<br>
+
+PROCESS
+
+</div>
+
+</div>
+
+
+<div class="highlight">
+
+<strong>PLC:</strong>
+Primarily performs real-time machine and process control.
+
+<br><br>
+
+<strong>HMI:</strong>
+Provides the operator interface.
+
+<br><br>
+
+<strong>SCADA:</strong>
+Provides supervisory monitoring, alarms, trends and data acquisition.
+
+<br><br>
+
+<strong>DCS:</strong>
+Designed primarily for large continuous/process industries
+with distributed control architecture.
+
+</div>
+
+</section>
+
+
+<!-- =================================================
+APPLICATIONS
+================================================= -->
+
+<section id="applications" class="card">
+
+<h2>
+9. Industrial Applications
+</h2>
+
+
+<table>
+
+<tr>
+
+<th>
+Industry
+</th>
+
+<th>
+Automation Example
+</th>
+
+</tr>
+
+
+<tr>
+
+<td>
+Automobile
+</td>
+
+<td>
+Robot welding, conveyor control, assembly automation
+</td>
+
+</tr>
+
+
+<tr>
+
+<td>
+Power Plant
+</td>
+
+<td>
+Boiler control, turbine monitoring, generator control
+</td>
+
+</tr>
+
+
+<tr>
+
+<td>
+Chemical Industry
+</td>
+
+<td>
+Temperature, pressure, flow and level control
+</td>
+
+</tr>
+
+
+<tr>
+
+<td>
+Water Treatment
+</td>
+
+<td>
+Pump control, tank-level control, flow monitoring
+</td>
+
+</tr>
+
+
+<tr>
+
+<td>
+Food Industry
+</td>
+
+<td>
+Filling, packaging and temperature control
+</td>
+
+</tr>
+
+
+<tr>
+
+<td>
+Pharmaceutical
+</td>
+
+<td>
+Batch control, temperature and pressure monitoring
+</td>
+
+</tr>
+
+</table>
+
+
+<br>
+
+
+<img
+class="realImage"
+src="https://commons.wikimedia.org/wiki/Special:FilePath/SCADA%20system%20at%20a%20central%20chilled%20water%20plant.jpg"
+alt="Real SCADA industrial control system">
+
+<div class="caption">
+
+Real SCADA control system at a chilled-water plant.
+The image is from Wikimedia Commons and is released under
+CC0 according to its file page. :contentReference[oaicite:1]{index=1}
+
+</div>
+
+</section>
+
+
+<!-- =================================================
+LEARNING SUMMARY
+================================================= -->
+
+<section class="card">
+
+<h2>
+10. Learning Summary
+</h2>
+
+<ul>
+
+<li>
+Automation reduces continuous manual intervention.
+</li>
+
+<li>
+Sensors provide information about the physical process.
+</li>
+
+<li>
+Controllers process the sensor information.
+</li>
+
+<li>
+Actuators perform the required physical action.
+</li>
+
+<li>
+Feedback enables closed-loop control.
+</li>
+
+<li>
+PLC is widely used for machine and sequence control.
+</li>
+
+<li>
+HMI provides operator interaction.
+</li>
+
+<li>
+SCADA provides supervisory monitoring and data acquisition.
+</li>
+
+<li>
+DCS is widely used in large continuous process industries.
+</li>
+
+<li>
+Industrial communication networks connect controllers,
+field devices and supervisory systems.
+</li>
+
+</ul>
+
+</section>
+
+
+<!-- =================================================
+QUIZ
+================================================= -->
+
+<section id="quiz" class="card">
+
+<h2>
+11. Student Self-Assessment
+</h2>
+
+
+<div class="quiz">
+
+<strong>
+Q1. Which device measures a physical process variable?
+</strong>
+
+<button onclick="answer(this,false)">
+A. Actuator
+</button>
+
+<button onclick="answer(this,true)">
+B. Sensor
+</button>
+
+<button onclick="answer(this,false)">
+C. Contactor
+</button>
+
+<button onclick="answer(this,false)">
+D. Relay
+</button>
+
+</div>
+
+
+<div class="quiz">
+
+<strong>
+Q2. Which system is mainly used for supervisory monitoring?
+</strong>
+
+<button onclick="answer(this,false)">
+A. Sensor
+</button>
+
+<button onclick="answer(this,false)">
+B. Actuator
+</button>
+
+<button onclick="answer(this,true)">
+C. SCADA
+</button>
+
+<button onclick="answer(this,false)">
+D. Motor
+</button>
+
+</div>
+
+
+<div class="quiz">
+
+<strong>
+Q3. What distinguishes a closed-loop system?
+</strong>
+
+<button onclick="answer(this,false)">
+A. It does not use sensors
+</button>
+
+<button onclick="answer(this,true)">
+B. It uses feedback
+</button>
+
+<button onclick="answer(this,false)">
+C. It cannot use a controller
+</button>
+
+<button onclick="answer(this,false)">
+D. It always uses a relay
+</button>
+
+</div>
+
+
+<div class="quiz">
+
+<strong>
+Q4. Which device converts a controller command into physical action?
+</strong>
+
+<button onclick="answer(this,false)">
+A. Sensor
+</button>
+
+<button onclick="answer(this,true)">
+B. Actuator
+</button>
+
+<button onclick="answer(this,false)">
+C. SCADA
+</button>
+
+<button onclick="answer(this,false)">
+D. HMI
+</button>
+
+</div>
+
+
+<div id="quizResult"
+class="status">
+
+Select an answer.
+
+</div>
+
+</section>
+
+
+<!-- =================================================
+NEXT
+================================================= -->
+
+<section class="card">
+
+<h2>
+12. Next Topic
+</h2>
+
+<div class="highlight">
+
+<strong>
+Need for Automation
+</strong>
+
+<br><br>
+
+The next digital-book chapter will explain why industries
+use automation, including productivity, quality, safety,
+repeatability, cost, flexibility, human-machine interaction
+and limitations.
+
+<br><br>
+
+The chapter will contain an animated comparison of:
+
+<br><br>
+
+<strong>
+Manual Production
+VS
+Semi-Automatic Production
+VS
+Fully Automated Production
+</strong>
+
+</div>
+
+</section>
+
+
+</div>
+
+
+<script>
+
+/* ==========================================
+NAVIGATION
+========================================== */
+
+function go(id){
+
+    document.getElementById(id)
+    .scrollIntoView({
+        behavior:"smooth"
+    });
+
+}
+
+
+/* ==========================================
+SIMULATION VARIABLES
+========================================== */
+
+let running=false;
+
+let level=40;
+
+let interval;
+
+
+/* ==========================================
+SLIDERS
+========================================== */
+
+document
+.getElementById("setPoint")
+.addEventListener(
+"input",
+function(){
+
+document.getElementById(
+"setPointText"
+).innerText=this.value;
+
+});
+
+
+document
+.getElementById("disturbance")
+.addEventListener(
+"input",
+function(){
+
+document.getElementById(
+"disturbanceText"
+).innerText=this.value;
+
+});
+
+
+/* ==========================================
+START
+========================================== */
+
+function startSimulation(){
+
+    running=true;
+
+    document.getElementById(
+        "simStatus"
+    ).innerText=
+        "AUTOMATIC CONTROL RUNNING";
+
+    document.getElementById(
+        "simStatus"
+    ).className=
+        "status";
+
+
+    if(!interval){
+
+        interval=setInterval(
+            simulationStep,
+            200
+        );
+
+    }
+
+}
+
+
+/* ==========================================
+STOP
+========================================== */
+
+function stopSimulation(){
+
+    running=false;
+
+    document.getElementById(
+        "simStatus"
+    ).innerText=
+        "CONTROL STOPPED";
+
+    document.getElementById(
+        "simStatus"
+    ).className=
+        "status warning";
+
+}
+
+
+/* ==========================================
+RESET
+========================================== */
+
+function resetSimulation(){
+
+    running=false;
+
+    level=40;
+
+    document.getElementById(
+        "simStatus"
+    ).innerText=
+        "SYSTEM READY";
+
+    document.getElementById(
+        "simStatus"
+    ).className=
+        "status";
+
+    updateTank();
+
+}
+
+
+/* ==========================================
+SIMULATION
+========================================== */
+
+function simulationStep(){
+
+    if(!running){
+
+        return;
+
+    }
+
+
+    let setPoint=
+        Number(
+            document.getElementById(
+                "setPoint"
+            ).value
+        );
+
+
+    let disturbance=
+        Number(
+            document.getElementById(
+                "disturbance"
+            ).value
+        );
+
+
+    let error=
+        setPoint-level;
+
+
+    if(error>3){
+
+        level += 1.4;
+
+        activateFlow(true);
+
+    }
+
+    else if(error<-3){
+
+        level -= .8;
+
+        activateFlow(false);
+
+    }
+
+    else{
+
+        level +=
+            (Math.random()-.5)*.3;
+
+        activateFlow(false);
+
+    }
+
+
+    level -=
+        disturbance*.01;
+
+
+    if(level<0){
+
+        level=0;
+
+    }
+
+    if(level>100){
+
+        level=100;
+
+    }
+
+
+    updateTank();
+
+}
+
+
+/* ==========================================
+UPDATE TANK
+========================================== */
+
+function updateTank(){
+
+    document.getElementById(
+        "water"
+    ).style.height=
+        level+"%";
+
+
+    document.getElementById(
+        "levelText"
+    ).innerText=
+        Math.round(level)+" %";
+
+
+    document.getElementById(
+        "gauge"
+    ).innerText=
+        Math.round(level);
+
+}
+
+
+/* ==========================================
+FLOW ANIMATION
+========================================== */
+
+function activateFlow(pumpOn){
+
+    let ids=[
+
+        "aSensor",
+        "aController",
+        "aPump",
+        "aTank"
+
+    ];
+
+
+    ids.forEach(
+        id=>{
+
+            document
+            .getElementById(id)
+            .classList.remove(
+                "active"
+            );
+
+        }
+    );
+
+
+    document
+    .getElementById(
+        "aSensor"
+    )
+    .classList.add(
+        "active"
+    );
+
+
+    setTimeout(()=>{
+
+        document
+        .getElementById(
+            "aController"
+        )
+        .classList.add(
+            "active"
+        );
+
+    },150);
+
+
+    setTimeout(()=>{
+
+        if(pumpOn){
+
+            document
+            .getElementById(
+                "aPump"
+            )
+            .classList.add(
+                "active"
+            );
+
+            document
+            .getElementById(
+                "pump"
+            )
+            .classList.add(
+                "running"
+            );
+
+        }
+        else{
+
+            document
+            .getElementById(
+                "pump"
+            )
+            .classList.remove(
+                "running"
+            );
+
+        }
+
+    },300);
+
+
+    setTimeout(()=>{
+
+        document
+        .getElementById(
+            "aTank"
+        )
+        .classList.add(
+            "active"
+        );
+
+    },450);
+
+}
+
+
+/* ==========================================
+QUIZ
+========================================== */
+
+let score=0;
+
+let answered=0;
+
+
+function answer(button,correct){
+
+    if(
+        button.parentElement
+        .dataset.answered
+    ){
+
+        return;
+
+    }
+
+
+    button.parentElement
+    .dataset.answered=true;
+
+
+    answered++;
+
+
+    if(correct){
+
+        button.classList.add(
+            "correct"
+        );
+
+        score++;
+
+        document.getElementById(
+            "quizResult"
+        ).innerText=
+            "✓ Correct! Score: "+
+            score+
+            "/"+
+            answered;
+
+    }
+
+    else{
+
+        button.classList.add(
+            "wrong"
+        );
+
+        document.getElementById(
+            "quizResult"
+        ).innerText=
+            "✗ Incorrect. Score: "+
+            score+
+            "/"+
+            answered;
+
+    }
+
+}
+
+
+/* ==========================================
+INITIALIZE
+========================================== */
+
+updateTank();
+
+</script>
+
+
+</body>
+
+</html>

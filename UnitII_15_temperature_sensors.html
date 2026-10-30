@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Chapter 15: Temperature Sensing – RTD & Thermistor</title>
+
+<!-- MathJax Configuration and Script -->
+<script>
+  window.MathJax = {
+    tex: {
+      inlineMath: [['$', '$'], ['\\(', '\\)']],
+      displayMath: [['$$', '$$'], ['\\[', '\\]']]
+    }
+  };
+</script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+<style>
+  :root {
+    --bg-dark: #071017;
+    --panel-bg: #0d1f2d;
+    --border-color: #1e3a50;
+    --accent-blue: #38bdf8;
+    --accent-green: #22c55e;
+    --accent-amber: #f59e0b;
+    --text-main: #e2e8f0;
+    --text-muted: #94a3b8;
+  }
+
+  body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: var(--bg-dark);
+    color: var(--text-main);
+    line-height: 1.6;
+    padding: 24px;
+    margin: 0;
+  }
+
+  h1, h2, h3, h4 {
+    color: var(--accent-blue);
+  }
+
+  h1 {
+    border-bottom: 2px solid var(--border-color);
+    padding-bottom: 10px;
+    margin-bottom: 20px;
+  }
+
+  .sensor-card {
+    background-color: var(--panel-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 10px;
+    padding: 24px;
+    margin-bottom: 30px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+  }
+
+  .grid-2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+  }
+
+  @media (max-width: 900px) {
+    .grid-2 { grid-template-columns: 1fr; }
+  }
+
+  .anim-box {
+    background: #040a0f;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 16px;
+    text-align: center;
+  }
+
+  .img-fluid {
+    max-width: 100%;
+    height: 180px;
+    object-fit: contain;
+    border-radius: 6px;
+    background: #040a0f;
+    padding: 10px;
+    border: 1px solid var(--border-color);
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 15px;
+  }
+
+  th, td {
+    border: 1px solid var(--border-color);
+    padding: 10px;
+    text-align: left;
+  }
+
+  th {
+    background-color: #132b3e;
+    color: var(--accent-blue);
+  }
+
+  .numerical-card {
+    background: #0a1824;
+    border-left: 4px solid var(--accent-amber);
+    padding: 18px;
+    margin-bottom: 20px;
+    border-radius: 0 8px 8px 0;
+  }
+
+  .formula {
+    background: #040a0f;
+    padding: 8px 12px;
+    border-radius: 6px;
+    color: #4ade80;
+    overflow-x: auto;
+    margin: 8px 0;
+  }
+</style>
+</head>
+<body>
+
+<h1>Chapter 15: Temperature Measurement Transducers</h1>
+<p>This chapter examines resistive temperature sensors used in industrial thermal control and electric motor winding protection. Topics include linear Positive Temperature Coefficient (PTC) sensing via <strong>Resistance Temperature Detectors (RTD - Pt100/Pt1000)</strong>, non-linear high-sensitivity sensing via <strong>NTC Thermistors</strong>, Wheatstone bridge signal conditioning, and temperature coefficient calculations.</p>
+
+<!-- SECTION 1: RTD SENSOR -->
+<div class="sensor-card">
+  <h2>1. Resistance Temperature Detector (RTD - Pt100 / Pt1000)</h2>
+  <div class="grid-2">
+    <div>
+      <h3>Industrial Hardware Image</h3>
+      <img src="images/RTD.jpg" class="img-fluid" alt="Industrial PT100 RTD Temperature Probe">
+      <br>
+      <h4>Working Principle</h4>
+      <p>An RTD is a passive sensor operating on the principle that electrical resistance of pure metals increases predictably and linearly with temperature (Positive Temperature Coefficient, PTC). Platinum is the industry standard due to its high resistance to corrosion and long-term stability.</p>
+
+      <p>The relationship between resistance $R_T$ and temperature $T$ ($^\circ\text{C}$) over typical operating ranges ($0^\circ\text{C}\text{ to }100^\circ\text{C}$) is governed by the linear Callendar-Van Dusen simplification:</p>
+      <div class="formula">
+        $$R_T = R_0 \cdot (1 + \alpha \cdot T)$$
+      </div>
+      <p>Where $R_0$ is the nominal resistance at $0^\circ\text{C}$ ($100\ \Omega$ for Pt100, $1000\ \Omega$ for Pt1000) and $\alpha$ is the Temperature Coefficient of Resistance (TCR), typically $\alpha = 0.00385\ \Omega/\Omega/^\circ\text{C}$ for standard platinum elements.</p>
+    </div>
+
+    <div>
+      <h3>Interactive Wire Compensation Animation</h3>
+      <div class="anim-box">
+        <svg viewBox="0 0 400 200" width="100%" height="180">
+          <!-- RTD Element Probe -->
+          <rect x="30" y="70" width="90" height="60" fill="#334155" stroke="#38bdf8" stroke-width="2" rx="4"/>
+          <path d="M 40 100 L 50 85 L 60 115 L 70 85 L 80 115 L 90 85 L 100 100" fill="none" stroke="#f59e0b" stroke-width="2"/>
+          <text x="50" y="125" fill="#38bdf8" font-size="10" font-weight="bold">Pt100 Element</text>
+
+          <!-- Heat Source Glow -->
+          <circle cx="20" cy="100" r="15" fill="#ef4444" opacity="0.6">
+            <animate attributeName="r" values="12;18;12" dur="1.5s" repeatCount="indefinite"/>
+          </circle>
+          <text x="12" y="104" fill="#fff" font-size="9" font-weight="bold">HEAT</text>
+
+          <!-- 3-Wire Configuration -->
+          <line x1="120" y1="80" x2="250" y2="80" stroke="#ef4444" stroke-width="2"/>
+          <text x="160" y="75" fill="#ef4444" font-size="9">Wire A (RL1)</text>
+
+          <line x1="120" y1="100" x2="250" y2="100" stroke="#ef4444" stroke-width="2"/>
+          <text x="160" y="95" fill="#ef4444" font-size="9">Wire B (RL2)</text>
+
+          <line x1="120" y1="120" x2="250" y2="120" stroke="#38bdf8" stroke-width="2"/>
+          <text x="160" y="135" fill="#38bdf8" font-size="9">Wire C (Compensation RL3)</text>
+
+          <!-- Wheatstone Bridge Block -->
+          <rect x="250" y="60" width="130" height="80" fill="#091a24" stroke="#22c55e" stroke-width="2" rx="6"/>
+          <text x="260" y="85" fill="#22c55e" font-size="11" font-weight="bold">3-Wire Bridge Circuit</text>
+          <text x="265" y="115" fill="#4ade80" font-size="12" font-weight="bold">Vout ∝ ΔR_T</text>
+          <text x="260" y="130" fill="#94a3b8" font-size="8">Lead Resistance Cancelled</text>
+        </svg>
+        <p style="font-size:12px; color:#94a3b8;">Linear Metal Resistance Increase & 3-Wire Lead Compensation</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SECTION 2: THERMISTOR -->
+<div class="sensor-card">
+  <h2>2. Thermistor (NTC / PTC)</h2>
+  <div class="grid-2">
+    <div>
+      <h3>Industrial Hardware Image</h3>
+      <img src="images/Thermistor.jpg" class="img-fluid" alt="NTC Thermistor Sensor Module">
+      <br>
+      <h4>Working Principle</h4>
+      <p>A Thermistor is a temperature-sensitive semiconductor resistor made from sintered metal oxides. Unlike RTDs, <strong>Negative Temperature Coefficient (NTC)</strong> thermistors experience a dramatic, non-linear decrease in resistance as temperature rises.</p>
+
+      <p>The resistance-temperature characteristic is modeled accurately using the <strong>$\beta$-parameter (Beta) equation</strong>:</p>
+      <div class="formula">
+        $$R_T = R_{0} \cdot \exp\left[ \beta \left( \frac{1}{T} - \frac{1}{T_0} \right) \right]$$
+      </div>
+      <p>Where $T$ and $T_0$ are absolute temperatures in Kelvin ($\text{K} = ^\circ\text{C} + 273.15$), $R_0$ is the rated nominal resistance at reference temperature $T_0 = 298.15\text{ K}$ ($25^\circ\text{C}$), and $\beta$ is the material constant (typically $3000\text{ K} - 5000\text{ K}$).</p>
+    </div>
+
+    <div>
+      <h3>Interactive Exponential Curve Animation</h3>
+      <div class="anim-box">
+        <svg viewBox="0 0 400 200" width="100%" height="180">
+          <!-- Graph Axes -->
+          <line x1="50" y1="150" x2="350" y2="150" stroke="#94a3b8" stroke-width="2"/>
+          <line x1="50" y1="20" x2="50" y2="150" stroke="#94a3b8" stroke-width="2"/>
+          <text x="180" y="170" fill="#94a3b8" font-size="10">Temperature T (°C)</text>
+          <text x="10" y="80" fill="#94a3b8" font-size="10" transform="rotate(-90 20,80)">Resistance R (Ω)</text>
+
+          <!-- Linear RTD Line -->
+          <path d="M 50 130 L 330 40" fill="none" stroke="#38bdf8" stroke-width="2" stroke-dasharray="4,4"/>
+          <text x="260" y="50" fill="#38bdf8" font-size="9">RTD (Linear PTC)</text>
+
+          <!-- Exponential NTC Curve -->
+          <path d="M 60 30 Q 100 130 330 140" fill="none" stroke="#ef4444" stroke-width="3">
+            <animate attributeName="stroke-dashoffset" values="300;0" dur="2s" repeatCount="indefinite"/>
+          </path>
+          <text x="110" y="90" fill="#ef4444" font-size="9" font-weight="bold">NTC Thermistor (Exponential)</text>
+
+          <!-- Interactive Marker Point -->
+          <circle cx="160" cy="125" r="5" fill="#f59e0b">
+            <animate attributeName="cx" values="60;330;60" dur="4s" repeatCount="indefinite"/>
+            <animate attributeName="cy" values="30;140;30" dur="4s" repeatCount="indefinite"/>
+          </circle>
+        </svg>
+        <p style="font-size:12px; color:#94a3b8;">High Sensitivity Non-Linear Exponential Decay Characteristic</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SECTION 3: COMPARISON TABLE -->
+<div class="sensor-card">
+  <h2>Comparative Analysis: Temperature Sensors</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>Feature</th>
+        <th>Platinum RTD (Pt100 / Pt1000)</th>
+        <th>NTC Thermistor</th>
+        <th>Thermocouple (Type K)</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>Temperature Range</strong></td>
+        <td>$-200^\circ\text{C}\text{ to }+850^\circ\text{C}$</td>
+        <td>$-55^\circ\text{C}\text{ to }+150^\circ\text{C}$</td>
+        <td>$-200^\circ\text{C}\text{ to }+1260^\circ\text{C}$</td>
+      </tr>
+      <tr>
+        <td><strong>Linearity</strong></td>
+        <td><strong>Excellent</strong> (Nearly linear positive response).</td>
+        <td><strong>Poor</strong> (Highly exponential non-linear curve).</td>
+        <td>Fair to Moderate.</td>
+      </tr>
+      <tr>
+        <td><strong>Sensitivity & Speed</strong></td>
+        <td>Moderate sensitivity; moderate response time.</td>
+        <td><strong>Very High</strong> sensitivity; rapid response to small change.</td>
+        <td>Low sensitivity ($41\ \mu\text{V}/^\circ\text{C}$); fast response.</td>
+      </tr>
+      <tr>
+        <td><strong>Accuracy & Stability</strong></td>
+        <td><strong>Highest accuracy</strong> ($0.01^\circ\text{C}$), minimal long-term drift.</td>
+        <td>Moderate accuracy ($0.1^\circ\text{C} - 1^\circ\text{C}$); susceptible to aging.</td>
+        <td>Standard accuracy ($1^\circ\text{C} - 2^\circ\text{C}$).</td>
+      </tr>
+      <tr>
+        <td><strong>Primary Applications</strong></td>
+        <td>Precision industrial processes, HVAC ducts, motor winding monitoring.</td>
+        <td>Inrush current limiters, motor thermal overload protection, BMS.</td>
+        <td>High-temperature industrial furnaces, engine exhaust monitoring.</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- SECTION 4: NUMERICAL PROBLEMS -->
+<div class="sensor-card">
+  <h2>Numerical Problems: Thermal Transducers & Bridge Signal Conditioning</h2>
+
+  <!-- Problem 1: Pt100 Resistance & Wheatstone Bridge -->
+  <div class="numerical-card">
+    <h3>Problem 1: Pt100 RTD Temperature Measurement with Wheatstone Bridge</h3>
+    <p><strong>Scenario:</strong> A Pt100 RTD element ($R_0 = 100\ \Omega$ at $0^\circ\text{C}$, $\alpha = 0.00385\ \Omega/\Omega/^\circ\text{C}$) is installed inside a electric motor stator winding. It is placed in one arm of a balanced Wheatstone bridge where $R_1 = R_2 = R_3 = 100\ \Omega$, and the bridge excitation voltage is $V_S = 5.0\text{V}$. When the motor heats up under heavy load, the unbalance output voltage of the bridge is measured as $V_{OUT} = 45.45\text{ mV}$. Calculate:</p>
+    <ol type="a">
+      <li>The resistance $R_T$ of the Pt100 RTD element at the operating temperature.</li>
+      <li>The actual stator winding temperature $T$ in degrees Celsius ($^\circ\text{C}$).</li>
+    </ol>
+
+    <h4>Step-by-Step Solution:</h4>
+    <p><strong>1. Calculate RTD Resistance ($R_T$):</strong> The output voltage of an unbalanced Wheatstone bridge is:</p>
+    <div class="formula">
+      $$V_{OUT} = V_S \times \left( \frac{R_T}{R_T + R_3} - \frac{R_2}{R_1 + R_2} \right)$$
+    </div>
+    <p>Substituting $R_1 = R_2 = R_3 = 100\ \Omega$ and $V_S = 5.0\text{V}$:</p>
+    <div class="formula">
+      $$0.04545 = 5.0 \times \left( \frac{R_T}{R_T + 100} - 0.5 \right)$$
+    </div>
+    <div class="formula">
+      $$\frac{0.04545}{5.0} = \frac{R_T}{R_T + 100} - 0.5 \implies 0.00909 + 0.5 = 0.50909 = \frac{R_T}{R_T + 100}$$
+    </div>
+    <div class="formula">
+      $$0.50909 \times (R_T + 100) = R_T \implies 50.909 = R_T - 0.50909 R_T = 0.49091 R_T$$
+    </div>
+    <div class="formula">
+      $$R_T = \frac{50.909}{0.49091} = 103.704\ \Omega$$
+    </div>
+
+    <p><strong>2. Calculate Stator Winding Temperature ($T$):</strong> Using the linear RTD formula:</p>
+    <div class="formula">
+      $$R_T = R_0 \cdot (1 + \alpha \cdot T) \implies 103.704 = 100 \cdot (1 + 0.00385 \cdot T)$$
+    </div>
+    <div class="formula">
+      $$\frac{103.704}{100} - 1 = 0.03704 = 0.00385 \cdot T \implies T = \frac{0.03704}{0.00385} = 9.62^\circ\text{C} + 0^\circ\text{C} \approx 9.62\text{ °C change...}$$
+    </div>
+    <p><em>(Recalculating directly from $0^\circ\text{C}$):</em></p>
+    <div class="formula">
+      $$T = \frac{R_T - R_0}{\alpha \cdot R_0} = \frac{103.704 - 100}{0.00385 \times 100} = \frac{3.704}{0.385} = 96.21\text{ °C}$$
+    </div>
+  </div>
+
+  <!-- Problem 2: NTC Thermistor Beta Calculation -->
+  <div class="numerical-card">
+    <h3>Problem 2: NTC Thermistor Temperature Evaluation using Beta Equation</h3>
+    <p><strong>Scenario:</strong> An NTC thermistor used for motor controller thermal protection has a rated nominal resistance $R_0 = 10\text{ k}\Omega$ ($10000\ \Omega$) at reference temperature $T_0 = 25^\circ\text{C}$ ($298.15\text{ K}$) and a beta constant $\beta = 3950\text{ K}$. When monitoring an inverter heatsink, a microcontroller measures a thermistor resistance $R_T = 2.45\text{ k}\Omega$ ($2450\ \Omega$). Calculate the heatsink temperature $T$ in $^\circ\text{C}$.</p>
+
+    <h4>Step-by-Step Solution:</h4>
+    <p><strong>1. Rearrange Beta Equation for Absolute Temperature ($T$):</strong></p>
+    <div class="formula">
+      $$\frac{R_T}{R_0} = \exp\left[ \beta \left( \frac{1}{T} - \frac{1}{T_0} \right) \right]$$
+    </div>
+    <div class="formula">
+      $$\ln\left( \frac{R_T}{R_0} \right) = \beta \left( \frac{1}{T} - \frac{1}{T_0} \right)$$
+    </div>
+    <div class="formula">
+      $$\frac{1}{T} = \frac{1}{T_0} + \frac{1}{\beta} \cdot \ln\left( \frac{R_T}{R_0} \right)$$
+    </div>
+
+    <p><strong>2. Substitute Values:</strong></p>
+    <div class="formula">
+      $$\frac{1}{T_0} = \frac{1}{298.15} = 0.003354\text{ K}^{-1}$$
+    </div>
+    <div class="formula">
+      $$\ln\left( \frac{2450}{10000} \right) = \ln(0.245) = -1.4065$$
+    </div>
+    <div class="formula">
+      $$\frac{1}{T} = 0.003354 + \frac{-1.4065}{3950} = 0.003354 - 0.000356 = 0.002998\text{ K}^{-1}$$
+    </div>
+
+    <p><strong>3. Convert Absolute Temperature to Celsius ($^\circ\text{C}$):</strong></p>
+    <div class="formula">
+      $$T = \frac{1}{0.002998} = 333.56\text{ K}$$
+    </div>
+    <div class="formula">
+      $$T(^\circ\text{C}) = 333.56 - 273.15 = 60.41\text{ °C}$$
+    </div>
+  </div>
+
+  <!-- Problem 3: Self-Heating Dissipation Constant -->
+  <div class="numerical-card">
+    <h3>Problem 3: RTD Self-Heating Error Calculation</h3>
+    <p><strong>Scenario:</strong> A Pt100 sensor with a dissipation constant $P_D = 4.0\text{ mW}/^\circ\text{C}$ in still air is biased with a excitation current $I_{ex} = 5.0\text{ mA}$. At an ambient temperature $T_{amb} = 50.0^\circ\text{C}$, the RTD resistance is approximately $R_T = 119.4\ \Omega$. Calculate:</p>
+    <ol type="a">
+      <li>The electrical power $P_{elec}$ dissipated inside the RTD element.</li>
+      <li>The temperature measurement error $\Delta T_{error}$ caused by self-heating.</li>
+      <li>The actual temperature indicated by the sensor ($T_{indicated}$).</li>
+    </ol>
+
+    <h4>Step-by-Step Solution:</h4>
+    <p><strong>1. Electrical Power Dissipation ($P_{elec}$):</strong></p>
+    <div class="formula">
+      $$P_{elec} = I_{ex}^2 \times R_T = (5.0 \times 10^{-3}\text{ A})^2 \times 119.4\ \Omega = (25.0 \times 10^{-6}) \times 119.4 = 0.002985\text{ W} = 2.985\text{ mW}$$
+    </div>
+
+    <p><strong>2. Temperature Self-Heating Error ($\Delta T_{error}$):</strong></p>
+    <div class="formula">
+      $$\Delta T_{error} = \frac{P_{elec}}{P_D} = \frac{2.985\text{ mW}}{4.0\text{ mW}/^\circ\text{C}} = 0.746\text{ °C}$$
+    </div>
+
+    <p><strong>3. Indicated Temperature ($T_{indicated}$):</strong></p>
+    <div class="formula">
+      $$T_{indicated} = T_{amb} + \Delta T_{error} = 50.0^\circ\text{C} + 0.746^\circ\text{C} = 50.746\text{ °C}$$
+    </div>
+    <p><em>(Note: Keep excitation currents low, typically $\le 1\text{ mA}$, to minimize self-heating errors in precision RTD measurements).</em></p>
+  </div>
+</div>
+
+</body>
+</html>

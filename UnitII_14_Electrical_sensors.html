@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Chapter 14: Electrical Sensing – Isolated Voltage & Current Sensors</title>
+
+<!-- MathJax Configuration and Script -->
+<script>
+  window.MathJax = {
+    tex: {
+      inlineMath: [['$', '$'], ['\\(', '\\)']],
+      displayMath: [['$$', '$$'], ['\\[', '\\]']]
+    }
+  };
+</script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+<style>
+  :root {
+    --bg-dark: #071017;
+    --panel-bg: #0d1f2d;
+    --border-color: #1e3a50;
+    --accent-blue: #38bdf8;
+    --accent-green: #22c55e;
+    --accent-amber: #f59e0b;
+    --text-main: #e2e8f0;
+    --text-muted: #94a3b8;
+  }
+
+  body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: var(--bg-dark);
+    color: var(--text-main);
+    line-height: 1.6;
+    padding: 24px;
+    margin: 0;
+  }
+
+  h1, h2, h3, h4 {
+    color: var(--accent-blue);
+  }
+
+  h1 {
+    border-bottom: 2px solid var(--border-color);
+    padding-bottom: 10px;
+    margin-bottom: 20px;
+  }
+
+  .sensor-card {
+    background-color: var(--panel-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 10px;
+    padding: 24px;
+    margin-bottom: 30px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+  }
+
+  .grid-2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+  }
+
+  @media (max-width: 900px) {
+    .grid-2 { grid-template-columns: 1fr; }
+  }
+
+  .anim-box {
+    background: #040a0f;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 16px;
+    text-align: center;
+  }
+
+  .img-fluid {
+    max-width: 100%;
+    height: 180px;
+    object-fit: contain;
+    border-radius: 6px;
+    background: #040a0f;
+    padding: 10px;
+    border: 1px solid var(--border-color);
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 15px;
+  }
+
+  th, td {
+    border: 1px solid var(--border-color);
+    padding: 10px;
+    text-align: left;
+  }
+
+  th {
+    background-color: #132b3e;
+    color: var(--accent-blue);
+  }
+
+  .numerical-card {
+    background: #0a1824;
+    border-left: 4px solid var(--accent-amber);
+    padding: 18px;
+    margin-bottom: 20px;
+    border-radius: 0 8px 8px 0;
+  }
+
+  .formula {
+    background: #040a0f;
+    padding: 8px 12px;
+    border-radius: 6px;
+    color: #4ade80;
+    overflow-x: auto;
+    margin: 8px 0;
+  }
+</style>
+</head>
+<body>
+
+<h1>Chapter 14: Electrical Sensing – Isolated Voltage & Current Transducers</h1>
+<p>This chapter covers galvanic isolation methods for measuring high power electrical variables in electric motor drives and automated power control systems. Topics include optical & magnetic barrier isolation in <strong>Isolated Voltage Sensor Modules</strong>, non-contact flux measurement in <strong>Hall Effect Current Sensors (Open-Loop & Closed-Loop)</strong>, and motor current/bus-voltage calculations.</p>
+
+<!-- SECTION 1: ISOLATED VOLTAGE SENSOR -->
+<div class="sensor-card">
+  <h2>1. Isolated Voltage Sensor Module</h2>
+  <div class="grid-2">
+    <div>
+      <h3>Industrial Hardware Image</h3>
+      <img src="images/Isolated Voltage Sensor Modules.jpg" class="img-fluid" alt="Isolated Voltage Sensor Module">
+      <br>
+      <h4>Working Principle</h4>
+      <p>High-voltage DC bus lines (e.g., $400\text{V} - 800\text{V}$ in motor drives) cannot be directly fed to low-voltage microcontrollers ($3.3\text{V}/5\text{V}$). <strong>Isolated Voltage Sensor Modules</strong> step down high voltage using a precision resistive divider network and transmit the scaled signal across a high-voltage <strong>galvanic isolation barrier</strong> (opto-isolation or capacitive isolation amplifier).</p>
+      
+      <p>For a high input voltage $V_{IN}$, precision input resistors $R_1$ and $R_2$ step down the voltage to a safe level $V_{sense}$:</p>
+      <div class="formula">
+        $$V_{sense} = V_{IN} \times \frac{R_2}{R_1 + R_2}$$
+      </div>
+      <p>The isolation amplifier modulates this small analog signal, transfers it across the isolation barrier via optical or capacitive coupling, and outputs an isolated proportional voltage $V_{OUT}$:</p>
+      <div class="formula">
+        $$V_{OUT} = G_{iso} \times V_{sense} = G_{iso} \times V_{IN} \times \left( \frac{R_2}{R_1 + R_2} \right)$$
+      </div>
+      <p>Where $G_{iso}$ is the gain of the isolation amplifier stage. This prevents ground loops and protects control electronics from high voltage surges.</p>
+    </div>
+
+    <div>
+      <h3>Interactive Galvanic Isolation Animation</h3>
+      <div class="anim-box">
+        <svg viewBox="0 0 400 200" width="100%" height="180">
+          <!-- High Voltage Side -->
+          <rect x="20" y="30" width="120" height="140" fill="#1e1b4b" stroke="#ef4444" stroke-width="2" rx="6"/>
+          <text x="32" y="52" fill="#ef4444" font-size="11" font-weight="bold">HIGH VOLTAGE SIDE</text>
+          <text x="40" y="80" fill="#e2e8f0" font-size="12">HV+ (600V DC)</text>
+          
+          <!-- Voltage Divider Resistors -->
+          <rect x="55" y="95" width="50" height="15" fill="#334155" stroke="#f59e0b"/>
+          <text x="70" y="107" fill="#f59e0b" font-size="9">R1 (300k)</text>
+          <rect x="55" y="120" width="50" height="15" fill="#334155" stroke="#f59e0b"/>
+          <text x="70" y="132" fill="#f59e0b" font-size="9">R2 (10k)</text>
+
+          <!-- Galvanic Barrier -->
+          <line x1="170" y1="20" x2="170" y2="180" stroke="#f59e0b" stroke-width="3" stroke-dasharray="6,4"/>
+          <text x="175" y="100" fill="#f59e0b" font-size="9" transform="rotate(-90 175,100)" text-anchor="middle" font-weight="bold">ISOLATION BARRIER (5kV)</text>
+
+          <!-- Photocoupler / Opto LED Transmission -->
+          <circle cx="150" cy="110" r="10" fill="#ef4444">
+            <animate attributeName="opacity" values="0.3;1;0.3" dur="1.5s" repeatCount="indefinite"/>
+          </circle>
+          <polygon points="175,105 190,110 175,115" fill="#38bdf8">
+            <animate attributeName="opacity" values="0.3;1;0.3" dur="1.5s" repeatCount="indefinite"/>
+          </polygon>
+
+          <!-- Low Voltage Side -->
+          <rect x="210" y="30" width="170" height="140" fill="#062e1e" stroke="#22c55e" stroke-width="2" rx="6"/>
+          <text x="222" y="52" fill="#22c55e" font-size="11" font-weight="bold">MCU LOW VOLTAGE SIDE</text>
+          <text x="230" y="85" fill="#e2e8f0" font-size="11">Isolated ADC Input</text>
+          
+          <!-- Oscilloscope Signal -->
+          <rect x="230" y="100" width="130" height="50" fill="#040a0f" stroke="#38bdf8" rx="4"/>
+          <path d="M 240 125 L 270 125 L 270 110 L 310 110 L 310 125 L 350 125" fill="none" stroke="#4ade80" stroke-width="2"/>
+          <text x="245" y="142" fill="#94a3b8" font-size="9">Safe 0 - 3.3V Analog Signal</text>
+        </svg>
+        <p style="font-size:12px; color:#94a3b8;">High Voltage Stepped-Down Optocoupled Isolation Barrier</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SECTION 2: HALL EFFECT CURRENT SENSOR -->
+<div class="sensor-card">
+  <h2>2. Hall Effect Current Sensor (ACS712 / Open & Closed Loop)</h2>
+  <div class="grid-2">
+    <div>
+      <h3>Industrial Hardware Image</h3>
+      <img src="images/Hall Effect Current Sensor.jpg" class="img-fluid" alt="Hall Effect Current Sensor Module">
+      <br>
+      <h4>Working Principle</h4>
+      <p>A Hall Effect Current Sensor measures primary AC or DC motor current without physical electrical connection (galvanically isolated). As current $I_p$ flows through an internal low-resistance copper conductor track, it generates a proportional magnetic field $B$ according to Ampere’s Law:</p>
+      <div class="formula">
+        $$B = \frac{\mu_0 \cdot I_p}{2\pi \cdot r}$$
+      </div>
+      <p>An integrated Hall IC converts this magnetic flux into a proportional transverse Hall voltage $V_H$. The sensor module conditions this signal into a linear output voltage $V_{OUT}$ proportional to primary current:</p>
+      <div class="formula">
+        $$V_{OUT} = V_{zero} + (S_{sens} \times I_p)$$
+      </div>
+      <p>Where $V_{zero}$ is the zero-current offset voltage (typically $2.5\text{V}$ for a $5\text{V}$ supply) and $S_{sens}$ is the sensor sensitivity constant (expressed in $\text{mV/A}$).</p>
+    </div>
+
+    <div>
+      <h3>Interactive Magnetic Field & Hall Element Animation</h3>
+      <div class="anim-box">
+        <svg viewBox="0 0 400 200" width="100%" height="180">
+          <!-- Primary Current Busbar / Wire -->
+          <rect x="40" y="80" width="320" height="30" fill="#b45309" stroke="#f59e0b" stroke-width="2" rx="4"/>
+          <text x="60" y="100" fill="#fff" font-size="12" font-weight="bold">Primary Current Ip --></text>
+          
+          <!-- Animated Current Dots -->
+          <circle cx="160" cy="95" r="4" fill="#fbbf24">
+            <animate attributeName="cx" values="60;320" dur="1.5s" repeatCount="indefinite"/>
+          </circle>
+          <circle cx="100" cy="95" r="4" fill="#fbbf24">
+            <animate attributeName="cx" values="60;320" dur="1.5s" repeatCount="indefinite"/>
+          </circle>
+
+          <!-- Concentric Magnetic Flux Rings -->
+          <ellipse cx="200" cy="95" rx="50" ry="60" fill="none" stroke="#38bdf8" stroke-width="2" stroke-dasharray="4,4">
+            <animate attributeName="stroke-dashoffset" values="0;20" dur="1s" repeatCount="indefinite"/>
+          </ellipse>
+          <text x="180" y="25" fill="#38bdf8" font-size="10" font-weight="bold">Magnetic Field B</text>
+
+          <!-- Hall Effect Transducer Chip -->
+          <rect x="180" y="50" width="40" height="25" fill="#0f172a" stroke="#22c55e" stroke-width="2" rx="2"/>
+          <text x="185" y="66" fill="#22c55e" font-size="9" font-weight="bold">HALL IC</text>
+
+          <!-- Signal Output Line -->
+          <line x1="220" y1="62" x2="310" y2="62" stroke="#4ade80" stroke-width="2"/>
+          <rect x="310" y="45" width="80" height="35" fill="#091a24" stroke="#4ade80" rx="4"/>
+          <text x="315" y="66" fill="#4ade80" font-size="11" font-weight="bold">Vout (mV/A)</text>
+        </svg>
+        <p style="font-size:12px; color:#94a3b8;">Non-Contact Ampere Magnetic Field Sensing</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SECTION 3: COMPARISON TABLE -->
+<div class="sensor-card">
+  <h2>Comparative Analysis: Current Measurement Technologies</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>Technology</th>
+        <th>Isolation</th>
+        <th>Bandwidth & Response</th>
+        <th>Power Dissipation</th>
+        <th>Primary Applications</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>Hall Effect Current Sensor (Open Loop)</strong></td>
+        <td><strong>Galvanic</strong> (Up to $3\text{kV}-5\text{kV}$).</td>
+        <td>Medium ($DC\text{ to }100\text{ kHz}$).</td>
+        <td><strong>Extremely Low</strong> ($R_{conductor} \approx 1.2\text{ m}\Omega$).</td>
+        <td>BLDC motor drives, solar inverters, battery management systems (BMS).</td>
+      </tr>
+      <tr>
+        <td><strong>Hall Effect Current Sensor (Closed Loop)</strong></td>
+        <td><strong>Galvanic</strong> (Up to $5\text{kV}$).</td>
+        <td>High ($DC\text{ to }200\text{ kHz}$), superior linearity.</td>
+        <td>Low to Moderate (requires secondary feedback coil power).</td>
+        <td>Precision servo drives, industrial VFDs, medical MRI power supplies.</td>
+      </tr>
+      <tr>
+        <td><strong>Current Shunt Resistor</strong></td>
+        <td><strong>None</strong> (Requires external isolation amplifier).</td>
+        <td>Ultra-High ($> 1\text{ MHz}$).</td>
+        <td>High ($P = I^2 R$), thermal drift issues at high currents.</td>
+        <td>Low-cost, low-current DC motor control, micro-inverters.</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- SECTION 4: NUMERICAL PROBLEMS -->
+<div class="sensor-card">
+  <h2>Numerical Problems: Voltage & Current Sensing in Electric Motor Drives</h2>
+
+  <!-- Problem 1: Isolated Voltage Sensor Scale Factor -->
+  <div class="numerical-card">
+    <h3>Problem 1: DC Bus Voltage Monitoring in an Industrial Motor Drive</h3>
+    <p><strong>Scenario:</strong> An isolated voltage sensor module measures the DC bus voltage of an industrial variable frequency drive (VFD). The module has a voltage divider with $R_1 = 495\text{ k}\Omega$ and $R_2 = 5\text{ k}\Omega$. The internal isolation amplifier has a unity gain ($G_{iso} = 1.0$). The output is connected to a 12-bit microcontroller ADC with a reference voltage $V_{ref} = 3.3\text{V}$. Calculate:</p>
+    <ol type="a">
+      <li>The voltage step-down attenuation ratio of the resistor network.</li>
+      <li>The module output voltage $V_{OUT}$ when the DC bus voltage is $V_{DC} = 300\text{V}$.</li>
+      <li>The ADC digital output count for $V_{DC} = 300\text{V}$.</li>
+      <li>The maximum allowable DC bus voltage before the ADC saturates ($3.3\text{V}$).</li>
+    </ol>
+
+    <h4>Step-by-Step Solution:</h4>
+    <p><strong>1. Attenuation Ratio ($K_{div}$):</strong></p>
+    <div class="formula">
+      $$K_{div} = \frac{R_2}{R_1 + R_2} = \frac{5\text{ k}\Omega}{495\text{ k}\Omega + 5\text{ k}\Omega} = \frac{5}{500} = 0.01\ (100:1\text{ attenuation})$$
+    </div>
+
+    <p><strong>2. Sensor Output Voltage ($V_{OUT}$) at $300\text{V}$:</strong></p>
+    <div class="formula">
+      $$V_{OUT} = V_{DC} \times K_{div} \times G_{iso} = 300\text{V} \times 0.01 \times 1.0 = 3.00\text{ V}$$
+    </div>
+
+    <p><strong>3. 12-Bit ADC Digital Count:</strong> A 12-bit ADC has $2^{12} = 4096$ levels ($0\text{ to }4095$):</p>
+    <div class="formula">
+      $$\text{ADC Count} = \left( \frac{V_{OUT}}{V_{ref}} \right) \times 4095 = \left( \frac{3.00\text{V}}{3.30\text{V}} \right) \times 4095 = 3722.7 \approx 3723\text{ counts}$$
+    </div>
+
+    <p><strong>4. Maximum Measurable DC Voltage ($V_{DC,max}$):</strong> At $V_{OUT} = 3.3\text{V}$:</p>
+    <div class="formula">
+      $$V_{DC,max} = \frac{V_{ref}}{K_{div}} = \frac{3.30\text{V}}{0.01} = 330\text{ Volts}$$
+    </div>
+  </div>
+
+  <!-- Problem 2: ACS712 Hall Current Sensor Calculations -->
+  <div class="numerical-card">
+    <h3>Problem 2: Hall Effect Sensor Current Measurement in a DC Motor</h3>
+    <p><strong>Scenario:</strong> A bi-directional Hall effect current sensor (ACS712-20A model) is powered by a $5.0\text{V}$ DC supply. It has a zero-current output voltage $V_{zero} = 2.50\text{V}$ and a rated sensitivity $S_{sens} = 100\text{ mV/A}$ ($0.100\text{ V/A}$). Calculate:</p>
+    <ol type="a">
+      <li>The sensor output voltage when the motor draws a forward current $I_p = +12\text{ A}$.</li>
+      <li>The sensor output voltage when regenerative braking causes a reverse current $I_p = -8\text{ A}$.</li>
+      <li>The measured motor current if a microcontroller reads a sensor output voltage $V_{OUT} = 3.85\text{ V}$.</li>
+    </ol>
+
+    <h4>Step-by-Step Solution:</h4>
+    <p><strong>1. Output Voltage for Forward Current ($+12\text{A}$):</strong></p>
+    <div class="formula">
+      $$V_{OUT} = V_{zero} + (S_{sens} \times I_p) = 2.50\text{V} + (0.100\text{ V/A} \times 12\text{ A}) = 2.50 + 1.20 = 3.70\text{ Volts}$$
+    </div>
+
+    <p><strong>2. Output Voltage for Reverse Current ($-8\text{A}$):</strong></p>
+    <div class="formula">
+      $$V_{OUT} = V_{zero} + (S_{sens} \times I_p) = 2.50\text{V} + (0.100\text{ V/A} \times (-8\text{ A})) = 2.50 - 0.80 = 1.70\text{ Volts}$$
+    </div>
+
+    <p><strong>3. Calculate Current from Measured Output ($3.85\text{V}$):</strong> Rearranging the sensor transfer formula:</p>
+    <div class="formula">
+      $$I_p = \frac{V_{OUT} - V_{zero}}{S_{sens}} = \frac{3.85\text{V} - 2.50\text{V}}{0.100\text{ V/A}} = \frac{1.35\text{V}}{0.100\text{ V/A}} = +13.5\text{ Amperes}$$
+    </div>
+  </div>
+
+  <!-- Problem 3: Closed-Loop Hall Current Transformer Power Dissipation -->
+  <div class="numerical-card">
+    <h3>Problem 3: Power Dissipation & Efficiency Comparison</h3>
+    <p><strong>Scenario:</strong> A motor drive phase current of $I_{rms} = 50\text{ A}$ is measured using two different methods:</p>
+    <ul>
+      <li><strong>Option A:</strong> A precision current shunt resistor $R_{shunt} = 2\text{ m}\Omega$.</li>
+      <li><strong>Option B:</strong> A Hall effect current sensor with an internal primary conductor resistance $R_{hall} = 0.2\text{ m}\Omega$.</li>
+    </ul>
+    <p>Calculate the power dissipated ($P_{loss}$) in watts for both sensors and determine the power saved by using the Hall effect transducer.</p>
+
+    <h4>Step-by-Step Solution:</h4>
+    <p><strong>1. Power Loss in Shunt Resistor (Option A):</strong></p>
+    <div class="formula">
+      $$P_{shunt} = I_{rms}^2 \times R_{shunt} = (50\text{ A})^2 \times (2.0 \times 10^{-3}\ \Omega) = 2500 \times 0.002 = 5.00\text{ Watts}$$
+    </div>
+
+    <p><strong>2. Power Loss in Hall Sensor Conductor (Option B):</strong></p>
+    <div class="formula">
+      $$P_{hall} = I_{rms}^2 \times R_{hall} = (50\text{ A})^2 \times (0.2 \times 10^{-3}\ \Omega) = 2500 \times 0.0002 = 0.50\text{ Watts}$$
+    </div>
+
+    <p><strong>3. Power Saved:</strong></p>
+    <div class="formula">
+      $$\Delta P = P_{shunt} - P_{hall} = 5.00\text{W} - 0.50\text{W} = 4.50\text{ Watts (90\% reduction in thermal loss)}$$
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

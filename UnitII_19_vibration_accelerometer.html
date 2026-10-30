@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Chapter 20: Vibration Sensing – Electromagnetic Accelerometers</title>
+
+<!-- MathJax Configuration and Script -->
+<script>
+  window.MathJax = {
+    tex: {
+      inlineMath: [['$', '$'], ['\\(', '\\)']],
+      displayMath: [['$$', '$$'], ['\\[', '\\]']]
+    }
+  };
+</script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+<style>
+  :root {
+    --bg-dark: #071017;
+    --panel-bg: #0d1f2d;
+    --border-color: #1e3a50;
+    --accent-blue: #38bdf8;
+    --accent-green: #22c55e;
+    --accent-amber: #f59e0b;
+    --text-main: #e2e8f0;
+    --text-muted: #94a3b8;
+  }
+
+  body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: var(--bg-dark);
+    color: var(--text-main);
+    line-height: 1.6;
+    padding: 24px;
+    margin: 0;
+  }
+
+  h1, h2, h3, h4 {
+    color: var(--accent-blue);
+  }
+
+  h1 {
+    border-bottom: 2px solid var(--border-color);
+    padding-bottom: 10px;
+    margin-bottom: 20px;
+  }
+
+  .sensor-card {
+    background-color: var(--panel-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 10px;
+    padding: 24px;
+    margin-bottom: 30px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+  }
+
+  .grid-2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+  }
+
+  @media (max-width: 900px) {
+    .grid-2 { grid-template-columns: 1fr; }
+  }
+
+  .anim-box {
+    background: #040a0f;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 16px;
+    text-align: center;
+  }
+
+  .img-fluid {
+    max-width: 100%;
+    height: 180px;
+    object-fit: contain;
+    border-radius: 6px;
+    background: #040a0f;
+    padding: 10px;
+    border: 1px solid var(--border-color);
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 15px;
+  }
+
+  th, td {
+    border: 1px solid var(--border-color);
+    padding: 10px;
+    text-align: left;
+  }
+
+  th {
+    background-color: #132b3e;
+    color: var(--accent-blue);
+  }
+
+  .numerical-card {
+    background: #0a1824;
+    border-left: 4px solid var(--accent-amber);
+    padding: 18px;
+    margin-bottom: 20px;
+    border-radius: 0 8px 8px 0;
+  }
+
+  .formula {
+    background: #040a0f;
+    padding: 8px 12px;
+    border-radius: 6px;
+    color: #4ade80;
+    overflow-x: auto;
+    margin: 8px 0;
+  }
+</style>
+</head>
+<body>
+
+<h1>Chapter 20: Vibration & Acceleration Measurement – Electromagnetic Accelerometer Transducers</h1>
+<p>This chapter explores industrial vibration monitoring, mechanical seismic systems, electromagnetic induction sensors, piezoelectric acceleration transducers, harmonic acceleration dynamics, and natural frequency response calculations.</p>
+
+<!-- SECTION 1: ACCELEROMETER SENSOR -->
+<div class="sensor-card">
+  <h2>1. Seismic Electromagnetic & Piezoelectric Accelerometers</h2>
+  <div class="grid-2">
+    <div>
+      <h3>Industrial Hardware Image</h3>
+      <img src="images/accelerometer.jpg" class="img-fluid" alt="Industrial Electromagnetic Accelerometer">
+      <br>
+      <h4>Working Principle</h4>
+      <p>An accelerometer measures structural acceleration and mechanical vibration using a spring-mass-damper seismic system enclosed within a protective housing. When subjected to external acceleration $a(t)$, the seismic mass $m$ resists displacement due to inertia.</p>
+
+      <p>The relative motion $z(t)$ between the seismic mass and housing is governed by Newton's Second Law and mechanical second-order system dynamics:</p>
+      <div class="formula">
+        $$m \cdot \frac{d^2 z}{dt^2} + c \cdot \frac{dz}{dt} + k \cdot z = -m \cdot a(t)$$
+      </div>
+      <p>In <strong>electromagnetic (moving-coil/moving-magnet) accelerometers</strong>, the relative velocity $v_r = \frac{dz}{dt}$ of the seismic element cuts through a permanent magnetic field $B$, inducing an electromotive force (EMF) $E$ according to Faraday's Law:</p>
+      <div class="formula">
+        $$E = B \cdot L \cdot \frac{dz}{dt} = B \cdot L \cdot v_r$$
+      </div>
+      <p>Where $B$ is magnetic flux density ($\text{Tesla}$), $L$ is coil length ($\text{m}$), and $v_r$ is relative seismic velocity. At frequencies well below the natural frequency $\omega_n = \sqrt{\frac{k}{m}}$, relative displacement $z$ is directly proportional to base acceleration $a$: $z \approx \frac{a}{\omega_n^2}$.</p>
+    </div>
+
+    <div>
+      <h3>Interactive Seismic Mass & Induction Animation</h3>
+      <div class="anim-box">
+        <svg viewBox="0 0 400 200" width="100%" height="180">
+          <!-- Outer Sensor Housing Base (Vibrating Up/Down) -->
+          <g>
+            <rect x="60" y="20" width="280" height="160" fill="#091a24" stroke="#1e3a50" stroke-width="3" rx="6"/>
+            
+            <!-- Structural Base Mount Pin -->
+            <rect x="175" y="175" width="50" height="20" fill="#132b3e" stroke="#38bdf8" stroke-width="2"/>
+            <text x="183" y="189" fill="#38bdf8" font-size="9" font-weight="bold">MOUNT</text>
+
+            <animateTransform attributeName="transform" type="translate" values="0,0; 0,-8; 0,0; 0,8; 0,0" dur="0.6s" repeatCount="indefinite"/>
+          </g>
+
+          <!-- Suspension Spring (Top) -->
+          <path d="M 200 35 L 200 45 L 210 50 L 190 60 L 210 70 L 190 80 L 200 85 L 200 90" fill="none" stroke="#f59e0b" stroke-width="2.5">
+            <animate attributeName="d" 
+                     values="M 200 35 L 200 45 L 210 50 L 190 60 L 210 70 L 190 80 L 200 85 L 200 90;
+                             M 200 35 L 200 40 L 210 48 L 190 56 L 210 64 L 190 72 L 200 78 L 200 82;
+                             M 200 35 L 200 45 L 210 50 L 190 60 L 210 70 L 190 80 L 200 85 L 200 90;
+                             M 200 35 L 200 50 L 210 58 L 190 68 L 210 78 L 190 88 L 200 95 L 200 100;
+                             M 200 35 L 200 45 L 210 50 L 190 60 L 210 70 L 190 80 L 200 85 L 200 90" 
+                     dur="0.6s" repeatCount="indefinite"/>
+          </path>
+
+          <!-- Inertial Seismic Mass (Suspended Ring/Block) -->
+          <rect x="150" y="90" width="100" height="40" fill="#22c55e" stroke="#fff" stroke-width="1.5" rx="4">
+            <animateTransform attributeName="transform" type="translate" values="0,0; 0,5; 0,0; 0,-5; 0,0" dur="0.6s" repeatCount="indefinite"/>
+          </rect>
+          <text x="165" y="114" fill="#040a0f" font-size="10" font-weight="bold">SEISMIC MASS (m)</text>
+
+          <!-- Magnetic Sensing Field Lines -->
+          <line x1="110" y1="90" x2="110" y2="130" stroke="#ef4444" stroke-width="3" stroke-dasharray="4,2"/>
+          <text x="80" y="113" fill="#ef4444" font-size="9" font-weight="bold">Coil (B)</text>
+
+          <!-- Signal Output Box -->
+          <rect x="270" y="40" width="60" height="40" fill="#040a0f" stroke="#38bdf8" stroke-width="1.5" rx="4"/>
+          <text x="277" y="58" fill="#38bdf8" font-size="9" font-weight="bold">Output V(t)</text>
+          <text x="277" y="71" fill="#4ade80" font-size="8">∝ d^2x/dt^2</text>
+        </svg>
+        <p style="font-size:12px; color:#94a3b8;">Relative Displacement of Inertial Mass Inducing Voltage Proportional to Acceleration</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SECTION 2: FREQUENCY RESPONSE & DYNAMICS -->
+<div class="sensor-card">
+  <h2>2. Natural Frequency, Damping & Harmonic Acceleration</h2>
+  <div class="grid-2">
+    <div>
+      <h3>Frequency Response & Resonance Limits</h3>
+      <p>The usable linear frequency bandwidth of an accelerometer is determined by its undamped mechanical natural frequency $f_n$ ($\text{Hz}$):</p>
+      <div class="formula">
+        $$f_n = \frac{1}{2\pi} \sqrt{\frac{k}{m}}$$
+      </div>
+      <p>To avoid resonance distortion, accelerometers are operated below $\approx 20\%\text{--}30\%$ of their natural frequency $f_n$. Standard optimal damping ratio $\zeta \approx 0.6\text{--}0.7$ yields a flat amplitude response across the operating range.</p>
+
+      <p>For sinusoidal vibration displacement $x(t) = X \cdot \sin(\omega t)$, peak vibration velocity $V_{peak}$ and peak acceleration $A_{peak}$ scale quadratically with angular frequency $\omega = 2\pi f$:</p>
+      <div class="formula">
+        $$v(t) = \frac{dx}{dt} = \omega X \cdot \cos(\omega t) \implies V_{peak} = \omega X$$
+      </div>
+      <div class="formula">
+        $$a(t) = \frac{d^2x}{dt^2} = -\omega^2 X \cdot \sin(\omega t) \implies A_{peak} = \omega^2 X = (2\pi f)^2 X$$
+      </div>
+    </div>
+
+    <div>
+      <h3>Sinusoidal Motion & Harmonic Derivatives</h3>
+      <div class="anim-box">
+        <svg viewBox="0 0 400 200" width="100%" height="180">
+          <!-- Graph Grid Axes -->
+          <line x1="40" y1="100" x2="360" y2="100" stroke="#1e3a50" stroke-width="1.5"/>
+          <line x1="40" y1="20" x2="40" y2="180" stroke="#1e3a50" stroke-width="1.5"/>
+
+          <text x="365" y="104" fill="#94a3b8" font-size="9">Time (t)</text>
+          <text x="15" y="25" fill="#38bdf8" font-size="9">Sine Waves</text>
+
+          <!-- Wave 1: Displacement x(t) (Blue) -->
+          <path d="M 40 100 Q 100 30 160 100 T 280 100 T 400 100" fill="none" stroke="#38bdf8" stroke-width="2"/>
+          <text x="285" y="65" fill="#38bdf8" font-size="9" font-weight="bold">Displacement x(t)</text>
+
+          <!-- Wave 2: Acceleration a(t) = -w^2 x(t) (Inverted Red - High Amp) -->
+          <path d="M 40 100 Q 100 170 160 100 T 280 100 T 400 100" fill="none" stroke="#ef4444" stroke-width="2" stroke-dasharray="4,2"/>
+          <text x="285" y="145" fill="#ef4444" font-size="9" font-weight="bold">Acceleration a(t) [180° Shift]</text>
+        </svg>
+        <p style="font-size:12px; color:#94a3b8;">Phase Relationship: Displacement vs Acceleration ($a = -\omega^2 x$)</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SECTION 3: COMPARISON TABLE -->
+<div class="sensor-card">
+  <h2>Comparative Analysis: Industrial Acceleration & Vibration Sensors</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>Sensor Technology</th>
+        <th>Sensing Mechanism</th>
+        <th>Frequency Bandwidth</th>
+        <th>DC (Static 0 Hz) Response</th>
+        <th>Typical Applications</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>Piezoelectric (IEPE/ICP)</strong></td>
+        <td>Dynamic stress on quartz/PZT generates charge ($q = d \cdot F$).</td>
+        <td>High ($1\text{ Hz to } 20\text{ kHz}$).</td>
+        <td><strong>No (Dynamic Only)</strong></td>
+        <td>Bearing health, gearbox fault analysis, machinery health.</td>
+      </tr>
+      <tr>
+        <td><strong>MEMS Capacitive</strong></td>
+        <td>Differential capacitive comb finger displacement ($\Delta C$).</td>
+        <td>Low to Moderate ($0\text{ Hz to } 2\text{ kHz}$).</td>
+        <td><strong>Yes (Static + Dynamic)</strong></td>
+        <td>Automotive airbags, tilt/inclinometers, smartphone motion.</td>
+      </tr>
+      <tr>
+        <td><strong>Electromagnetic (Velometer)</strong></td>
+        <td>Moving magnet cuts stationary coil ($E = BLv$).</td>
+        <td>Moderate ($10\text{ Hz to } 1\text{ kHz}$).</td>
+        <td><strong>No</strong></td>
+        <td>Turbine shaft vibration, power plant cooling pumps.</td>
+      </tr>
+      <tr>
+        <td><strong>Piezoresistive Strain Gauge</strong></td>
+        <td>Silicone bridge resistance shift under cantilever stress.</td>
+        <td>Low to High ($0\text{ Hz to } 5\text{ kHz}$).</td>
+        <td><strong>Yes</strong></td>
+        <td>Vehicle crash testing, structural seismic monitoring.</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- SECTION 4: NUMERICAL PROBLEMS -->
+<div class="sensor-card">
+  <h2>Numerical Problems: Vibration Dynamics & Accelerometer Sensitivity</h2>
+
+  <!-- Problem 1: Harmonic Acceleration Calculation -->
+  <div class="numerical-card">
+    <h3>Problem 1: Peak Vibration Velocity and Acceleration</h3>
+    <p><strong>Scenario:</strong> An electric motor housing experiences steady-state harmonic vibration during operation at a frequency $f = 60\text{ Hz}$. An optical displacement sensor records a peak-to-peak vibration displacement $d_{p-p} = 0.50\text{ mm}$ ($0.0005\text{ m}$). Calculate:</p>
+    <ol type="a">
+      <li>The peak single-amplitude displacement $X_{peak}$ in meters.</li>
+      <li>The angular frequency $\omega$ in radians per second ($\text{rad/s}$).</li>
+      <li>The peak vibration velocity $V_{peak}$ in meters per second ($\text{m/s}$).</li>
+      <li>The peak acceleration $A_{peak}$ in $\text{m/s}^2$ and in engineering standard $g$-units ($1g = 9.81\text{ m/s}^2$).</li>
+    </ol>
+
+    <h4>Step-by-Step Solution:</h4>
+    <p><strong>1. Calculate Peak Single-Amplitude Displacement ($X_{peak}$):</strong></p>
+    <div class="formula">
+      $$X_{peak} = \frac{d_{p-p}}{2} = \frac{0.50\text{ mm}}{2} = 0.25\text{ mm} = 2.5 \times 10^{-4}\text{ m}$$
+    </div>
+
+    <p><strong>2. Calculate Angular Frequency ($\omega$):</strong></p>
+    <div class="formula">
+      $$\omega = 2\pi f = 2\pi \times 60\text{ Hz} = 376.99\text{ rad/s}$$
+    </div>
+
+    <p><strong>3. Calculate Peak Velocity ($V_{peak}$):</strong></p>
+    <div class="formula">
+      $$V_{peak} = \omega \cdot X_{peak} = 376.99\text{ rad/s} \times 2.5 \times 10^{-4}\text{ m} = 0.09425\text{ m/s} = 94.25\text{ mm/s}$$
+    </div>
+
+    <p><strong>4. Calculate Peak Acceleration ($A_{peak}$):</strong></p>
+    <div class="formula">
+      $$A_{peak} = \omega^2 \cdot X_{peak} = (376.99)^2 \times 2.5 \times 10^{-4}\text{ m} = 142.12 \times 0.25 = 35.53\text{ m/s}^2$$
+    </div>
+    <div class="formula">
+      $$A_{peak\_g} = \frac{35.53\text{ m/s}^2}{9.81\text{ m/s}^2/g} = 3.622\text{ g}$$
+    </div>
+  </div>
+
+  <!-- Problem 2: Piezoelectric Accelerometer Output Calculation -->
+  <div class="numerical-card">
+    <h3>Problem 2: Piezoelectric Accelerometer Sensitivity & Voltage Output</h3>
+    <p><strong>Scenario:</strong> A piezoelectric vibration sensor has an acceleration sensitivity rating $S_a = 100\text{ mV/g}$. It is mounted on a gearbox bearing pedestal experiencing an RMS acceleration reading $A_{rms} = 4.5\text{ g}$. Calculate:</p>
+    <ol type="a">
+      <li>The peak acceleration $A_{peak}$ assuming pure sinusoidal vibration.</li>
+      <li>The peak-to-peak output voltage $V_{p-p}$ generated by the sensor.</li>
+      <li>The RMS voltage signal output $V_{rms}$ fed to the data acquisition system.</li>
+    </ol>
+
+    <h4>Step-by-Step Solution:</h4>
+    <p><strong>1. Calculate Peak Acceleration ($A_{peak}$):</strong></p>
+    <div class="formula">
+      $$A_{peak} = A_{rms} \times \sqrt{2} = 4.5\text{ g} \times 1.4142 = 6.364\text{ g}$$
+    </div>
+
+    <p><strong>2. Calculate RMS Voltage Output ($V_{rms}$):</strong></p>
+    <div class="formula">
+      $$V_{rms} = A_{rms} \times S_a = 4.5\text{ g} \times 100\text{ mV/g} = 450\text{ mV} = 0.450\text{ V}$$
+    </div>
+
+    <p><strong>3. Calculate Peak-to-Peak Voltage Output ($V_{p-p}$):</strong></p>
+    <div class="formula">
+      $$V_{p-p} = 2 \times V_{peak} = 2 \times (A_{peak} \times S_a) = 2 \times (6.364\text{ g} \times 100\text{ mV/g}) = 1272.8\text{ mV} = 1.273\text{ V}$$
+    </div>
+  </div>
+
+  <!-- Problem 3: Natural Frequency & Spring Stiffness Sizing -->
+  <div class="numerical-card">
+    <h3>Problem 3: Seismic Accelerometer Natural Frequency Calculation</h3>
+    <p><strong>Scenario:</strong> A seismic accelerometer transducer is designed with a seismic mass $m = 25\text{ grams}$ ($0.025\text{ kg}$) and a internal flexure spring constant $k = 4.0 \times 10^4\text{ N/m}$. Calculate:</p>
+    <ol type="a">
+      <li>The undamped mechanical natural frequency $f_n$ in Hertz ($\text{Hz}$).</li>
+      <li>The maximum usable flat frequency limit (assuming a safety upper limit of $20\%$ of $f_n$).</li>
+    </ol>
+
+    <h4>Step-by-Step Solution:</h4>
+    <p><strong>1. Calculate Undamped Natural Frequency ($f_n$):</strong></p>
+    <div class="formula">
+      $$\omega_n = \sqrt{\frac{k}{m}} = \sqrt{\frac{4.0 \times 10^4\text{ N/m}}{0.025\text{ kg}}} = \sqrt{1.6 \times 10^6} = 1264.91\text{ rad/s}$$
+    </div>
+    <div class="formula">
+      $$f_n = \frac{\omega_n}{2\pi} = \frac{1264.91\text{ rad/s}}{2\pi} = 201.32\text{ Hz}$$
+    </div>
+
+    <p><strong>2. Calculate Maximum Usable Linear Frequency Range ($f_{max}$):</strong></p>
+    <div class="formula">
+      $$f_{max} = 0.20 \times f_n = 0.20 \times 201.32\text{ Hz} = 40.26\text{ Hz}$$
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

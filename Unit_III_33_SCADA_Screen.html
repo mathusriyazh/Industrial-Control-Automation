@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Chapter 33: Designing Simple SCADA Screens</title>
+
+<!-- MathJax Configuration and Script -->
+<script>
+  window.MathJax = {
+    tex: {
+      inlineMath: [['$', '$'], ['\\(', '\\)']],
+      displayMath: [['$$', '$$'], ['\\[', '\\]']]
+    }
+  };
+</script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+<style>
+  :root {
+    --bg-dark: #071017;
+    --panel-bg: #0d1f2d;
+    --border-color: #1e3a50;
+    --accent-blue: #38bdf8;
+    --accent-green: #22c55e;
+    --accent-amber: #f59e0b;
+    --accent-red: #ef4444;
+    --text-main: #e2e8f0;
+    --text-muted: #94a3b8;
+  }
+
+  body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: var(--bg-dark);
+    color: var(--text-main);
+    line-height: 1.6;
+    padding: 24px;
+    margin: 0;
+  }
+
+  h1, h2, h3, h4 {
+    color: var(--accent-blue);
+  }
+
+  h1 {
+    border-bottom: 2px solid var(--border-color);
+    padding-bottom: 10px;
+    margin-bottom: 20px;
+  }
+
+  .sensor-card {
+    background-color: var(--panel-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 10px;
+    padding: 24px;
+    margin-bottom: 30px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+  }
+
+  .grid-2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+  }
+
+  @media (max-width: 900px) {
+    .grid-2 { grid-template-columns: 1fr; }
+  }
+
+  .anim-box {
+    background: #040a0f;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 16px;
+    text-align: center;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 15px;
+  }
+
+  th, td {
+    border: 1px solid var(--border-color);
+    padding: 10px;
+    text-align: left;
+  }
+
+  th {
+    background-color: #132b3e;
+    color: var(--accent-blue);
+  }
+
+  .numerical-card {
+    background: #0a1824;
+    border-left: 4px solid var(--accent-amber);
+    padding: 18px;
+    margin-bottom: 20px;
+    border-radius: 0 8px 8px 0;
+  }
+
+  .formula {
+    background: #040a0f;
+    padding: 8px 12px;
+    border-radius: 6px;
+    color: #4ade80;
+    overflow-x: auto;
+    margin: 8px 0;
+  }
+</style>
+</head>
+<body>
+
+<h1>Chapter 33: Designing Simple SCADA Screens</h1>
+<p>This chapter covers the fundamentals of designing Human-Machine Interfaces (HMI) and Supervisory Control and Data Acquisition (SCADA) screens. Topics include visual layout principles (ISA-101 standards), tag binding architecture, alarm state representations, refresh update cycles, and network bandwidth budgeting.</p>
+
+<!-- SECTION 1: SCADA GRAPHICS & TAG PIPELINE -->
+<div class="sensor-card">
+  <h2>1. SCADA HMI Architecture & Pipeline Mockup</h2>
+  <div class="grid-2">
+    <div>
+      <h3>Animated Process Display (High-Performance HMI)</h3>
+      <div class="anim-box">
+        <svg viewBox="0 0 320 180" width="100%" height="170">
+          <!-- Main Tank Body -->
+          <rect x="120" y="40" width="80" height="100" fill="#132b3e" stroke="#38bdf8" stroke-width="2" rx="4"/>
+          <!-- Dynamic Water Level -->
+          <rect x="122" y="70" width="76" height="68" fill="#38bdf8" opacity="0.6">
+            <animate attributeName="height" values="68;30;68" dur="6s" repeatCount="indefinite" />
+            <animate attributeName="y" values="70;108;70" dur="6s" repeatCount="indefinite" />
+          </rect>
+          <!-- Tank Level Value Text -->
+          <text x="135" y="95" fill="#ffffff" font-size="10" font-weight="bold">68.5 %</text>
+
+          <!-- Inlet Pipe -->
+          <path d="M 30 55 L 120 55" stroke="#94a3b8" stroke-width="8" fill="none"/>
+          <circle cx="75" cy="55" r="10" fill="#040a0f" stroke="#22c55e" stroke-width="2"/>
+          <text x="70" y="58" fill="#22c55e" font-size="8" font-weight="bold">V1</text>
+
+          <!-- Flow Arrow Animation -->
+          <circle cx="0" cy="0" r="3" fill="#22c55e">
+            <animateMotion path="M 30 55 L 120 55" dur="1.5s" repeatCount="indefinite"/>
+          </circle>
+
+          <!-- Outlet Pipe -->
+          <path d="M 200 125 L 290 125" stroke="#94a3b8" stroke-width="8" fill="none"/>
+          <circle cx="245" cy="125" r="10" fill="#040a0f" stroke="#ef4444" stroke-width="2"/>
+          <text x="240" y="128" fill="#ef4444" font-size="8" font-weight="bold">V2</text>
+
+          <!-- Alarm Indicator Beacon -->
+          <circle cx="160" cy="25" r="8" fill="#040a0f" stroke="#f59e0b" stroke-width="2">
+            <animate attributeName="fill" values="#040a0f;#f59e0b;#040a0f" dur="1s" repeatCount="indefinite" />
+          </circle>
+          <text x="142" y="12" fill="#f59e0b" font-size="7" font-weight="bold">ALARM: HI-TEMP</text>
+        </svg>
+      </div>
+      <br>
+      <h4>Core Design Guidelines (ISA-101)</h4>
+      <p>Modern industrial SCADA screens prioritize situational awareness over complex 3D graphics:</p>
+      <ul>
+        <li><strong>High-Performance Color Palette:</strong> Neutral gray backgrounds reduce operator eye fatigue and maximize visual contrast for abnormal states.</li>
+        <li><strong>Color Usage for Status:</strong> Bright colors (Red, Amber) are strictly reserved for alarms and exceptions, avoiding static visual clutter.</li>
+        <li><strong>Direct Tag Mapping:</strong> Graphic widgets bind to OPC UA or Modbus tags in real time using deadband filters to reduce unnecessary updates.</li>
+      </ul>
+    </div>
+
+    <div>
+      <h3>Tag Data Flow & Screen Refresh Loop</h3>
+      <div class="anim-box">
+        <svg viewBox="0 0 300 180" width="100%" height="170">
+          <rect x="10" y="15" width="280" height="150" fill="#0d1f2d" stroke="#1e3a50" stroke-width="2" rx="4"/>
+          
+          <!-- PLC Layer -->
+          <rect x="25" y="30" width="60" height="40" fill="#040a0f" stroke="#22c55e" stroke-width="1.5" rx="3"/>
+          <text x="35" y="53" fill="#22c55e" font-size="8" font-weight="bold">PLC / Field</text>
+
+          <!-- OPC UA Server -->
+          <rect x="120" y="30" width="65" height="40" fill="#040a0f" stroke="#38bdf8" stroke-width="1.5" rx="3"/>
+          <text x="125" y="53" fill="#38bdf8" font-size="8" font-weight="bold">OPC Server</text>
+
+          <!-- HMI Client -->
+          <rect x="220" y="30" width="60" height="40" fill="#040a0f" stroke="#f59e0b" stroke-width="1.5" rx="3"/>
+          <text x="225" y="53" fill="#f59e0b" font-size="8" font-weight="bold">HMI Screen</text>
+
+          <!-- Arrows -->
+          <line x1="85" y1="50" x2="120" y2="50" stroke="#e2e8f0" stroke-width="1.5"/>
+          <line x1="185" y1="50" x2="220" y2="50" stroke="#e2e8f0" stroke-width="1.5"/>
+
+          <!-- Refresh Rate Cycle Box -->
+          <rect x="25" y="95" width="255" height="50" fill="#040a0f" stroke="#94a3b8" stroke-width="1" rx="3"/>
+          <text x="35" y="115" fill="#38bdf8" font-size="8" font-weight="bold">Screen Polling Rate ($T_{refresh}$): 250ms - 1000ms</text>
+          <text x="35" y="132" fill="#94a3b8" font-size="8">Deadband Filtering ($\Delta V_{min}$): Suppresses noise transmission</text>
+        </svg>
+        <p style="font-size:12px; color:#94a3b8;">Data Pipeline from Field Controllers to SCADA Visual Elements</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SECTION 2: COMPARISON TABLE -->
+<div class="sensor-card">
+  <h2>Comparative Analysis: SCADA Screen Element Layout Standards</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>Graphic Category</th>
+        <th>Visual Style</th>
+        <th>Update Rate Target</th>
+        <th>Primary Purpose</th>
+        <th>Common Pitfall to Avoid</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>Process Overview (Level 1)</strong></td>
+        <td>Minimalist, schematic-style, muted grays.</td>
+        <td>$1\text{ second}$</td>
+        <td>High-level plant visibility and global alarm summary.</td>
+        <td>Overcrowding with raw numbers instead of status indicators.</td>
+      </tr>
+      <tr>
+        <td><strong>Control Detail (Level 2)</strong></td>
+        <td>Process Flow Diagrams (PFD) with equipment controls.</td>
+        <td>$250\text{ ms} - 500\text{ ms}$</td>
+        <td>Direct operator control of valves, pumps, and setpoints.</td>
+        <td>Using realistic 3D graphics that obscure critical text.</td>
+      </tr>
+      <tr>
+        <td><strong>Diagnostic & Trending (Level 3)</strong></td>
+        <td>High-density line graphs and data tables.</td>
+        <td>$100\text{ ms} - 250\text{ ms}$</td>
+        <td>Root-cause troubleshooting and PID tuning analysis.</td>
+        <td>Plotting too many historical variables without scale normalization.</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- SECTION 3: NUMERICAL PROBLEMS -->
+<div class="sensor-card">
+  <h2>Numerical Problems: Telemetry Throughput & Refresh Budgeting</h2>
+
+  <!-- Problem 1: Telemetry Data Rate Calculation -->
+  <div class="numerical-card">
+    <h3>Problem 1: SCADA Tag Database Bandwidth Consumption</h3>
+    <p><strong>Scenario:</strong> A SCADA server polls an industrial site with $N = 2,500$ operational tags over an OPC UA network interface. The tag breakdown is as follows:</p>
+    <ul>
+      <li>$60\%$ Digital Status Tags (1-bit booleans, packed into 1 byte with metadata = 4 bytes/tag).</li>
+      <li>$40\%$ Analog Process Values (32-bit floating-point numbers + status metadata = 12 bytes/tag).</li>
+    </ul>
+    <p>The screen updates require $50\%$ of tags to be polled continuously at $f_{fast} = 4\text{ Hz}$ ($250\text{ ms}$ rate) and the remaining $50\%$ to be polled at $f_{slow} = 1\text{ Hz}$ ($1000\text{ ms}$ rate).</p>
+
+    <p>Calculate:</p>
+    <ol type="a">
+      <li>The average size per tag (in bytes) across the tag database.</li>
+      <li>The raw polling telemetry throughput required in kilobytes per second ($\text{KB/s}$) and kilobits per second ($\text{Kbps}$).</li>
+      <li>The total data transferred during an 8-hour operator shift in megabytes ($\text{MB}$).</li>
+    </ol>
+
+    <h4>Step-by-Step Solution:</h4>
+    <p><strong>1. Compute Average Tag Size ($S_{avg}$):</strong></p>
+    <div class="formula">
+      $$S_{avg} = (0.60 \times 4\text{ bytes}) + (0.40 \times 12\text{ bytes}) = 2.4 + 4.8 = 7.2\text{ bytes/tag}$$
+    </div>
+
+    <p><strong>2. Compute Total Polling Data Rate:</strong></p>
+    <div class="formula">
+      $$\text{Fast Tags Polling Rate} = 1,250\text{ tags} \times 4\text{ updates/sec} = 5,000\text{ tag-updates/sec}$$
+    </div>
+    <div class="formula">
+      $$\text{Slow Tags Polling Rate} = 1,250\text{ tags} \times 1\text{ update/sec} = 1,250\text{ tag-updates/sec}$$
+    </div>
+    <div class="formula">
+      $$\text{Total Updates} = 5,000 + 1,250 = 6,250\text{ updates/sec}$$
+    </div>
+    <div class="formula">
+      $$\text{Data Throughput (KB/s)} = \frac{6,250\text{ updates/sec} \times 7.2\text{ bytes}}{1,000} = 45.0\text{ KB/s}$$
+    </div>
+    <div class="formula">
+      $$\text{Data Throughput (Kbps)} = 45.0\text{ KB/s} \times 8 = 360.0\text{ Kbps}$$
+    </div>
+
+    <p><strong>3. Compute Shift Telemetry Transfer Volume:</strong></p>
+    <div class="formula">
+      $$\text{Shift Duration} = 8\text{ hours} \times 3,600\text{ seconds} = 28,800\text{ seconds}$$
+    </div>
+    <div class="formula">
+      $$\text{Total Shift Storage} = \frac{45.0\text{ KB/s} \times 28,800\text{ s}}{1,024} \approx 1,265.625\text{ MB} \approx 1.266\text{ GB}$$
+    </div>
+  </div>
+
+  <!-- Problem 2: Screen Refresh Latency Budget -->
+  <div class="numerical-card">
+    <h3>Problem 2: Screen Rendering and Display Refresh Latency</h3>
+    <p><strong>Scenario:</strong> An HMI client screen displays $N_{screen} = 180$ dynamic UI widgets (gauges, digital readouts, trends). To ensure a smooth user interface, the screen must refresh at $f_{render} = 10\text{ Hz}$ ($T_{frame} = 100\text{ ms}$). The latency components per cycle are:</p>
+    <ul>
+      <li>Network Request/Response Round-Trip Time (RTT): $t_{net} = 32\text{ ms}$</li>
+      <li>OPC Server Data Serialization Time: $t_{serial} = 18\text{ ms}$</li>
+      <li>Graphic Widget Redraw Execution Time per widget: $t_{widget} = 0.15\text{ ms/widget}$</li>
+    </ul>
+
+    <p>Calculate:</p>
+    <ol type="a">
+      <li>The total rendering duration $t_{render}$ required to redraw all screen widgets.</li>
+      <li>The available idle buffer time before violating the $100\text{ ms}$ frame deadline.</li>
+      <li>The maximum number of dynamic widgets ($N_{max}$) the screen can support without exceeding $T_{frame}$.</li>
+    </ol>
+
+    <h4>Step-by-Step Solution:</h4>
+    <p><strong>1. Compute Total Screen Widget Rendering Time ($t_{render}$):</strong></p>
+    <div class="formula">
+      $$t_{render} = 180\text{ widgets} \times 0.15\text{ ms/widget} = 27.0\text{ ms}$$
+    </div>
+
+    <p><strong>2. Compute Total Frame Delay and Remaining Idle Time:</strong></p>
+    <div class="formula">
+      $$t_{total\_frame} = t_{net} + t_{serial} + t_{render} = 32\text{ ms} + 18\text{ ms} + 27\text{ ms} = 77.0\text{ ms}$$
+    </div>
+    <div class="formula">
+      $$t_{idle} = T_{frame} - t_{total\_frame} = 100\text{ ms} - 77.0\text{ ms} = 23.0\text{ ms}$$
+    </div>
+
+    <p><strong>3. Compute Maximum Supported Dynamic Widgets ($N_{max}$):</strong></p>
+    <div class="formula">
+      $$t_{render\_max} = T_{frame} - (t_{net} + t_{serial}) = 100\text{ ms} - 50\text{ ms} = 50.0\text{ ms}$$
+    </div>
+    <div class="formula">
+      $$N_{max} = \lfloor \frac{50.0\text{ ms}}{0.15\text{ ms/widget}} \rfloor = \lfloor 333.33 \rfloor = 333\text{ widgets}$$
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

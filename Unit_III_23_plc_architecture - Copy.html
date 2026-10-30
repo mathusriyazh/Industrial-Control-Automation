@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Chapter 24: PLC Architecture & Industrial Automation Control</title>
+
+<!-- MathJax Configuration and Script -->
+<script>
+  window.MathJax = {
+    tex: {
+      inlineMath: [['$', '$'], ['\\(', '\\)']],
+      displayMath: [['$$', '$$'], ['\\[', '\\]']]
+    }
+  };
+</script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+<style>
+  :root {
+    --bg-dark: #071017;
+    --panel-bg: #0d1f2d;
+    --border-color: #1e3a50;
+    --accent-blue: #38bdf8;
+    --accent-green: #22c55e;
+    --accent-amber: #f59e0b;
+    --accent-red: #ef4444;
+    --text-main: #e2e8f0;
+    --text-muted: #94a3b8;
+  }
+
+  body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: var(--bg-dark);
+    color: var(--text-main);
+    line-height: 1.6;
+    padding: 24px;
+    margin: 0;
+  }
+
+  h1, h2, h3, h4 {
+    color: var(--accent-blue);
+  }
+
+  h1 {
+    border-bottom: 2px solid var(--border-color);
+    padding-bottom: 10px;
+    margin-bottom: 20px;
+  }
+
+  .sensor-card {
+    background-color: var(--panel-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 10px;
+    padding: 24px;
+    margin-bottom: 30px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+  }
+
+  .grid-2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+  }
+
+  @media (max-width: 900px) {
+    .grid-2 { grid-template-columns: 1fr; }
+  }
+
+  .anim-box {
+    background: #040a0f;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 16px;
+    text-align: center;
+  }
+
+  .img-fluid {
+    max-width: 100%;
+    height: 180px;
+    object-fit: contain;
+    border-radius: 6px;
+    background: #040a0f;
+    padding: 10px;
+    border: 1px solid var(--border-color);
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 15px;
+  }
+
+  th, td {
+    border: 1px solid var(--border-color);
+    padding: 10px;
+    text-align: left;
+  }
+
+  th {
+    background-color: #132b3e;
+    color: var(--accent-blue);
+  }
+
+  .numerical-card {
+    background: #0a1824;
+    border-left: 4px solid var(--accent-amber);
+    padding: 18px;
+    margin-bottom: 20px;
+    border-radius: 0 8px 8px 0;
+  }
+
+  .formula {
+    background: #040a0f;
+    padding: 8px 12px;
+    border-radius: 6px;
+    color: #4ade80;
+    overflow-x: auto;
+    margin: 8px 0;
+  }
+</style>
+</head>
+<body>
+
+<h1>Chapter 24: Industrial Controllers – Architecture of Programmable Logic Controllers (PLC)</h1>
+<p>This chapter examines the internal hardware system architecture of Programmable Logic Controllers (PLCs), optical isolation safety interfaces, memory allocation structures, scan timing calculations, and cyclic execution dynamics.</p>
+
+<!-- SECTION 1: SYSTEM ARCHITECTURE & SCAN CYCLE -->
+<div class="sensor-card">
+  <h2>1. Hardware Architecture & Continuous Scan Cycle</h2>
+  <div class="grid-2">
+    <div>
+      <h3>Hardware Hardware Image Reference</h3>
+      <img src="images/plc_architecture.jpg" class="img-fluid" alt="Industrial Modular Programmable Logic Controller Hardware Architecture">
+      <br>
+      <h4>Core Architecture Overview</h4>
+      <p>A Programmable Logic Controller (PLC) is an industrial microprocessor-based controller designed for real-time control of manufacturing processes. Its hardware architecture consists of five core elements:</p>
+      <ul>
+        <li><strong>Central Processing Unit (CPU):</strong> Executes the user program stored in non-volatile memory and manages systemic diagnostics.</li>
+        <li><strong>Power Supply Module:</strong> Converts line AC voltage (120/240V AC) to regulated low-voltage DC (24V DC, 5V DC) for internal backplane buses and CPU microelectronics.</li>
+        <li><strong>Input Module:</strong> Receives discrete or analog signals from field devices (switches, sensors) using optocouplers for high-voltage isolation.</li>
+        <li><strong>Output Module:</strong> Drives field actuators (solenoids, relays, contactors) via solid-state switches or electromechanical contacts.</li>
+        <li><strong>Memory Unit:</strong> Divided into RAM (data table/registers) and ROM/EEPROM (program storage).</li>
+      </ul>
+
+      <p>The total operating time of a PLC during one complete processing sweep is governed by the total scan time $T_{scan}$:</p>
+      <div class="formula">
+        $$T_{scan} = T_{input\_read} + T_{program\_exec} + T_{output\_write} + T_{overhead}$$
+      </div>
+    </div>
+
+    <div>
+      <h3>Interactive PLC Dynamic Scan Cycle Animation</h3>
+      <div class="anim-box">
+        <svg viewBox="0 0 400 230" width="100%" height="210">
+          <!-- Background Bus Lines -->
+          <rect x="20" y="20" width="360" height="190" fill="#040a0f" stroke="#1e3a50" stroke-width="2" rx="10"/>
+
+          <!-- Central Hardware Blocks -->
+          <!-- Input Module -->
+          <rect x="40" y="40" width="90" height="60" fill="#0d1f2d" stroke="#38bdf8" stroke-width="2" rx="5"/>
+          <text x="50" y="65" fill="#38bdf8" font-size="10" font-weight="bold">1. INPUT SCAN</text>
+          <text x="48" y="82" fill="#94a3b8" font-size="8">Read Field Inputs</text>
+
+          <!-- CPU / Program Execution -->
+          <rect x="155" y="40" width="90" height="60" fill="#0d1f2d" stroke="#f59e0b" stroke-width="2" rx="5"/>
+          <text x="163" y="65" fill="#f59e0b" font-size="10" font-weight="bold">2. EXECUTE</text>
+          <text x="162" y="82" fill="#94a3b8" font-size="8">Ladder Logic Logic</text>
+
+          <!-- Output Module -->
+          <rect x="270" y="40" width="90" height="60" fill="#0d1f2d" stroke="#22c55e" stroke-width="2" rx="5"/>
+          <text x="277" y="65" fill="#22c55e" font-size="10" font-weight="bold">3. OUTPUT SCAN</text>
+          <text x="282" y="82" fill="#94a3b8" font-size="8">Update Actuators</text>
+
+          <!-- Diagnostics Overhead -->
+          <rect x="155" y="140" width="90" height="50" fill="#0d1f2d" stroke="#ef4444" stroke-width="1.5" rx="5"/>
+          <text x="160" y="162" fill="#ef4444" font-size="9" font-weight="bold">4. OVERHEAD</text>
+          <text x="161" y="177" fill="#94a3b8" font-size="8">Comm & Self-Diag</text>
+
+          <!-- Animated Data Pulse Path around Scan Loop -->
+          <path d="M 130 70 L 155 70" fill="none" stroke="#38bdf8" stroke-width="2" stroke-dasharray="4,2"/>
+          <path d="M 245 70 L 270 70" fill="none" stroke="#f59e0b" stroke-width="2" stroke-dasharray="4,2"/>
+          <path d="M 315 100 L 315 165 L 245 165" fill="none" stroke="#22c55e" stroke-width="2" stroke-dasharray="4,2"/>
+          <path d="M 155 165 L 85 165 L 85 100" fill="none" stroke="#ef4444" stroke-width="2" stroke-dasharray="4,2"/>
+
+          <!-- Traveling Scan Particle Animation -->
+          <circle cx="0" cy="0" r="4" fill="#38bdf8">
+            <animateMotion path="M 130 70 L 155 70 L 245 70 L 270 70 L 315 70 L 315 165 L 245 165 L 155 165 L 85 165 L 85 70 Z" dur="3s" repeatCount="indefinite"/>
+          </circle>
+
+          <text x="100" y="200" fill="#38bdf8" font-size="9" font-weight="bold">Cyclic Real-Time Execution Loop</text>
+        </svg>
+        <p style="font-size:12px; color:#94a3b8;">Deterministic 4-Stage Continuous Scan Cycle of Industrial PLC</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SECTION 2: INPUT/OUTPUT ISOLATION CIRCUITS -->
+<div class="sensor-card">
+  <h2>2. Optoisolation & Input Signal Conditioning</h2>
+  <div class="grid-2">
+    <div>
+      <h3>Optocoupler Electrical Isolation</h3>
+      <p>To prevent field electrical transients, high-voltage surges, and ground loops from damaging sensitive 5V microprocessors, industrial PLC input cards employ <strong>Optoisolators (Optocouplers)</strong>.</p>
+
+      <p>The optical isolation barrier converts incoming field current $I_{in}$ into light pulses using an Infrared LED, which photo-triggers a phototransistor on the microprocessor side:</p>
+      <div class="formula">
+        $$I_{LED} = \frac{V_{in} - V_{LED}}{R_{limit}}$$
+      </div>
+      <p>Where $V_{in}$ is the incoming field voltage (e.g., 24V DC), $V_{LED}$ is the forward voltage drop of the internal LED ($\approx 1.2\text{ to } 1.7\text{ V}$), and $R_{limit}$ is the current-limiting input resistor.</p>
+    </div>
+
+    <div>
+      <h3>Optocoupler Signal Conditioning Schematic</h3>
+      <div class="anim-box">
+        <svg viewBox="0 0 400 180" width="100%" height="160">
+          <!-- Field Side (High Voltage) -->
+          <rect x="20" y="20" width="150" height="140" fill="#091a24" stroke="#38bdf8" stroke-width="1.5" rx="5"/>
+          <text x="35" y="40" fill="#38bdf8" font-size="9" font-weight="bold">24V DC FIELD SIDE</text>
+          
+          <circle cx="40" cy="80" r="5" fill="#38bdf8"/>
+          <text x="50" y="83" fill="#e2e8f0" font-size="8">V_in (+24V)</text>
+          
+          <!-- Limiting Resistor -->
+          <rect x="80" y="75" width="25" height="10" fill="#f59e0b" stroke="#fff" stroke-width="1"/>
+          <text x="82" y="70" fill="#f59e0b" font-size="7">R_limit</text>
+
+          <!-- Optocoupler Package Barrier -->
+          <rect x="180" y="30" width="40" height="120" fill="#1e3a50" stroke="#fff" stroke-width="1" stroke-dasharray="4,2"/>
+          <text x="183" y="25" fill="#fff" font-size="8">Isolation</text>
+
+          <!-- Internal Infrared LED -->
+          <polygon points="120,70 120,90 135,80" fill="#ef4444"/>
+          <line x1="135" y1="70" x2="135" y2="90" stroke="#ef4444" stroke-width="2"/>
+          
+          <!-- Optical Light Photons -->
+          <line x1="140" y1="75" x2="160" y2="75" stroke="#f59e0b" stroke-width="1.5" stroke-dasharray="2,2"/>
+          <line x1="140" y1="85" x2="160" y2="85" stroke="#f59e0b" stroke-width="1.5" stroke-dasharray="2,2"/>
+
+          <!-- Microprocessor Logic Side (Low Voltage) -->
+          <rect x="230" y="20" width="150" height="140" fill="#091a24" stroke="#22c55e" stroke-width="1.5" rx="5"/>
+          <text x="245" y="40" fill="#22c55e" font-size="9" font-weight="bold">5V CPU LOGIC SIDE</text>
+
+          <!-- Phototransistor -->
+          <circle cx="260" cy="80" r="15" fill="#0d1f2d" stroke="#22c55e" stroke-width="1"/>
+          <text x="285" y="83" fill="#22c55e" font-size="8">To CPU Bus</text>
+        </svg>
+        <p style="font-size:12px; color:#94a3b8;">Optically Isolated Field Input Circuit (Galvanic Separation)</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SECTION 3: COMPARISON TABLE -->
+<div class="sensor-card">
+  <h2>Comparative Analysis: PLC Input/Output Module Interfaces</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>Module Category</th>
+        <th>Signal Type</th>
+        <th>Optoisolation</th>
+        <th>Response Speed</th>
+        <th>Common Application Field Devices</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>Discrete DC Input</strong></td>
+        <td>24V DC Sinking / Sourcing (0 or 1).</td>
+        <td>Yes (Optocoupler).</td>
+        <td>Fast ($1\text{ to } 10\text{ ms}$).</td>
+        <td>Pushbuttons, inductive proximity sensors, limit switches.</td>
+      </tr>
+      <tr>
+        <td><strong>Discrete AC Input</strong></td>
+        <td>120V / 240V AC Digital.</td>
+        <td>Yes (Optoisolated + RC Filter).</td>
+        <td>Moderate ($10\text{ to } 20\text{ ms}$).</td>
+        <td>Legacy pressure switches, selector switches, motor starter contacts.</td>
+      </tr>
+      <tr>
+        <td><strong>Analog Input</strong></td>
+        <td>$0-10\text{ V DC}$ or $4-20\text{ mA}$ Current Loop.</td>
+        <td>Yes (Isolated ADC Transducer).</td>
+        <td>Sample-rate dependent ($2\text{ to } 50\text{ ms}$).</td>
+        <td>Thermocouples, RTDs, ultrasonic level transmitters, load cells.</td>
+      </tr>
+      <tr>
+        <td><strong>Relay Output Module</strong></td>
+        <td>AC/DC Dry Mechanical Contact.</td>
+        <td>Yes (Galvanic Relay Coil).</td>
+        <td>Slow ($10\text{ to } 20\text{ ms}$).</td>
+        <td>High-power interlocks, solenoid valves, alarm horns.</td>
+      </tr>
+      <tr>
+        <td><strong>Transistor Output (Solid-State)</strong></td>
+        <td>24V DC Sinking (NPN) or Sourcing (PNP).</td>
+        <td>Yes (Opto-TRIAC/FET).</td>
+        <td><strong>Ultra-Fast ($< 0.1\text{ ms}$)</strong></td>
+        <td>PWM motor controllers, stepper drive pulse generators, high-speed counters.</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- SECTION 4: NUMERICAL PROBLEMS -->
+<div class="sensor-card">
+  <h2>Numerical Problems: Scan Time, Memory Capacity & Analog Resolution</h2>
+
+  <!-- Problem 1: PLC Total Scan Time Calculation -->
+  <div class="numerical-card">
+    <h3>Problem 1: PLC Program Execution & Total Scan Time Calculation</h3>
+    <p><strong>Scenario:</strong> A modular industrial PLC controls an automated sorting line. Its instruction execution speed is $0.05\ \mu\text{s per basic instruction}$ and $0.40\ \mu\text{s per complex math block}$. The ladder logic program consists of $12,000\text{ basic instructions}$ and $800\text{ complex math blocks}$.</p>
+    <p>The module system specifications provide the following overhead times:</p>
+    <ul>
+      <li>Input Module Discrete Read Sweep Time: $T_{input} = 0.85\text{ ms}$</li>
+      <li>Output Module Write Sweep Time: $T_{output} = 0.65\text{ ms}$</li>
+      <li>CPU Diagnostics & Network Communication Overhead: $T_{overhead} = 1.20\text{ ms}$</li>
+    </ul>
+    <p>Determine:</p>
+    <ol type="a">
+      <li>The program execution time $T_{program\_exec}$ in milliseconds.</li>
+      <li>The total system scan time $T_{scan}$ in milliseconds.</li>
+      <li>The maximum theoretical update frequency $f_{scan}$ in Hertz ($\text{Hz}$).</li>
+    </ol>
+
+    <h4>Step-by-Step Solution:</h4>
+    <p><strong>1. Calculate Program Execution Time ($T_{program\_exec}$):</strong></p>
+    <div class="formula">
+      $$T_{basic} = 12000 \times 0.05\ \mu\text{s} = 600\ \mu\text{s} = 0.60\text{ ms}$$
+    </div>
+    <div class="formula">
+      $$T_{math} = 800 \times 0.40\ \mu\text{s} = 320\ \mu\text{s} = 0.32\text{ ms}$$
+    </div>
+    <div class="formula">
+      $$T_{program\_exec} = T_{basic} + T_{math} = 0.60\text{ ms} + 0.32\text{ ms} = 0.92\text{ ms}$$
+    </div>
+
+    <p><strong>2. Calculate Total Scan Time ($T_{scan}$):</strong></p>
+    <div class="formula">
+      $$T_{scan} = T_{input} + T_{program\_exec} + T_{output} + T_{overhead}$$
+    </div>
+    <div class="formula">
+      $$T_{scan} = 0.85\text{ ms} + 0.92\text{ ms} + 0.65\text{ ms} + 1.20\text{ ms} = 3.62\text{ ms}$$
+    </div>
+
+    <p><strong>3. Calculate Update Frequency ($f_{scan}$):</strong></p>
+    <div class="formula">
+      $$f_{scan} = \frac{1}{T_{scan}} = \frac{1}{3.62 \times 10^{-3}\text{ s}} \approx 276.24\text{ Hz}$$
+    </div>
+  </div>
+
+  <!-- Problem 2: Analog-to-Digital Module Scaling & Resolution -->
+  <div class="numerical-card">
+    <h3>Problem 2: Analog Input Module Quantization & Voltage Resolution</h3>
+    <p><strong>Scenario:</strong> An analog input card accepts a $0\text{ to } 10\text{ V DC}$ pressure sensor signal and converts it using a 14-bit Analog-to-Digital Converter (ADC). The field pressure sensor ranges from $0\text{ to } 200\text{ PSI}$.</p>
+    <p>Calculate:</p>
+    <ol type="a">
+      <li>The total number of discrete quantization levels ($2^N$) for the 14-bit ADC module.</li>
+      <li>The voltage resolution per bit $\Delta V$ in millivolts ($\text{mV}$).</li>
+      <li>The engineering unit pressure resolution $\Delta P$ in $\text{PSI per bit}$.</li>
+      <li>The register integer value returned by the PLC when the input voltage is $6.40\text{ V DC}$.</li>
+    </ol>
+
+    <h4>Step-by-Step Solution:</h4>
+    <p><strong>1. Calculate Quantization Levels:</strong></p>
+    <div class="formula">
+      $$\text{Levels} = 2^{14} = 16,384\text{ counts (0 to 16,383)}$$
+    </div>
+
+    <p><strong>2. Calculate Voltage Resolution ($\Delta V$):</strong></p>
+    <div class="formula">
+      $$\Delta V = \frac{V_{max} - V_{min}}{2^N - 1} = \frac{10\text{ V} - 0\text{ V}}{16383} = 0.00061038\text{ V/count} = 0.6104\text{ mV/count}$$
+    </div>
+
+    <p><strong>3. Calculate Pressure Resolution ($\Delta P$):</strong></p>
+    <div class="formula">
+      $$\Delta P = \frac{200\text{ PSI}}{16383\text{ counts}} = 0.012207\text{ PSI/count}$$
+    </div>
+
+    <p><strong>4. Calculate Register Integer Value for $V_{in} = 6.40\text{ V}$:</strong></p>
+    <div class="formula">
+      $$\text{Register Value} = \text{Round}\left( \frac{V_{in}}{\Delta V} \right) = \text{Round}\left( \frac{6.40\text{ V}}{0.00061038\text{ V}} \right) = 10,485\text{ counts}$$
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

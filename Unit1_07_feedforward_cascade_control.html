@@ -1,0 +1,989 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Feedforward and Cascade Control Systems</title>
+
+<!-- ADD THIS SCRIPT TO RENDER LATEX MATH PROPERLY -->
+<!-- MATHJAX SETUP (NO POLYFILL NEEDED) -->
+<script>
+  window.MathJax = {
+    tex: {
+      inlineMath: [['$', '$'], ['\\(', '\\)']]
+    }
+  };
+</script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+
+<style>
+*{box-sizing:border-box}
+
+body{
+    margin:0;
+    font-family:Arial,Helvetica,sans-serif;
+    background:#071017;
+    color:#edf7fb;
+}
+
+header{
+    background:#0b2533;
+    padding:22px;
+    border-bottom:3px solid #28a9d6;
+    position:sticky;
+    top:0;
+    z-index:1000;
+}
+
+header h1{margin:0;font-size:25px}
+header p{margin:7px 0;color:#a9ddec}
+
+nav{
+    background:#081720;
+    padding:10px;
+    text-align:center;
+    border-bottom:1px solid #31505d;
+}
+
+nav button{
+    background:#12394b;
+    color:white;
+    border:1px solid #477080;
+    padding:9px 13px;
+    border-radius:6px;
+    margin:3px;
+    cursor:pointer;
+}
+
+nav button:hover{background:#1c5b71}
+
+.container{
+    max-width:1400px;
+    margin:auto;
+    padding:22px;
+}
+
+.card{
+    background:#0c1b25;
+    border:1px solid #2c4d5b;
+    border-radius:11px;
+    padding:24px;
+    margin-bottom:22px;
+}
+
+h2{color:#7dd3fc}
+h3{color:#8ddcf0}
+
+p{line-height:1.7}
+
+.highlight{
+    background:#0e2d3b;
+    border-left:5px solid #38bdf8;
+    padding:16px;
+    margin:16px 0;
+    border-radius:5px;
+}
+
+.warning{
+    background:#332717;
+    border-left:5px solid #f59e0b;
+    padding:16px;
+    margin:16px 0;
+}
+
+.grid2{
+    display:grid;
+    grid-template-columns:repeat(2,1fr);
+    gap:18px;
+}
+
+.grid3{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:18px;
+}
+
+.info{
+    background:#102632;
+    border:1px solid #3b6170;
+    border-radius:9px;
+    padding:20px;
+}
+
+.icon{
+    font-size:48px;
+    text-align:center;
+    margin:10px;
+}
+
+/* FLOW & DIAGRAMS */
+
+.flow{
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    flex-wrap:wrap;
+    gap:12px;
+    margin:25px 0;
+}
+
+.flowBox{
+    min-width:130px;
+    padding:16px;
+    text-align:center;
+    background:#102c3a;
+    border:2px solid #456d7b;
+    border-radius:8px;
+    transition:.3s;
+}
+
+.flowBox.active{
+    border-color:#38bdf8;
+    box-shadow:0 0 15px rgba(56,189,248,.4);
+    background:#164257;
+}
+
+.arrow{
+    font-size:30px;
+    color:#758f99;
+}
+
+.arrow.active{
+    color:#22c55e;
+    text-shadow:0 0 12px #22c55e;
+}
+
+/* SIMULATION CANVAS */
+
+.simContainer{
+    background:#03090d;
+    border:2px solid #385765;
+    border-radius:10px;
+    padding:25px;
+}
+
+.simTitle{
+    text-align:center;
+    color:#8ddcf0;
+    font-size:20px;
+    font-weight:bold;
+    margin-bottom:20px;
+}
+
+.canvasWrapper{
+    position:relative;
+    width:100%;
+    height:320px;
+    background:#08131a;
+    border:1px solid #284450;
+    border-radius:8px;
+    overflow:hidden;
+}
+
+canvas{
+    width:100%;
+    height:100%;
+    display:block;
+}
+
+/* METRICS */
+
+.metrics{
+    display:grid;
+    grid-template-columns:repeat(4,1fr);
+    gap:14px;
+    margin-top:20px;
+}
+
+.metric{
+    background:#102a35;
+    border:1px solid #3b6270;
+    padding:18px;
+    border-radius:8px;
+    text-align:center;
+}
+
+.metricValue{
+    font-size:24px;
+    font-weight:bold;
+    color:#7dd3fc;
+    margin-top:8px;
+}
+
+/* BUTTONS */
+
+.btn{
+    border:0;
+    color:white;
+    padding:12px 18px;
+    border-radius:6px;
+    margin:5px;
+    cursor:pointer;
+    font-weight:bold;
+}
+
+.green{background:#15803d}
+.red{background:#b91c1c}
+.blue{background:#2563eb}
+.orange{background:#b45309}
+
+/* TABLE */
+
+table{
+    width:100%;
+    border-collapse:collapse;
+}
+
+th,td{
+    border:1px solid #3b5d68;
+    padding:13px;
+}
+
+th{
+    background:#12394b;
+}
+
+/* QUIZ */
+
+.quiz{
+    background:#091923;
+    border:1px solid #355a68;
+    padding:18px;
+    margin:15px 0;
+    border-radius:8px;
+}
+
+.quiz button{
+    display:block;
+    width:100%;
+    text-align:left;
+    padding:11px;
+    margin:6px 0;
+    background:#123548;
+    color:white;
+    border:1px solid #426979;
+    border-radius:5px;
+    cursor:pointer;
+}
+
+.quiz button.correct{background:#14532d}
+.quiz button.wrong{background:#7f1d1d}
+
+.result{
+    background:#102c38;
+    padding:15px;
+    border-left:5px solid #38bdf8;
+}
+
+.center{text-align:center}
+
+@media(max-width:900px){
+    .grid2,.grid3{grid-template-columns:1fr}
+    .metrics{grid-template-columns:1fr 1fr}
+}
+
+@media(max-width:600px){
+    .metrics{grid-template-columns:1fr}
+    header h1{font-size:20px}
+}
+</style>
+</head>
+
+
+<body>
+
+<header>
+
+<h1>📘 INDUSTRIAL CONTROL AND AUTOMATION</h1>
+
+<p>UNIT – I | Chapter 7 — Advanced Control Strategies: Feedforward & Cascade Control</p>
+
+</header>
+
+
+<nav>
+
+<button onclick="go('concept')">Concept</button>
+<button onclick="go('feedforward')">Feedforward Control</button>
+<button onclick="go('cascade')">Cascade Control</button>
+<button onclick="go('comparison')">Comparison</button>
+<button onclick="go('simulation')">Interactive Plot</button>
+<button onclick="go('quiz')">Quiz</button>
+
+</nav>
+
+
+<div class="container">
+
+
+<!-- INTRODUCTION -->
+
+<section id="concept" class="card">
+
+<h2>1. Beyond Standard Feedback Control</h2>
+
+<p>
+
+Standard feedback control acts only <strong>after</strong> an error in the Process Variable (PV) is detected. In slow industrial processes (like heat exchangers or distillation columns), waiting for error to accumulate causes large transient deviations and slow recovery times.
+
+</p>
+
+<div class="highlight">
+
+<strong>Core Objective:</strong>
+
+Understand how <strong>Feedforward Control</strong> rejects measured disturbances preemptively and how <strong>Cascade Control</strong> isolates inner-loop disturbances before they affect the main process variable.
+
+</div>
+
+<div class="grid2">
+
+<div class="info">
+<div class="icon">🛡️</div>
+<h3>Feedforward Principle</h3>
+<p>Measures the disturbance <strong>before</strong> it enters the process and applies corrective action proactively, preventing PV deviation.</p>
+</div>
+
+<div class="info">
+<div class="icon">🔄</div>
+<h3>Cascade Principle</h3>
+<p>Uses a nested loop architecture where a primary (master) controller regulates a secondary (slave) loop to eliminate local disturbances rapidly.</p>
+</div>
+
+</div>
+
+</section>
+
+
+<!-- FEEDFORWARD CONTROL -->
+
+<section id="feedforward" class="card">
+
+<h2>2. Feedforward Control Strategy</h2>
+
+<p>
+
+Feedforward control measures incoming load disturbances (e.g., changes in cold water inlet flow rate) and uses a mathematical model of the process to adjust the control action before the plant output strays from setpoint.
+
+</p>
+
+<div class="highlight">
+
+<strong>Transfer Function Ideal Feedforward Gain:</strong>
+
+<br><br>
+
+$G_{ff}(s) = -\frac{G_d(s)}{G_p(s)}$
+
+<br><br>
+
+Where $G_d(s)$ is the Disturbance Transfer Function and $G_p(s)$ is the Process Transfer Function.
+
+</div>
+
+<div class="flow">
+
+<div class="flowBox">
+🌊<br>
+Disturbance (d)
+</div>
+
+<div class="arrow active">→</div>
+
+<div class="flowBox">
+📐<br>
+Feedforward Model<br><small>Gff(s)</small>
+</div>
+
+<div class="arrow active">↘</div>
+
+<div class="flowBox">
+➕<br>
+Summing Point
+</div>
+
+<div class="arrow active">→</div>
+
+<div class="flowBox">
+⚙️<br>
+Actuator & Process
+</div>
+
+<div class="arrow active">→</div>
+
+<div class="flowBox">
+📈<br>
+Process Output (PV)
+</div>
+
+</div>
+
+<div class="warning">
+
+<strong>Note:</strong> Pure feedforward cannot correct for unmeasured disturbances or model inaccuracies. Therefore, industrial systems combine <strong>Feedforward + Feedback</strong> control.
+
+</div>
+
+</section>
+
+
+<!-- CASCADE CONTROL -->
+
+<section id="cascade" class="card">
+
+<h2>3. Cascade Control Architecture</h2>
+
+<p>
+
+Cascade control uses two controllers in series: the <strong>Master (Primary) Controller</strong> measures the main process variable (e.g., Tank Temperature) and provides the Setpoint to the <strong>Slave (Secondary) Controller</strong>, which controls an inner parameter (e.g., Steam Valve Flow Rate).
+
+</p>
+
+<div class="flow">
+
+<div class="flowBox">
+🎯<br>
+Primary SP
+</div>
+
+<div class="arrow active">→</div>
+
+<div class="flowBox">
+👑<br>
+Master Controller<br><small>(Primary / Temp)</small>
+</div>
+
+<div class="arrow active">→</div>
+
+<div class="flowBox">
+🎯<br>
+Secondary SP
+</div>
+
+<div class="arrow active">→</div>
+
+<div class="flowBox">
+🛠️<br>
+Slave Controller<br><small>(Secondary / Flow)</small>
+</div>
+
+<div class="arrow active">→</div>
+
+<div class="flowBox">
+🚰<br>
+Valve & Plant
+</div>
+
+</div>
+
+<div class="grid3">
+
+<div class="info">
+<div class="icon">⚡</div>
+<h3>Fast Secondary Loop</h3>
+<p>The secondary loop must react <strong>3x to 5x faster</strong> than the primary loop to attenuate supply disturbances rapidly.</p>
+</div>
+
+<div class="info">
+<div class="icon">🔒</div>
+<h3>Valve Nonlinearities</h3>
+<p>Protects the main process from valve hysteresis, friction, and upstream pressure fluctuations.</p>
+</div>
+
+<div class="info">
+<div class="icon">📈</div>
+<h3>Improved Stability</h3>
+<p>Reduces total phase lag and increases allowable gain for the primary controller.</p>
+</div>
+
+</div>
+
+</section>
+
+
+<!-- COMPARISON TABLE -->
+
+<section id="comparison" class="card">
+
+<h2>4. Strategy Comparison Matrix</h2>
+
+<table>
+
+<tr>
+<th>Feature</th>
+<th>Feedback Control</th>
+<th>Feedforward Control</th>
+<th>Cascade Control</th>
+</tr>
+
+<tr>
+<td><strong>Disturbance Sensing</strong></td>
+<td>Not measured directly (Sensed through PV error)</td>
+<td>Directly measured before process entry</td>
+<td>Sensed in inner (secondary) process loop</td>
+</tr>
+
+<tr>
+<td><strong>Action Timing</strong></td>
+<td>Reactive (After error occurs)</td>
+<td>Proactive (Before error occurs)</td>
+<td>Reactive within inner loop, rapid overall</td>
+</tr>
+
+<tr>
+<td><strong>Process Model Dependency</strong></td>
+<td>Low</td>
+<td>High (Requires dynamic model)</td>
+<td>Moderate</td>
+</tr>
+
+<tr>
+<td><strong>Unmeasured Disturbances</strong></td>
+<td>Handled completely</td>
+<td>Ignored (Cannot react)</td>
+<td>Handled by primary outer loop</td>
+</tr>
+
+<tr>
+<td><strong>Secondary Measurements</strong></td>
+<td>1 Sensor (PV)</td>
+<td>2 Sensors (Disturbance + PV)</td>
+<td>2 Sensors (Primary PV + Secondary PV)</td>
+</tr>
+
+</table>
+
+</section>
+
+
+<!-- INTERACTIVE SIMULATION -->
+
+<section id="simulation" class="card">
+
+<h2>5. Interactive Disturbance Rejection Simulator</h2>
+
+<p>
+
+Inject an upstream pressure disturbance at $t = 2.0\text{ s}$ and observe how Feedback, Feedforward, and Cascade architectures reject the load change.
+
+</p>
+
+<div class="simContainer">
+
+<div class="simTitle">DISTURBANCE REJECTION SIMULATOR (HEAT EXCHANGER TANK)</div>
+
+<div class="canvasWrapper">
+<canvas id="simCanvas"></canvas>
+</div>
+
+<div class="metrics">
+
+<div class="metric">
+Selected Mode
+<div class="metricValue" id="m_mode">Feedback</div>
+</div>
+
+<div class="metric">
+Max Deviation
+<div class="metricValue" id="m_dev">-- °C</div>
+</div>
+
+<div class="metric">
+Recovery Time
+<div class="metricValue" id="m_rec">-- s</div>
+</div>
+
+<div class="metric">
+Integrated Error (IAE)
+<div class="metricValue" id="m_iae">--</div>
+</div>
+
+</div>
+
+<br>
+
+<div class="center">
+<button class="btn blue" onclick="setMode('feedback')">Feedback Only</button>
+<button class="btn green" onclick="setMode('feedforward')">Feedforward + Feedback</button>
+<button class="btn orange" onclick="setMode('cascade')">Cascade Control</button>
+<button class="btn red" onclick="triggerDisturbance()">⚡ Inject Disturbance</button>
+</div>
+
+<div class="highlight center" id="simStatus">
+Feedback Mode Selected. Click "Inject Disturbance" to test load rejection.
+</div>
+
+</div>
+
+</section>
+
+
+<!-- CHAPTER SUMMARY -->
+
+<section class="card">
+
+<h2>6. Chapter Summary</h2>
+
+<ul>
+
+<li><strong>Feedback Control</strong> is simple and universal, but intrinsically reactive and slow for long dead-time processes.</li>
+
+<li><strong>Feedforward Control</strong> cancels measurable disturbances proactively before they impact the main process variable.</li>
+
+<li><strong>Cascade Control</strong> embeds a secondary fast control loop to crush local valve or pressure variations before they affect the master variable.</li>
+
+<li>Industrial practice frequently merges <strong>Feedforward + Cascade</strong> into multi-loop DCS control topologies for maximum stability.</li>
+
+</ul>
+
+<div class="highlight">
+
+<strong>Student memory rule:</strong>
+
+<br><br>
+
+⏱️ Feedback = Reacts <strong>After</strong> Error
+
+<br>
+
+🔮 Feedforward = Anticipates <strong>Before</strong> Error
+
+<br>
+
+Nested 🔄 Cascade = Kills Inner Loop Disturbance <strong>Fast</strong>
+
+</div>
+
+</section>
+
+
+<!-- QUIZ -->
+
+<section id="quiz" class="card">
+
+<h2>7. Student Self-Assessment</h2>
+
+<div class="quiz">
+
+<strong>
+Q1. What is the main operational drawback of a purely Feedforward control system?
+</strong>
+
+<button onclick="answer(this,false)">
+A. It causes severe instability in simple fast loops
+</button>
+
+<button onclick="answer(this,true)">
+B. It cannot react to unmeasured disturbances or plant model errors
+</button>
+
+<button onclick="answer(this,false)">
+C. It requires two master controllers in series
+</button>
+
+<button onclick="answer(this,false)">
+D. It increases steady-state error to infinity
+</button>
+
+</div>
+
+
+<div class="quiz">
+
+<strong>
+Q2. In a Cascade control system, how fast should the slave (secondary) loop be relative to the master (primary) loop?
+</strong>
+
+<button onclick="answer(this,false)">
+A. 10x slower than the master loop
+</button>
+
+<button onclick="answer(this,false)">
+B. Exactly equal speed to the master loop
+</button>
+
+<button onclick="answer(this,true)">
+C. Significantly faster (typically 3x to 5x faster) than the master loop
+</button>
+
+<button onclick="answer(this,false)">
+D. Speed ratio does not matter in cascade loops
+</button>
+
+</div>
+
+
+<div class="quiz">
+
+<strong>
+Q3. Where does the setpoint of the secondary (slave) controller originate in a cascade architecture?
+</strong>
+
+<button onclick="answer(this,false)">
+A. Entered manually by the operator at all times
+</button>
+
+<button onclick="answer(this,true)">
+B. Output directly from the primary (master) controller
+</button>
+
+<button onclick="answer(this,false)">
+C. Calculated by the field disturbance transmitter
+</button>
+
+<button onclick="answer(this,false)">
+D. Generated by a fixed reference voltage
+</button>
+
+</div>
+
+
+<div class="quiz">
+
+<strong>
+Q4. Which control strategy directly measures the disturbance variable before it impacts the main process output?
+</strong>
+
+<button onclick="answer(this,true)">
+A. Feedforward Control
+</button>
+
+<button onclick="answer(this,false)">
+B. Feedback Control
+</button>
+
+<button onclick="answer(this,false)">
+C. On-Off Control
+</button>
+
+<button onclick="answer(this,false)">
+D. Open-loop manual control
+</button>
+
+</div>
+
+
+<div class="result" id="quizResult">
+Select an answer.
+</div>
+
+</section>
+
+
+</div>
+
+
+<script>
+
+/* NAVIGATION */
+
+function go(id){
+    document.getElementById(id).scrollIntoView({
+        behavior:"smooth"
+    });
+}
+
+
+/* SIMULATION ENGINE */
+
+const canvas = document.getElementById("simCanvas");
+const ctx = canvas.getContext("2d");
+
+let currentMode = 'feedback';
+let disturbanceActive = false;
+
+function resizeCanvas(){
+    canvas.width = canvas.parentElement.clientWidth;
+    canvas.height = canvas.parentElement.clientHeight;
+}
+window.addEventListener('resize', resizeCanvas);
+resizeCanvas();
+
+function setMode(mode){
+    currentMode = mode;
+    let modeText = "Feedback";
+    if(mode === 'feedforward') modeText = "Feedforward + Feedback";
+    if(mode === 'cascade') modeText = "Cascade Control";
+
+    document.getElementById("m_mode").innerText = modeText;
+    document.getElementById("simStatus").innerText = modeText + " Mode Selected. Click 'Inject Disturbance' to test.";
+    simulateAndDraw();
+}
+
+function triggerDisturbance(){
+    disturbanceActive = true;
+    simulateAndDraw();
+}
+
+function simulateAndDraw(){
+    resizeCanvas();
+    let w = canvas.width;
+    let h = canvas.height;
+
+    ctx.clearRect(0, 0, w, h);
+
+    // Gridlines
+    ctx.strokeStyle = "#1a3544";
+    ctx.lineWidth = 1;
+    for(let x = 0; x < w; x += 50){
+        ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, h); ctx.stroke();
+    }
+    for(let y = 0; y < h; y += 40){
+        ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(w, y); ctx.stroke();
+    }
+
+    let margin = 40;
+    let plotH = h - 2 * margin;
+    let plotW = w - 2 * margin;
+    let setpointY = h - margin - (0.5 * plotH); // Target = 50%
+
+    // Setpoint Line
+    ctx.strokeStyle = "#ef4444";
+    ctx.setLineDash([6, 6]);
+    ctx.beginPath();
+    ctx.moveTo(margin, setpointY);
+    ctx.lineTo(w - margin, setpointY);
+    ctx.stroke();
+    ctx.setLineDash([]);
+
+    ctx.fillStyle = "#ef4444";
+    ctx.font = "12px Arial";
+    ctx.fillText("Target Temp (SP = 50 °C)", w - 170, setpointY - 8);
+
+    let dt = 0.02;
+    let steps = 400;
+    let points = [];
+    let distPoints = [];
+
+    let pv = 50.0;
+    let d_val = 0.0;
+    let maxDev = 0;
+    let iae = 0;
+    let recoveryStep = -1;
+
+    // Controllers state
+    let master_integral = 0;
+    let slave_pv = 50.0;
+
+    for(let i = 0; i < steps; i++){
+        let t = i * dt;
+
+        // Step Disturbance at t = 2.0s
+        if(t >= 2.0 && disturbanceActive){
+            d_val = 15.0; // +15°C cold fluid flow drop disturbance
+        } else {
+            d_val = 0.0;
+        }
+        distPoints.push(d_val);
+
+        let err = 50.0 - pv;
+        iae += Math.abs(err) * dt;
+
+        if(Math.abs(err) > maxDev) maxDev = Math.abs(err);
+
+        if(t > 2.0 && recoveryStep === -1 && Math.abs(err) < 0.5){
+            recoveryStep = i;
+        }
+
+        let u = 0;
+
+        if(currentMode === 'feedback'){
+            // Standard PID on outer loop
+            master_integral += err * dt;
+            u = 1.5 * err + 0.8 * master_integral;
+            // Plant response with delay & disturbance
+            pv += (u * 0.1 - d_val * 0.12 - (pv - 50.0) * 0.08) * dt * 5;
+        } 
+        else if(currentMode === 'feedforward'){
+            // Feedforward cancels measured disturbance directly
+            master_integral += err * dt;
+            let u_fb = 1.5 * err + 0.8 * master_integral;
+            let u_ff = d_val * 1.15; // Model estimate
+            u = u_fb + u_ff;
+            pv += (u * 0.1 - d_val * 0.12 - (pv - 50.0) * 0.08) * dt * 5;
+        } 
+        else if(currentMode === 'cascade'){
+            // Primary (Master) -> Secondary (Slave) Loop
+            master_integral += err * dt;
+            let inner_sp = 50.0 + (1.2 * err + 0.6 * master_integral);
+            
+            // Fast inner loop rejects disturbance rapidly
+            let inner_err = inner_sp - slave_pv;
+            let slave_u = 4.0 * inner_err;
+            slave_pv += (slave_u * 0.4 - d_val * 0.4) * dt * 10;
+
+            pv += ((slave_pv - 50.0) * 0.15 - (pv - 50.0) * 0.08) * dt * 5;
+        }
+
+        points.push(pv);
+    }
+
+    // Render Disturbance (Orange line)
+    ctx.strokeStyle = "#f59e0b";
+    ctx.lineWidth = 1.5;
+    ctx.beginPath();
+    for(let i = 0; i < steps; i++){
+        let px = margin + (i / steps) * plotW;
+        let py = h - margin - (distPoints[i] / 30.0) * (0.3 * plotH);
+        if(i === 0) ctx.moveTo(px, py);
+        else ctx.lineTo(px, py);
+    }
+    ctx.stroke();
+
+    // Render PV Response Curve (Blue line)
+    ctx.strokeStyle = "#38bdf8";
+    ctx.lineWidth = 3;
+    ctx.beginPath();
+    for(let i = 0; i < steps; i++){
+        let px = margin + (i / steps) * plotW;
+        let py = h - margin - ((points[i] / 100.0) * plotH);
+        if(i === 0) ctx.moveTo(px, py);
+        else ctx.lineTo(px, py);
+    }
+    ctx.stroke();
+
+    // Update Metrics
+    let recTime = (recoveryStep > 0 && disturbanceActive) ? ((recoveryStep * dt) - 2.0).toFixed(2) + " s" : (disturbanceActive ? "> 6.0 s" : "0.00 s");
+
+    document.getElementById("m_dev").innerText = disturbanceActive ? maxDev.toFixed(2) + " °C" : "0.00 °C";
+    document.getElementById("m_rec").innerText = recTime;
+    document.getElementById("m_iae").innerText = disturbanceActive ? iae.toFixed(1) : "0.0";
+}
+
+
+/* QUIZ MODULE */
+
+let score = 0;
+let answered = 0;
+
+function answer(button, correct){
+    let quiz = button.parentElement;
+
+    if(quiz.dataset.answered){
+        return;
+    }
+
+    quiz.dataset.answered = "yes";
+    answered++;
+
+    if(correct){
+        button.classList.add("correct");
+        score++;
+        document.getElementById("quizResult").innerText = "✓ Correct | Score: " + score + " / " + answered;
+    }else{
+        button.classList.add("wrong");
+        document.getElementById("quizResult").innerText = "✗ Incorrect | Score: " + score + " / " + answered;
+    }
+}
+
+// Initial render
+window.onload = function(){
+    simulateAndDraw();
+};
+
+</script>
+
+</body>
+</html>

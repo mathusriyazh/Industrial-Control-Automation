@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Chapter 22: Pneumatic Control Valves & Actuators</title>
+
+<!-- MathJax Configuration and Script -->
+<script>
+  window.MathJax = {
+    tex: {
+      inlineMath: [['$', '$'], ['\\(', '\\)']],
+      displayMath: [['$$', '$$'], ['\\[', '\\]']]
+    }
+  };
+</script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+<style>
+  :root {
+    --bg-dark: #071017;
+    --panel-bg: #0d1f2d;
+    --border-color: #1e3a50;
+    --accent-blue: #38bdf8;
+    --accent-green: #22c55e;
+    --accent-amber: #f59e0b;
+    --text-main: #e2e8f0;
+    --text-muted: #94a3b8;
+  }
+
+  body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: var(--bg-dark);
+    color: var(--text-main);
+    line-height: 1.6;
+    padding: 24px;
+    margin: 0;
+  }
+
+  h1, h2, h3, h4 {
+    color: var(--accent-blue);
+  }
+
+  h1 {
+    border-bottom: 2px solid var(--border-color);
+    padding-bottom: 10px;
+    margin-bottom: 20px;
+  }
+
+  .sensor-card {
+    background-color: var(--panel-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 10px;
+    padding: 24px;
+    margin-bottom: 30px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+  }
+
+  .grid-2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+  }
+
+  @media (max-width: 900px) {
+    .grid-2 { grid-template-columns: 1fr; }
+  }
+
+  .anim-box {
+    background: #040a0f;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 16px;
+    text-align: center;
+  }
+
+  .img-fluid {
+    max-width: 100%;
+    height: 180px;
+    object-fit: contain;
+    border-radius: 6px;
+    background: #040a0f;
+    padding: 10px;
+    border: 1px solid var(--border-color);
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 15px;
+  }
+
+  th, td {
+    border: 1px solid var(--border-color);
+    padding: 10px;
+    text-align: left;
+  }
+
+  th {
+    background-color: #132b3e;
+    color: var(--accent-blue);
+  }
+
+  .numerical-card {
+    background: #0a1824;
+    border-left: 4px solid var(--accent-amber);
+    padding: 18px;
+    margin-bottom: 20px;
+    border-radius: 0 8px 8px 0;
+  }
+
+  .formula {
+    background: #040a0f;
+    padding: 8px 12px;
+    border-radius: 6px;
+    color: #4ade80;
+    overflow-x: auto;
+    margin: 8px 0;
+  }
+</style>
+</head>
+<body>
+
+<h1>Chapter 22: Process Control & Actuation – Pneumatic Control Valves</h1>
+<p>This chapter covers pneumatic control valves, diaphragm actuators, I/P (Current-to-Pressure) positioners, flow coefficient ($C_v$) calculations, force balance relationships, and valve sizing equations.</p>
+
+<!-- SECTION 1: PNEUMATIC CONTROL VALVE -->
+<div class="sensor-card">
+  <h2>1. Pneumatic Diaphragm Actuator & Control Valve Assembly</h2>
+  <div class="grid-2">
+    <div>
+      <h3>Industrial Hardware Image</h3>
+      <img src="images/pneumatic_valve.jpg" class="img-fluid" alt="Pneumatic Globe Control Valve with Actuator">
+      <br>
+      <h4>Working Principle</h4>
+      <p>A pneumatic control valve regulates fluid flow rate by modulating the position of a valve plug within a orifice seat. Compressed air signal pressure $P_{in}$ (typically $3\text{--}15\text{ psi}$ or $0.2\text{--}1.0\text{ bar}$) acts against a flexible elastomeric diaphragm of effective area $A_{d}$.</p>
+
+      <p>The downward force produced by air pressure opposes an opposing return spring of stiffness $k_s$. The static force balance equation dictating valve stem displacement $x$ is given by:</p>
+      <div class="formula">
+        $$F_{net} = P_{in} \cdot A_d - (k_s \cdot x + F_{pre} + F_{fluid}) = 0$$
+      </div>
+      <p>Where $F_{pre}$ is the initial spring preload force and $F_{fluid}$ is dynamic fluid reaction force on the valve plug. Stem displacement changes the variable flow orifice area $A(x)$, directly controlling volumetric flow rate $Q$ via the incompressible flow equation:</p>
+      <div class="formula">
+        $$Q = C_v \cdot \sqrt{\frac{\Delta P}{SG}}$$
+      </div>
+    </div>
+
+    <div>
+      <h3>Interactive Diaphragm Actuator & Plug Animation</h3>
+      <div class="anim-box">
+        <svg viewBox="0 0 400 220" width="100%" height="200">
+          <!-- Actuator Upper Dome Housing -->
+          <path d="M 120 40 Q 200 10 280 40 L 280 60 L 120 60 Z" fill="#091a24" stroke="#1e3a50" stroke-width="2"/>
+          
+          <!-- Air Supply Line (Controlled Pressure Pin) -->
+          <line x1="200" y1="5" x2="200" y2="25" stroke="#38bdf8" stroke-width="4"/>
+          <polygon points="200,30 195,20 205,20" fill="#38bdf8"/>
+          <text x="210" y="20" fill="#38bdf8" font-size="9" font-weight="bold">Air Signal P_in</text>
+
+          <!-- Flexible Diaphragm Membrane (Pneumatic Movement) -->
+          <path d="M 120 60 Q 200 60 280 60" fill="none" stroke="#ef4444" stroke-width="4">
+            <animate attributeName="d" 
+                     values="M 120 60 Q 200 60 280 60;
+                             M 120 60 Q 200 85 280 60;
+                             M 120 60 Q 200 60 280 60;
+                             M 120 60 Q 200 45 280 60;
+                             M 120 60 Q 200 60 280 60" 
+                     dur="2s" repeatCount="indefinite"/>
+          </path>
+          <text x="70" y="65" fill="#ef4444" font-size="9" font-weight="bold">Diaphragm</text>
+
+          <!-- Actuator Lower Casing -->
+          <path d="M 120 60 L 150 100 L 250 100 L 280 60" fill="none" stroke="#1e3a50" stroke-width="2"/>
+
+          <!-- Compression Return Spring -->
+          <path d="M 185 80 L 215 80 L 185 95 L 215 95 L 185 110 L 215 110 L 185 125 L 215 125" fill="none" stroke="#f59e0b" stroke-width="2.5">
+            <animate attributeName="d" 
+                     values="M 185 80 L 215 80 L 185 95 L 215 95 L 185 110 L 215 110 L 185 125 L 215 125;
+                             M 185 95 L 215 95 L 185 105 L 215 105 L 185 115 L 215 115 L 185 125 L 215 125;
+                             M 185 80 L 215 80 L 185 95 L 215 95 L 185 110 L 215 110 L 185 125 L 215 125;
+                             M 185 70 L 215 70 L 185 88 L 215 88 L 185 106 L 215 106 L 185 125 L 215 125;
+                             M 185 80 L 215 80 L 185 95 L 215 95 L 185 110 L 215 110 L 185 125 L 215 125" 
+                     dur="2s" repeatCount="indefinite"/>
+          </path>
+
+          <!-- Central Valve Stem -->
+          <line x1="200" y1="60" x2="200" y2="170" stroke="#e2e8f0" stroke-width="3">
+            <animateTransform attributeName="transform" type="translate" values="0,0; 0,20; 0,0; 0,-12; 0,0" dur="2s" repeatCount="indefinite"/>
+          </line>
+          <text x="210" y="115" fill="#e2e8f0" font-size="9">Valve Stem</text>
+
+          <!-- Valve Body and Pipe Chamber -->
+          <path d="M 80 160 L 140 160 L 140 190 L 260 190 L 260 160 L 320 160" fill="none" stroke="#38bdf8" stroke-width="2"/>
+          <path d="M 80 200 L 320 200" fill="none" stroke="#38bdf8" stroke-width="2"/>
+
+          <!-- Valve Plug (Modulating Orifice Seat) -->
+          <polygon points="185,160 215,160 200,185" fill="#22c55e" stroke="#fff" stroke-width="1">
+            <animateTransform attributeName="transform" type="translate" values="0,0; 0,20; 0,0; 0,-12; 0,0" dur="2s" repeatCount="indefinite"/>
+          </polygon>
+          <text x="130" y="215" fill="#22c55e" font-size="9" font-weight="bold">Valve Plug & Orifice Seat</text>
+
+          <!-- Fluid Flow Direction Arrows -->
+          <path d="M 90 180 L 130 180 Q 170 180 180 192 Q 220 192 270 180 L 310 180" fill="none" stroke="#38bdf8" stroke-width="2" stroke-dasharray="4,2"/>
+        </svg>
+        <p style="font-size:12px; color:#94a3b8;">Direct-Acting Pneumatic Actuator Controlling Liquid Orifice Opening</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SECTION 2: VALVE CHARACTERISTICS & I/P CONVERSION -->
+<div class="sensor-card">
+  <h2>2. Valve Flow Characteristics & I/P Transducers</h2>
+  <div class="grid-2">
+    <div>
+      <h3>Inherent Flow Characteristics</h3>
+      <p>Control valves exhibit distinct mathematical profiles relating stem travel position $x$ ($0\text{ to }100\%$) to relative flow capacity $C_v$:</p>
+      <ul>
+        <li><strong>Linear:</strong> Flow rate is directly proportional to stem travel:
+          $$\frac{C_v}{C_{v,max}} = x$$
+        </li>
+        <li><strong>Equal Percentage:</strong> Equal increments of stem travel produce equal percentage changes in flow rate:
+          $$\frac{C_v}{C_{v,max}} = R^{(x - 1)}$$
+          (where $R$ is rangeability factor, typically $30\text{--}50$).
+        </li>
+        <li><strong>Quick Opening:</strong> Provides high flow capacity at low travel increments, used primarily for on-off isolation.</li>
+      </ul>
+      <p>An <strong>I/P Positioner (Current-to-Pressure Transducer)</strong> converts a $4\text{--}20\text{ mA}$ industrial control loop signal into a proportional $3\text{--}15\text{ psi}$ pneumatic signal using a nozzle-flapper magnetic balance mechanism.</p>
+    </div>
+
+    <div>
+      <h3>Inherent Flow Characteristic Curves</h3>
+      <div class="anim-box">
+        <svg viewBox="0 0 400 200" width="100%" height="180">
+          <!-- Graph Axes -->
+          <line x1="50" y1="150" x2="350" y2="150" stroke="#1e3a50" stroke-width="1.5"/>
+          <line x1="50" y1="30" x2="50" y2="150" stroke="#1e3a50" stroke-width="1.5"/>
+
+          <text x="170" y="175" fill="#94a3b8" font-size="9">Stem Travel x (%)</text>
+          <text x="10" y="25" fill="#38bdf8" font-size="9">Flow Cv (%)</text>
+
+          <!-- Quick Opening (Amber Curve) -->
+          <path d="M 50 150 Q 70 50 350 30" fill="none" stroke="#f59e0b" stroke-width="2"/>
+          <text x="80" y="55" fill="#f59e0b" font-size="9" font-weight="bold">Quick Opening</text>
+
+          <!-- Linear (Blue Straight Line) -->
+          <line x1="50" y1="150" x2="350" y2="30" stroke="#38bdf8" stroke-width="2"/>
+          <text x="190" y="95" fill="#38bdf8" font-size="9" font-weight="bold">Linear</text>
+
+          <!-- Equal Percentage (Green Exponential Curve) -->
+          <path d="M 50 150 Q 250 145 350 30" fill="none" stroke="#22c55e" stroke-width="2"/>
+          <text x="250" y="135" fill="#22c55e" font-size="9" font-weight="bold">Equal Percentage</text>
+        </svg>
+        <p style="font-size:12px; color:#94a3b8;">Inherent Flow Profiles: Equal %, Linear, and Quick Opening</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SECTION 3: COMPARISON TABLE -->
+<div class="sensor-card">
+  <h2>Comparative Analysis: Industrial Valve Actuators</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>Actuator Type</th>
+        <th>Power Source</th>
+        <th>Response Speed</th>
+        <th>Fail-Safe Mode Capability</th>
+        <th>Typical Applications</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>Pneumatic Diaphragm</strong></td>
+        <td>Compressed air ($3\text{--}15\text{ psi}$ / $2\text{--}6\text{ bar}$).</td>
+        <td>Fast ($0.5\text{--}2\text{ s}$).</td>
+        <td><strong>Direct Mechanical Spring (Fail-Open / Fail-Closed)</strong></td>
+        <td>Chemical refineries, steam loops, water treatment plant loops.</td>
+      </tr>
+      <tr>
+        <td><strong>Electric Motor (Servo)</strong></td>
+        <td>AC/DC Electrical power.</td>
+        <td>Slow to Moderate ($5\text{--}30\text{ s}$).</td>
+        <td>Requires battery backup / supercapacitor reserves.</td>
+        <td>HVAC ducting, remote pipelines without compressed air networks.</td>
+      </tr>
+      <tr>
+        <td><strong>Electro-Hydraulic</strong></td>
+        <td>High-pressure hydraulic fluid.</td>
+        <td>Very Fast & High Force Output.</td>
+        <td>Hydraulic accumulator pressure dump.</td>
+        <td>Heavy power plants, dam spillway control, subsea oil valves.</td>
+      </tr>
+      <tr>
+        <td><strong>Manual Handwheel</strong></td>
+        <td>Mechanical human torque.</td>
+        <td>Manual operation only.</td>
+        <td>Manual lock out pin.</td>
+        <td>Bypass lines, emergency manual override stations.</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- SECTION 4: NUMERICAL PROBLEMS -->
+<div class="sensor-card">
+  <h2>Numerical Problems: Valve Sizing ($C_v$), Spring Force & I/P Calibration</h2>
+
+  <!-- Problem 1: Valve Flow Coefficient Calculation -->
+  <div class="numerical-card">
+    <h3>Problem 1: Liquid Flow Coefficient ($C_v$) and Valve Sizing</h3>
+    <p><strong>Scenario:</strong> A chemical processing line requires a control valve to regulate water flow at a rate $Q = 120\text{ GPM}$ (gallons per minute). The allowable pressure drop across the fully open valve is $\Delta P = 16\text{ psi}$. The specific gravity of the liquid mixture is $SG = 1.21$.</p>
+    <p>Calculate:</p>
+    <ol type="a">
+      <li>The required valve flow coefficient $C_v$.</li>
+      <li>The volumetric flow rate $Q_{new}$ if the pressure drop $\Delta P$ increases to $25\text{ psi}$ at the same valve opening position.</li>
+    </ol>
+
+    <h4>Step-by-Step Solution:</h4>
+    <p><strong>1. Calculate Required Flow Coefficient ($C_v$):</strong></p>
+    <div class="formula">
+      $$C_v = Q \cdot \sqrt{\frac{SG}{\Delta P}} = 120 \cdot \sqrt{\frac{1.21}{16}} = 120 \cdot \frac{1.1}{4} = 120 \cdot 0.275 = 33.0\text{ GPM/\sqrt{psi}}$$
+    </div>
+
+    <p><strong>2. Calculate New Flow Rate ($Q_{new}$) at $\Delta P = 25\text{ psi}$:</strong></p>
+    <div class="formula">
+      $$Q_{new} = C_v \cdot \sqrt{\frac{\Delta P_{new}}{SG}} = 33.0 \cdot \sqrt{\frac{25}{1.21}} = 33.0 \cdot \frac{5}{1.1} = 33.0 \cdot 4.545 = 150.0\text{ GPM}$$
+    </div>
+  </div>
+
+  <!-- Problem 2: Diaphragm Actuator Spring Rate & Force Balance -->
+  <div class="numerical-card">
+    <h3>Problem 2: Pneumatic Actuator Diaphragm Sizing</h3>
+    <p><strong>Scenario:</strong> A direct-acting fail-open control valve requires a stem travel stroke $x = 1.5\text{ inches}$ ($0.0381\text{ m}$) to move from fully open to fully closed. The pneumatic diaphragm upper chamber receives a operating pressure span $\Delta P_{in} = 3\text{ to }15\text{ psi}$ ($\text{span} = 12\text{ psi} = 82.74\text{ kPa}$). The return spring stiffness is $k_s = 800\text{ lbf/in}$. Neglecting fluid dynamic forces, calculate:</p>
+    <ol type="a">
+      <li>The spring force $F_{spring}$ generated at full $1.5\text{ inch}$ displacement.</li>
+      <li>The minimum required effective diaphragm area $A_d$ in square inches ($\text{in}^2$).</li>
+      <li>The stem travel position $x$ when the pneumatic input pressure is $9\text{ psi}$.</li>
+    </ol>
+
+    <h4>Step-by-Step Solution:</h4>
+    <p><strong>1. Calculate Spring Force at Full Stroke ($F_{spring}$):</strong></p>
+    <div class="formula">
+      $$F_{spring} = k_s \cdot x = 800\text{ lbf/in} \times 1.5\text{ in} = 1200\text{ lbf}$$
+    </div>
+
+    <p><strong>2. Calculate Effective Diaphragm Area ($A_d$):</strong> The air pressure span ($12\text{ psi}$) must generate $1200\text{ lbf}$ of force to overcome the spring stroke:</p>
+    <div class="formula">
+      $$F = \Delta P_{in} \cdot A_d \implies 1200\text{ lbf} = 12\text{ psi} \cdot A_d \implies A_d = \frac{1200}{12} = 100\text{ in}^2$$
+    </div>
+
+    <p><strong>3. Calculate Stem Travel at $9\text{ psi}$ Signal:</strong> $9\text{ psi}$ represents $50\%$ of the $3\text{--}15\text{ psi}$ signal range ($P_{signal} - P_{min} = 9 - 3 = 6\text{ psi}$):</p>
+    <div class="formula">
+      $$x(9\text{ psi}) = 1.5\text{ in} \times \left(\frac{9 - 3}{15 - 3}\right) = 1.5\text{ in} \times \frac{6}{12} = 0.75\text{ inches (50% travel)}$$
+    </div>
+  </div>
+
+  <!-- Problem 3: I/P Positioner Calibration & Current Transfer -->
+  <div class="numerical-card">
+    <h3>Problem 3: I/P Transducer Signal Conversion</h3>
+    <p><strong>Scenario:</strong> An industrial I/P transducer converts a standard $4\text{--}20\text{ mA}$ control loop signal into a proportional $3\text{--}15\text{ psi}$ pneumatic signal to drive a control valve actuator. Determine:</p>
+    <ol type="a">
+      <li>The output pressure $P_{out}$ generated when the input current signal is $12\text{ mA}$ ($50\%$ process command).</li>
+      <li>The input current $I_{in}$ required to set a pneumatic pressure of $10.5\text{ psi}$.</li>
+    </ol>
+
+    <h4>Step-by-Step Solution:</h4>
+    <p><strong>1. Calculate Pneumatic Output Pressure for $12\text{ mA}$ Input:</strong></p>
+    <div class="formula">
+      $$\% \text{ Signal} = \frac{12\text{ mA} - 4\text{ mA}}{20\text{ mA} - 4\text{ mA}} = \frac{8}{16} = 0.50\ (50\%)$$
+    </div>
+    <div class="formula">
+      $$P_{out} = P_{min} + 0.50 \times (P_{max} - P_{min}) = 3\text{ psi} + 0.50 \times (15 - 3)\text{ psi} = 3 + 6 = 9.0\text{ psi}$$
+    </div>
+
+    <p><strong>2. Calculate Input Current for $10.5\text{ psi}$ Output:</strong></p>
+    <div class="formula">
+      $$\% \text{ Pressure Span} = \frac{10.5\text{ psi} - 3\text{ psi}}{15\text{ psi} - 3\text{ psi}} = \frac{7.5}{12} = 0.625\ (62.5\%)$$
+    </div>
+    <div class="formula">
+      $$I_{in} = 4\text{ mA} + 0.625 \times (20 - 4)\text{ mA} = 4 + 10 = 14.0\text{ mA}$$
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

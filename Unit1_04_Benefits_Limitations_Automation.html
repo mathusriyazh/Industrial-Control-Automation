@@ -1,0 +1,2212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Industrial Control and Automation - Benefits and Limitations</title>
+
+<style>
+*{box-sizing:border-box}
+
+body{
+    margin:0;
+    font-family:Arial,Helvetica,sans-serif;
+    background:#071017;
+    color:#edf7fb;
+}
+
+header{
+    background:#0b2533;
+    padding:22px;
+    border-bottom:3px solid #28a9d6;
+    position:sticky;
+    top:0;
+    z-index:1000;
+}
+
+header h1{margin:0;font-size:25px}
+header p{margin:7px 0;color:#a9ddec}
+
+nav{
+    background:#081720;
+    padding:10px;
+    text-align:center;
+    border-bottom:1px solid #31505d;
+}
+
+nav button{
+    background:#12394b;
+    color:white;
+    border:1px solid #477080;
+    padding:9px 13px;
+    border-radius:6px;
+    margin:3px;
+    cursor:pointer;
+}
+
+nav button:hover{background:#1c5b71}
+
+.container{
+    max-width:1400px;
+    margin:auto;
+    padding:22px;
+}
+
+.card{
+    background:#0c1b25;
+    border:1px solid #2c4d5b;
+    border-radius:11px;
+    padding:24px;
+    margin-bottom:22px;
+}
+
+h2{color:#7dd3fc}
+h3{color:#8ddcf0}
+
+p{line-height:1.7}
+
+.highlight{
+    background:#0e2d3b;
+    border-left:5px solid #38bdf8;
+    padding:16px;
+    margin:16px 0;
+    border-radius:5px;
+}
+
+.warning{
+    background:#332717;
+    border-left:5px solid #f59e0b;
+    padding:16px;
+    margin:16px 0;
+}
+
+.grid2{
+    display:grid;
+    grid-template-columns:repeat(2,1fr);
+    gap:18px;
+}
+
+.grid3{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:18px;
+}
+
+.info{
+    background:#102632;
+    border:1px solid #3b6170;
+    border-radius:9px;
+    padding:20px;
+}
+
+.icon{
+    font-size:48px;
+    text-align:center;
+    margin:10px;
+}
+
+/* FLOW */
+
+.flow{
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    flex-wrap:wrap;
+    gap:12px;
+    margin:25px 0;
+}
+
+.flowBox{
+    min-width:135px;
+    padding:18px;
+    text-align:center;
+    background:#102c3a;
+    border:2px solid #456d7b;
+    border-radius:8px;
+}
+
+.arrow{
+    font-size:30px;
+    color:#758f99;
+}
+
+.arrow.active{
+    color:#22c55e;
+    text-shadow:0 0 12px #22c55e;
+}
+
+/* FACTORY */
+
+.factory{
+    background:#03090d;
+    border:2px solid #385765;
+    border-radius:10px;
+    padding:25px;
+}
+
+.factoryTitle{
+    text-align:center;
+    color:#8ddcf0;
+    font-size:20px;
+    font-weight:bold;
+    margin-bottom:25px;
+}
+
+.line{
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    flex-wrap:wrap;
+    gap:10px;
+}
+
+.machine{
+    width:150px;
+    height:125px;
+    background:#142a34;
+    border:3px solid #4b6975;
+    border-radius:9px;
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+    align-items:center;
+    transition:.3s;
+}
+
+.machineIcon{
+    font-size:38px;
+}
+
+.machine.active{
+    border-color:#22c55e;
+    box-shadow:0 0 25px rgba(34,197,94,.55);
+    transform:scale(1.04);
+}
+
+.machine.warning{
+    border-color:#f59e0b;
+    box-shadow:0 0 20px rgba(245,158,11,.4);
+}
+
+/* PRODUCT */
+
+.productTrack{
+    position:relative;
+    height:70px;
+    background:#0b161c;
+    margin:25px 0;
+    border:1px solid #334f5a;
+    border-radius:8px;
+    overflow:hidden;
+}
+
+.product{
+    position:absolute;
+    top:21px;
+    left:-40px;
+    width:28px;
+    height:28px;
+    background:#dce8ed;
+    border-radius:5px;
+}
+
+.product.run{
+    animation:moveProduct 5s linear infinite;
+}
+
+@keyframes moveProduct{
+    0%{left:-40px}
+    100%{left:100%}
+}
+
+/* METRICS */
+
+.metrics{
+    display:grid;
+    grid-template-columns:repeat(4,1fr);
+    gap:14px;
+    margin-top:20px;
+}
+
+.metric{
+    background:#102a35;
+    border:1px solid #3b6270;
+    padding:18px;
+    border-radius:8px;
+    text-align:center;
+}
+
+.metricValue{
+    font-size:27px;
+    font-weight:bold;
+    color:#7dd3fc;
+    margin-top:8px;
+}
+
+/* BUTTONS */
+
+.btn{
+    border:0;
+    color:white;
+    padding:12px 18px;
+    border-radius:6px;
+    margin:5px;
+    cursor:pointer;
+    font-weight:bold;
+}
+
+.green{background:#15803d}
+.red{background:#b91c1c}
+.blue{background:#2563eb}
+.orange{background:#b45309}
+
+/* BARS */
+
+.barContainer{
+    margin:20px 0;
+}
+
+.barLabel{
+    margin-bottom:5px;
+}
+
+.bar{
+    height:30px;
+    background:#142d38;
+    border-radius:6px;
+    overflow:hidden;
+}
+
+.fill{
+    height:100%;
+    width:0;
+    background:#38bdf8;
+    transition:1.5s;
+}
+
+/* TABLE */
+
+table{
+    width:100%;
+    border-collapse:collapse;
+}
+
+th,td{
+    border:1px solid #3b5d68;
+    padding:13px;
+}
+
+th{
+    background:#12394b;
+}
+
+/* QUIZ */
+
+.quiz{
+    background:#091923;
+    border:1px solid #355a68;
+    padding:18px;
+    margin:15px 0;
+    border-radius:8px;
+}
+
+.quiz button{
+    display:block;
+    width:100%;
+    text-align:left;
+    padding:11px;
+    margin:6px 0;
+    background:#123548;
+    color:white;
+    border:1px solid #426979;
+    border-radius:5px;
+    cursor:pointer;
+}
+
+.quiz button.correct{background:#14532d}
+.quiz button.wrong{background:#7f1d1d}
+
+.result{
+    background:#102c38;
+    padding:15px;
+    border-left:5px solid #38bdf8;
+}
+
+.center{text-align:center}
+
+@media(max-width:900px){
+    .grid2,.grid3{grid-template-columns:1fr}
+    .metrics{grid-template-columns:1fr 1fr}
+}
+
+@media(max-width:600px){
+    .metrics{grid-template-columns:1fr}
+    header h1{font-size:20px}
+}
+</style>
+</head>
+
+
+<body>
+
+<header>
+
+<h1>📘 INDUSTRIAL CONTROL AND AUTOMATION</h1>
+
+<p>UNIT – I | Chapter 4 — Benefits and Limitations of Industrial Automation</p>
+
+</header>
+
+
+<nav>
+
+<button onclick="go('concept')">Concept</button>
+<button onclick="go('productivity')">Productivity</button>
+<button onclick="go('quality')">Quality</button>
+<button onclick="go('safety')">Safety</button>
+<button onclick="go('cost')">Cost</button>
+<button onclick="go('limitations')">Limitations</button>
+<button onclick="go('numerical')">Numerical</button>
+<button onclick="go('quiz')">Quiz</button>
+
+</nav>
+
+
+<div class="container">
+
+
+<!-- INTRODUCTION -->
+
+<section id="concept" class="card">
+
+<h2>1. Why Do Industries Use Automation?</h2>
+
+<p>
+
+Industrial automation uses sensors, controllers, drives,
+actuators, machines and software to perform industrial
+operations with reduced continuous human intervention.
+
+</p>
+
+<div class="highlight">
+
+<strong>Main objective:</strong>
+
+Automation is introduced to improve productivity, quality,
+safety, repeatability and process control while reducing
+unnecessary manual intervention.
+
+</div>
+
+
+<div class="grid3">
+
+<div class="info">
+<div class="icon">⚡</div>
+<h3>Productivity</h3>
+<p>More products can be manufactured in the same amount of time.</p>
+</div>
+
+<div class="info">
+<div class="icon">🎯</div>
+<h3>Quality</h3>
+<p>Automatic and repeatable operations reduce process variation.</p>
+</div>
+
+<div class="info">
+<div class="icon">🛡️</div>
+<h3>Safety</h3>
+<p>Humans can be removed from hazardous operations.</p>
+</div>
+
+<div class="info">
+<div class="icon">⏱️</div>
+<h3>Speed</h3>
+<p>Automatic machines can perform repetitive operations rapidly.</p>
+</div>
+
+<div class="info">
+<div class="icon">📊</div>
+<h3>Monitoring</h3>
+<p>PLC, HMI and SCADA systems provide real-time information.</p>
+</div>
+
+<div class="info">
+<div class="icon">🔁</div>
+<h3>Repeatability</h3>
+<p>The same programmed sequence can be executed repeatedly.</p>
+</div>
+
+</div>
+
+</section>
+
+
+<!-- BASIC FLOW -->
+
+<section class="card">
+
+<h2>2. Basic Automation Structure</h2>
+
+<div class="flow">
+
+<div class="flowBox">
+📡<br>
+Sensors
+</div>
+
+<div class="arrow active">→</div>
+
+<div class="flowBox">
+🧠<br>
+PLC / Controller
+</div>
+
+<div class="arrow active">→</div>
+
+<div class="flowBox">
+⚡<br>
+Drive / Relay
+</div>
+
+<div class="arrow active">→</div>
+
+<div class="flowBox">
+⚙️<br>
+Actuator
+</div>
+
+<div class="arrow active">→</div>
+
+<div class="flowBox">
+🏭<br>
+Industrial Process
+</div>
+
+</div>
+
+
+<div class="highlight">
+
+The controller receives information from sensors, processes
+the control logic and commands the actuators.
+
+</div>
+
+</section>
+
+
+<!-- PRODUCTIVITY -->
+
+<section id="productivity" class="card">
+
+<h2>3. Benefit 1 — Increased Productivity</h2>
+
+<p>
+
+Productivity refers to the amount of useful production
+obtained for a given amount of time, labour or resources.
+
+</p>
+
+
+<div class="factory">
+
+<div class="factoryTitle">
+AUTOMATED PRODUCTION LINE
+</div>
+
+
+<div class="line">
+
+<div class="machine" id="m1">
+<div class="machineIcon">📦</div>
+<strong>Material</strong>
+</div>
+
+<div class="arrow" id="a1">→</div>
+
+<div class="machine" id="m2">
+<div class="machineIcon">⚙️</div>
+<strong>Processing</strong>
+</div>
+
+<div class="arrow" id="a2">→</div>
+
+<div class="machine" id="m3">
+<div class="machineIcon">🔍</div>
+<strong>Inspection</strong>
+</div>
+
+<div class="arrow" id="a3">→</div>
+
+<div class="machine" id="m4">
+<div class="machineIcon">📦</div>
+<strong>Output</strong>
+</div>
+
+</div>
+
+
+<div class="productTrack">
+
+<div class="product" id="product"></div>
+
+</div>
+
+
+<div class="center">
+
+<button class="btn green" onclick="startProduction()">
+▶ START
+</button>
+
+<button class="btn red" onclick="stopProduction()">
+■ STOP
+</button>
+
+</div>
+
+<div class="highlight center" id="productionStatus">
+SYSTEM READY
+</div>
+
+</div>
+
+
+<h3>Why does productivity increase?</h3>
+
+<ul>
+
+<li>Higher operating speed</li>
+<li>Reduced idle time</li>
+<li>Continuous operation</li>
+<li>Reduced manual handling</li>
+<li>Faster material movement</li>
+<li>Reduced cycle time</li>
+
+</ul>
+
+</section>
+
+
+<!-- CYCLE TIME -->
+
+<section class="card">
+
+<h2>4. Benefit 2 — Reduced Cycle Time</h2>
+
+<p>
+
+Cycle time is the time required to complete one production
+cycle.
+
+</p>
+
+
+<div class="highlight">
+
+<strong>Cycle Time:</strong>
+
+<br><br>
+
+Cycle time = Total production time / Number of products
+
+</div>
+
+
+<div class="grid2">
+
+<div class="info">
+
+<h3>Manual System</h3>
+
+<p>
+
+Suppose one product requires:
+
+</p>
+
+<h2>60 seconds</h2>
+
+<p>per cycle.</p>
+
+</div>
+
+
+<div class="info">
+
+<h3>Automated System</h3>
+
+<p>
+
+The automated machine requires:
+
+</p>
+
+<h2>20 seconds</h2>
+
+<p>per cycle.</p>
+
+</div>
+
+</div>
+
+
+<div class="barContainer">
+
+<div class="barLabel">
+Manual cycle time = 60 s
+</div>
+
+<div class="bar">
+
+<div
+class="fill"
+id="manualBar"
+style="width:100%">
+</div>
+
+</div>
+
+</div>
+
+
+<div class="barContainer">
+
+<div class="barLabel">
+Automated cycle time = 20 s
+</div>
+
+<div class="bar">
+
+<div
+class="fill"
+id="autoBar"
+style="width:33%">
+</div>
+
+</div>
+
+</div>
+
+
+<div class="highlight">
+
+The automated process takes only one-third of the manual
+cycle time in this example.
+
+</div>
+
+</section>
+
+
+<!-- QUALITY -->
+
+<section id="quality" class="card">
+
+<h2>5. Benefit 3 — Improved Product Quality</h2>
+
+<p>
+
+Automation improves quality mainly through repeatability,
+accurate control and automatic inspection.
+
+</p>
+
+
+<div class="flow">
+
+<div class="flowBox">
+📦<br>
+Product
+</div>
+
+<div class="arrow active">→</div>
+
+<div class="flowBox">
+📷<br>
+Sensor / Vision
+</div>
+
+<div class="arrow active">→</div>
+
+<div class="flowBox">
+🧠<br>
+Controller
+</div>
+
+<div class="arrow active">→</div>
+
+<div class="flowBox">
+✅ / ❌<br>
+Decision
+</div>
+
+</div>
+
+
+<div class="grid2">
+
+<div class="info">
+
+<h3>Good Product</h3>
+
+<div class="icon">✅</div>
+
+<p>
+
+Product satisfies the programmed limits.
+
+</p>
+
+</div>
+
+
+<div class="info">
+
+<h3>Defective Product</h3>
+
+<div class="icon">❌</div>
+
+<p>
+
+Product is automatically rejected or sent for further
+inspection.
+
+</p>
+
+</div>
+
+</div>
+
+
+<div class="highlight">
+
+<strong>Example:</strong>
+
+A proximity sensor or vision system can detect whether a
+component is correctly positioned before the next machine
+operation begins.
+
+</div>
+
+</section>
+
+
+<!-- SAFETY -->
+
+<section id="safety" class="card">
+
+<h2>6. Benefit 4 — Improved Industrial Safety</h2>
+
+<p>
+
+Automation can reduce the need for humans to directly
+perform hazardous operations.
+
+</p>
+
+
+<div class="flow">
+
+<div class="flowBox">
+⚠️<br>
+Hazardous Process
+</div>
+
+<div class="arrow active">→</div>
+
+<div class="flowBox">
+📡<br>
+Safety Sensor
+</div>
+
+<div class="arrow active">→</div>
+
+<div class="flowBox">
+🧠<br>
+Safety Controller
+</div>
+
+<div class="arrow active">→</div>
+
+<div class="flowBox">
+🛑<br>
+Machine Stop
+</div>
+
+</div>
+
+
+<h3>Examples of hazardous environments</h3>
+
+<ul>
+
+<li>High-temperature processes</li>
+<li>High-voltage areas</li>
+<li>Heavy material handling</li>
+<li>Welding operations</li>
+<li>Chemical processing</li>
+<li>Rotating machinery</li>
+
+</ul>
+
+
+<div class="warning">
+
+<strong>Important:</strong>
+
+Automation does not automatically make a machine safe.
+Proper safety engineering, guarding, emergency stops,
+interlocks and safety-rated control systems are still
+required.
+
+</div>
+
+</section>
+
+
+<!-- HUMAN ERROR -->
+
+<section class="card">
+
+<h2>7. Benefit 5 — Reduction of Repetitive Human Error</h2>
+
+<p>
+
+Humans are highly capable but repetitive operations can
+result in fatigue, variation and mistakes.
+
+</p>
+
+
+<div class="grid2">
+
+<div class="info">
+
+<h3>Manual Process</h3>
+
+<ul>
+<li>Operator fatigue</li>
+<li>Variable operation</li>
+<li>Human mistakes</li>
+<li>Different cycle times</li>
+</ul>
+
+</div>
+
+
+<div class="info">
+
+<h3>Automated Process</h3>
+
+<ul>
+<li>Programmed sequence</li>
+<li>Repeatable operation</li>
+<li>Consistent timing</li>
+<li>Automatic monitoring</li>
+</ul>
+
+</div>
+
+</div>
+
+</section>
+
+
+<!-- MONITORING -->
+
+<section class="card">
+
+<h2>8. Benefit 6 — Real-Time Monitoring</h2>
+
+
+<div class="flow">
+
+<div class="flowBox">
+📡<br>
+Sensors
+</div>
+
+<div class="arrow active">→</div>
+
+<div class="flowBox">
+🧠<br>
+PLC
+</div>
+
+<div class="arrow active">→</div>
+
+<div class="flowBox">
+🖥️<br>
+HMI
+</div>
+
+<div class="arrow active">→</div>
+
+<div class="flowBox">
+🌐<br>
+SCADA
+</div>
+
+</div>
+
+
+<p>
+
+Industrial automation allows important process variables
+such as temperature, pressure, speed, level, current,
+voltage and flow to be monitored.
+
+</p>
+
+
+<div class="metrics">
+
+<div class="metric">
+
+Temperature
+
+<div class="metricValue">
+72 °C
+</div>
+
+</div>
+
+<div class="metric">
+
+Motor Speed
+
+<div class="metricValue">
+1450 rpm
+</div>
+
+</div>
+
+<div class="metric">
+
+Current
+
+<div class="metricValue">
+8.4 A
+</div>
+
+</div>
+
+<div class="metric">
+
+Pressure
+
+<div class="metricValue">
+4.2 bar
+</div>
+
+</div>
+
+</div>
+
+</section>
+
+
+<!-- COST -->
+
+<section id="cost" class="card">
+
+<h2>9. Benefit 7 — Reduced Operating Cost</h2>
+
+<p>
+
+Automation can reduce operating cost by improving machine
+utilization, reducing material waste and decreasing
+repetitive manual labour requirements.
+
+</p>
+
+
+<div class="grid3">
+
+<div class="info">
+
+<h3>Energy</h3>
+
+<div class="icon">⚡</div>
+
+<p>
+
+Optimized operation can reduce unnecessary energy use.
+
+</p>
+
+</div>
+
+
+<div class="info">
+
+<h3>Material</h3>
+
+<div class="icon">📦</div>
+
+<p>
+
+Better process control can reduce scrap and material waste.
+
+</p>
+
+</div>
+
+
+<div class="info">
+
+<h3>Labour</h3>
+
+<div class="icon">👷</div>
+
+<p>
+
+Operators can focus on supervision, maintenance and
+higher-value activities.
+
+</p>
+
+</div>
+
+</div>
+
+
+<div class="warning">
+
+Automation generally requires a significant initial
+investment. Therefore, the economic benefit must be
+evaluated over the complete life of the system.
+
+</div>
+
+</section>
+
+
+<!-- DATA -->
+
+<section class="card">
+
+<h2>10. Data Collection and Traceability</h2>
+
+<p>
+
+Modern automation systems can automatically record
+production and process information.
+
+</p>
+
+
+<div class="flow">
+
+<div class="flowBox">
+📡<br>
+Sensor Data
+</div>
+
+<div class="arrow active">→</div>
+
+<div class="flowBox">
+🧠<br>
+PLC
+</div>
+
+<div class="arrow active">→</div>
+
+<div class="flowBox">
+🖥️<br>
+HMI
+</div>
+
+<div class="arrow active">→</div>
+
+<div class="flowBox">
+🌐<br>
+SCADA
+</div>
+
+<div class="arrow active">→</div>
+
+<div class="flowBox">
+💾<br>
+Database
+</div>
+
+</div>
+
+
+<p>
+
+Recorded information can include production quantity,
+machine status, alarms, energy consumption, process
+variables and downtime.
+
+</p>
+
+</section>
+
+
+<!-- LIMITATIONS -->
+
+<section id="limitations" class="card">
+
+<h2>11. Limitations of Industrial Automation</h2>
+
+
+<div class="grid3">
+
+<div class="info">
+
+<div class="icon">💰</div>
+
+<h3>High Initial Cost</h3>
+
+<p>
+
+PLC systems, robots, drives, sensors, machines and
+installation can require significant investment.
+
+</p>
+
+</div>
+
+
+<div class="info">
+
+<div class="icon">🧑‍🔧</div>
+
+<h3>Skilled Personnel</h3>
+
+<p>
+
+Programming, commissioning and maintenance require
+trained personnel.
+
+</p>
+
+</div>
+
+
+<div class="info">
+
+<div class="icon">🔧</div>
+
+<h3>Maintenance</h3>
+
+<p>
+
+Sensors, actuators, controllers and communication networks
+must be maintained.
+
+</p>
+
+</div>
+
+
+<div class="info">
+
+<div class="icon">💻</div>
+
+<h3>Complexity</h3>
+
+<p>
+
+Large automation systems can become complex to design,
+program and troubleshoot.
+
+</p>
+
+</div>
+
+
+<div class="info">
+
+<div class="icon">🌐</div>
+
+<h3>Cybersecurity</h3>
+
+<p>
+
+Connected industrial systems introduce cybersecurity
+requirements.
+
+</p>
+
+</div>
+
+
+<div class="info">
+
+<div class="icon">⚠️</div>
+
+<h3>Failure Impact</h3>
+
+<p>
+
+A controller, network or machine failure can stop an
+entire production line.
+
+</p>
+
+</div>
+
+</div>
+
+</section>
+
+
+<!-- DOWNTIME -->
+
+<section class="card">
+
+<h2>12. Automation and Machine Downtime</h2>
+
+<p>
+
+Automation can increase productivity, but a failure in an
+automated system can affect many production operations
+simultaneously.
+
+</p>
+
+
+<div class="flow">
+
+<div class="flowBox">
+Sensor
+</div>
+
+<div class="arrow">→</div>
+
+<div class="flowBox">
+PLC
+</div>
+
+<div class="arrow">→</div>
+
+<div class="flowBox">
+Drive
+</div>
+
+<div class="arrow">→</div>
+
+<div class="flowBox">
+Motor
+</div>
+
+<div class="arrow">→</div>
+
+<div class="flowBox">
+Machine
+</div>
+
+</div>
+
+
+<div class="warning">
+
+<strong>Example:</strong>
+
+If a critical PLC communication network fails, several
+machines may stop even though the mechanical components
+are healthy.
+
+</div>
+
+</section>
+
+
+<!-- COMPARISON -->
+
+<section class="card">
+
+<h2>13. Overall Benefits vs Limitations</h2>
+
+
+<table>
+
+<tr>
+<th>Benefits</th>
+<th>Limitations</th>
+</tr>
+
+<tr>
+<td>Higher productivity</td>
+<td>High initial investment</td>
+</tr>
+
+<tr>
+<td>Improved repeatability</td>
+<td>Maintenance requirement</td>
+</tr>
+
+<tr>
+<td>Better quality</td>
+<td>Skilled manpower required</td>
+</tr>
+
+<tr>
+<td>Improved safety</td>
+<td>System complexity</td>
+</tr>
+
+<tr>
+<td>Reduced cycle time</td>
+<td>Cybersecurity issues</td>
+</tr>
+
+<tr>
+<td>Real-time monitoring</td>
+<td>Failure can cause production downtime</td>
+</tr>
+
+<tr>
+<td>Better data collection</td>
+<td>Technology obsolescence</td>
+</tr>
+
+</table>
+
+</section>
+
+
+<!-- NUMERICAL -->
+
+<section id="numerical" class="card">
+
+<h2>14. Numerical Example — Productivity Improvement</h2>
+
+<p>
+
+A manual production line produces <strong>120 units</strong>
+in 8 hours.
+
+After automation, the production becomes
+<strong>360 units</strong> in 8 hours.
+
+Determine:
+
+</p>
+
+<ol>
+
+<li>Manual production rate</li>
+<li>Automated production rate</li>
+<li>Increase in production rate</li>
+<li>Percentage increase</li>
+
+</ol>
+
+
+<div class="highlight">
+
+<strong>Step 1 — Manual production rate</strong>
+
+<br><br>
+
+Production rate = 120 / 8
+
+<br><br>
+
+= <strong>15 units/hour</strong>
+
+</div>
+
+
+<div class="highlight">
+
+<strong>Step 2 — Automated production rate</strong>
+
+<br><br>
+
+Production rate = 360 / 8
+
+<br><br>
+
+= <strong>45 units/hour</strong>
+
+</div>
+
+
+<div class="highlight">
+
+<strong>Step 3 — Increase</strong>
+
+<br><br>
+
+45 − 15 = <strong>30 units/hour</strong>
+
+</div>
+
+
+<div class="highlight">
+
+<strong>Step 4 — Percentage increase</strong>
+
+<br><br>
+
+Percentage increase
+
+<br><br>
+
+= [(45 − 15) / 15] × 100
+
+<br><br>
+
+= <strong>200%</strong>
+
+</div>
+
+
+<button class="btn blue" onclick="showCalculation()">
+
+Show Formula
+
+</button>
+
+
+<div
+class="result"
+id="calculation"
+style="display:none">
+
+<strong>General formula:</strong>
+
+<br><br>
+
+Percentage increase
+
+=
+
+(New production − Old production)
+
+÷ Old production × 100
+
+</div>
+
+</section>
+
+
+<!-- SECOND NUMERICAL -->
+
+<section class="card">
+
+<h2>15. Numerical Example — Machine Utilization</h2>
+
+<p>
+
+An automated machine is available for 10 hours per day.
+Due to setup, maintenance and downtime, it operates for
+8 hours.
+
+Find the machine utilization.
+
+</p>
+
+
+<div class="highlight">
+
+Machine Utilization
+
+<br><br>
+
+= Operating Time / Available Time × 100
+
+<br><br>
+
+= 8 / 10 × 100
+
+<br><br>
+
+= <strong>80%</strong>
+
+</div>
+
+
+<p>
+
+Therefore, the machine has an operating utilization of
+<strong>80%</strong>.
+
+</p>
+
+</section>
+
+
+<!-- ENGINEERING DECISION -->
+
+<section class="card">
+
+<h2>16. Engineering Decision — Should We Automate?</h2>
+
+
+<div class="flow">
+
+<div class="flowBox">
+Production Volume
+</div>
+
+<div class="arrow">+</div>
+
+<div class="flowBox">
+Product Variety
+</div>
+
+<div class="arrow">+</div>
+
+<div class="flowBox">
+Safety
+</div>
+
+<div class="arrow">+</div>
+
+<div class="flowBox">
+Quality
+</div>
+
+<div class="arrow">+</div>
+
+<div class="flowBox">
+Cost
+</div>
+
+<div class="arrow">→</div>
+
+<div class="flowBox">
+Automation Decision
+</div>
+
+</div>
+
+
+<div class="highlight">
+
+<strong>Important engineering principle:</strong>
+
+Automation should not be selected simply because
+"automation is better."
+
+The engineer must determine whether the expected
+productivity, quality, safety and operating benefits
+justify the investment and complexity.
+
+</div>
+
+</section>
+
+
+<!-- REAL WORLD -->
+
+<section class="card">
+
+<h2>17. Industrial Example — Automated Motor Assembly</h2>
+
+
+<div class="factory">
+
+<div class="factoryTitle">
+AUTOMATED MOTOR ASSEMBLY CELL
+</div>
+
+
+<div class="line">
+
+<div class="machine" id="rm1">
+
+<div class="machineIcon">📦</div>
+
+<strong>Component</strong>
+
+</div>
+
+<div class="arrow">→</div>
+
+<div class="machine" id="rm2">
+
+<div class="machineIcon">🤖</div>
+
+<strong>Robot</strong>
+
+</div>
+
+<div class="arrow">→</div>
+
+<div class="machine" id="rm3">
+
+<div class="machineIcon">🔩</div>
+
+<strong>Assembly</strong>
+
+</div>
+
+<div class="arrow">→</div>
+
+<div class="machine" id="rm4">
+
+<div class="machineIcon">🔍</div>
+
+<strong>Testing</strong>
+
+</div>
+
+<div class="arrow">→</div>
+
+<div class="machine" id="rm5">
+
+<div class="machineIcon">✅</div>
+
+<strong>Output</strong>
+
+</div>
+
+</div>
+
+<br>
+
+<div class="center">
+
+<button
+class="btn green"
+onclick="runMotorAssembly()">
+
+▶ RUN AUTOMATION
+
+</button>
+
+</div>
+
+<div
+class="highlight center"
+id="assemblyStatus">
+
+Press RUN AUTOMATION
+
+</div>
+
+</div>
+
+</section>
+
+
+<!-- SUMMARY -->
+
+<section class="card">
+
+<h2>18. Chapter Summary</h2>
+
+<ul>
+
+<li>Automation can increase production rate.</li>
+
+<li>Automation can reduce cycle time.</li>
+
+<li>Automatic control improves repeatability.</li>
+
+<li>Automatic inspection can improve product quality.</li>
+
+<li>Automation can reduce human exposure to hazardous processes.</li>
+
+<li>HMI and SCADA systems provide real-time monitoring.</li>
+
+<li>Automation can reduce operating costs, but the initial investment may be high.</li>
+
+<li>Automated systems require skilled programming and maintenance.</li>
+
+<li>Industrial networks introduce cybersecurity requirements.</li>
+
+<li>A good automation design balances productivity, safety, quality, cost and reliability.</li>
+
+</ul>
+
+
+<div class="highlight">
+
+<strong>Student memory rule:</strong>
+
+<br><br>
+
+⚡ Productivity
+
++
+
+🎯 Quality
+
++
+
+🛡️ Safety
+
++
+
+⏱️ Speed
+
++
+
+📊 Monitoring
+
+−
+
+💰 Initial Cost
+
+−
+
+🔧 Maintenance
+
+−
+
+💻 Complexity
+
+<br><br>
+
+= <strong>Automation Engineering Decision</strong>
+
+</div>
+
+</section>
+
+
+<!-- QUIZ -->
+
+<section id="quiz" class="card">
+
+<h2>19. Student Self-Assessment</h2>
+
+
+<div class="quiz">
+
+<strong>
+Q1. Which is a major benefit of industrial automation?
+</strong>
+
+<button onclick="answer(this,true)">
+A. Increased productivity
+</button>
+
+<button onclick="answer(this,false)">
+B. Increased manual errors
+</button>
+
+<button onclick="answer(this,false)">
+C. Increased repetitive labour
+</button>
+
+<button onclick="answer(this,false)">
+D. Reduced repeatability
+</button>
+
+</div>
+
+
+<div class="quiz">
+
+<strong>
+Q2. What does cycle time represent?
+</strong>
+
+<button onclick="answer(this,false)">
+A. Total machine cost
+</button>
+
+<button onclick="answer(this,true)">
+B. Time required for one production cycle
+</button>
+
+<button onclick="answer(this,false)">
+C. Motor rated power
+</button>
+
+<button onclick="answer(this,false)">
+D. Sensor accuracy
+</button>
+
+</div>
+
+
+<div class="quiz">
+
+<strong>
+Q3. Which is a limitation of automation?
+</strong>
+
+<button onclick="answer(this,false)">
+A. Improved repeatability
+</button>
+
+<button onclick="answer(this,false)">
+B. Improved monitoring
+</button>
+
+<button onclick="answer(this,true)">
+C. High initial investment
+</button>
+
+<button onclick="answer(this,false)">
+D. Reduced cycle time
+</button>
+
+</div>
+
+
+<div class="quiz">
+
+<strong>
+Q4. Which system is commonly used for supervisory monitoring?
+</strong>
+
+<button onclick="answer(this,false)">
+A. Resistor
+</button>
+
+<button onclick="answer(this,true)">
+B. SCADA
+</button>
+
+<button onclick="answer(this,false)">
+C. Fuse only
+</button>
+
+<button onclick="answer(this,false)">
+D. Transformer only
+</button>
+
+</div>
+
+
+<div class="quiz">
+
+<strong>
+Q5. Why are safety systems required in automated machines?
+</strong>
+
+<button onclick="answer(this,false)">
+A. Only to increase production speed
+</button>
+
+<button onclick="answer(this,true)">
+B. To detect hazardous conditions and bring the machine to a safe state
+</button>
+
+<button onclick="answer(this,false)">
+C. To increase product weight
+</button>
+
+<button onclick="answer(this,false)">
+D. To increase motor voltage
+</button>
+
+</div>
+
+
+<div class="result" id="quizResult">
+Select an answer.
+</div>
+
+</section>
+
+
+<!-- NEXT -->
+
+<section class="card">
+
+<h2>20. Next Chapter</h2>
+
+<div class="highlight">
+
+<strong>
+UNIT I — CHAPTER 5: INTRODUCTION TO INDUSTRIAL CONTROL SYSTEMS (ICS)
+</strong>
+
+<br><br>
+
+The next chapter will explain the complete hierarchy of an
+industrial control system:
+
+<br><br>
+
+📡 Field Sensors
+
+↓
+
+<br>
+
+⚙️ Actuators
+
+↓
+
+<br>
+
+🧠 PLC / RTU / Controller
+
+↓
+
+<br>
+
+🖥️ HMI
+
+↓
+
+<br>
+
+🌐 SCADA
+
+↓
+
+<br>
+
+🏭 DCS / Plant Control
+
+↓
+
+<br>
+
+💾 Historian / Enterprise Systems
+
+<br><br>
+
+The chapter will include an animated industrial process,
+control-loop animation, field level → control level →
+supervisory level explanation, PLC vs RTU vs DCS, and an
+interactive ICS architecture.
+
+</div>
+
+</section>
+
+
+</div>
+
+
+<script>
+
+/* NAVIGATION */
+
+function go(id){
+
+document
+.getElementById(id)
+.scrollIntoView({
+behavior:"smooth"
+});
+
+}
+
+
+/* PRODUCTION */
+
+let productionRunning=false;
+
+function startProduction(){
+
+productionRunning=true;
+
+document
+.getElementById("product")
+.classList.add("run");
+
+document
+.getElementById("productionStatus")
+.innerText=
+"🟢 AUTOMATED PRODUCTION RUNNING";
+
+
+let machines=[
+"m1",
+"m2",
+"m3",
+"m4"
+];
+
+let arrows=[
+"a1",
+"a2",
+"a3"
+];
+
+machines.forEach(
+(id,index)=>{
+
+setTimeout(()=>{
+
+if(!productionRunning)return;
+
+document
+.getElementById(id)
+.classList.add("active");
+
+},index*600);
+
+});
+
+
+arrows.forEach(
+(id,index)=>{
+
+setTimeout(()=>{
+
+if(!productionRunning)return;
+
+document
+.getElementById(id)
+.classList.add("active");
+
+},(index+1)*600);
+
+});
+
+}
+
+
+/* STOP */
+
+function stopProduction(){
+
+productionRunning=false;
+
+document
+.getElementById("product")
+.classList.remove("run");
+
+document
+.getElementById("productionStatus")
+.innerText=
+"🔴 PRODUCTION STOPPED";
+
+document
+.querySelectorAll(".machine")
+.forEach(
+m=>m.classList.remove("active")
+);
+
+document
+.querySelectorAll(".arrow")
+.forEach(
+a=>a.classList.remove("active")
+);
+
+}
+
+
+/* FORMULA */
+
+function showCalculation(){
+
+let box=
+document.getElementById("calculation");
+
+box.style.display=
+box.style.display==="none"
+?"block"
+:"none";
+
+}
+
+
+/* MOTOR ASSEMBLY */
+
+function runMotorAssembly(){
+
+let machines=[
+"rm1",
+"rm2",
+"rm3",
+"rm4",
+"rm5"
+];
+
+let status=
+document
+.getElementById("assemblyStatus");
+
+status.innerText=
+"🟢 Automated motor assembly started";
+
+
+machines.forEach(
+(id,index)=>{
+
+setTimeout(()=>{
+
+document
+.getElementById(id)
+.classList.add("active");
+
+status.innerText=
+"Processing stage "+
+(index+1)+
+" / "+
+machines.length;
+
+},index*700);
+
+});
+
+
+setTimeout(()=>{
+
+status.innerText=
+"✅ Motor assembly and automatic testing completed";
+
+},machines.length*700+300);
+
+}
+
+
+/* QUIZ */
+
+let score=0;
+
+let answered=0;
+
+
+function answer(button,correct){
+
+let quiz=
+button.parentElement;
+
+if(quiz.dataset.answered){
+
+return;
+
+}
+
+quiz.dataset.answered="yes";
+
+answered++;
+
+if(correct){
+
+button.classList.add("correct");
+
+score++;
+
+document
+.getElementById("quizResult")
+.innerText=
+"✓ Correct | Score: "+
+score+
+" / "+
+answered;
+
+}else{
+
+button.classList.add("wrong");
+
+document
+.getElementById("quizResult")
+.innerText=
+"✗ Incorrect | Score: "+
+score+
+" / "+
+answered;
+
+}
+
+}
+
+</script>
+
+</body>
+</html>

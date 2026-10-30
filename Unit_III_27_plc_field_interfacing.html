@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Chapter 27: Interfacing PLCs with Field Devices</title>
+
+<!-- MathJax Configuration and Script -->
+<script>
+  window.MathJax = {
+    tex: {
+      inlineMath: [['$', '$'], ['\\(', '\\)']],
+      displayMath: [['$$', '$$'], ['\\[', '\\]']]
+    }
+  };
+</script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+<style>
+  :root {
+    --bg-dark: #071017;
+    --panel-bg: #0d1f2d;
+    --border-color: #1e3a50;
+    --accent-blue: #38bdf8;
+    --accent-green: #22c55e;
+    --accent-amber: #f59e0b;
+    --accent-red: #ef4444;
+    --text-main: #e2e8f0;
+    --text-muted: #94a3b8;
+  }
+
+  body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: var(--bg-dark);
+    color: var(--text-main);
+    line-height: 1.6;
+    padding: 24px;
+    margin: 0;
+  }
+
+  h1, h2, h3, h4 {
+    color: var(--accent-blue);
+  }
+
+  h1 {
+    border-bottom: 2px solid var(--border-color);
+    padding-bottom: 10px;
+    margin-bottom: 20px;
+  }
+
+  .sensor-card {
+    background-color: var(--panel-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 10px;
+    padding: 24px;
+    margin-bottom: 30px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+  }
+
+  .grid-2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+  }
+
+  @media (max-width: 900px) {
+    .grid-2 { grid-template-columns: 1fr; }
+  }
+
+  .anim-box {
+    background: #040a0f;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 16px;
+    text-align: center;
+  }
+
+  .img-fluid {
+    max-width: 100%;
+    height: 180px;
+    object-fit: contain;
+    border-radius: 6px;
+    background: #040a0f;
+    padding: 10px;
+    border: 1px solid var(--border-color);
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 15px;
+  }
+
+  th, td {
+    border: 1px solid var(--border-color);
+    padding: 10px;
+    text-align: left;
+  }
+
+  th {
+    background-color: #132b3e;
+    color: var(--accent-blue);
+  }
+
+  .numerical-card {
+    background: #0a1824;
+    border-left: 4px solid var(--accent-amber);
+    padding: 18px;
+    margin-bottom: 20px;
+    border-radius: 0 8px 8px 0;
+  }
+
+  .formula {
+    background: #040a0f;
+    padding: 8px 12px;
+    border-radius: 6px;
+    color: #4ade80;
+    overflow-x: auto;
+    margin: 8px 0;
+  }
+</style>
+</head>
+<body>
+
+<h1>Chapter 27: Hardware Integration – Interfacing PLCs with Industrial Field Devices</h1>
+<p>This chapter covers the electrical and physical interfacing of PLCs with discrete and analog field hardware. Topics include PNP/NPN sinking and sourcing sensor wiring, 2-wire vs 4-wire $4\text{--}20\text{ mA}$ current loops, relay interlocks, inductive surge suppression, and loop burden calculations.</p>
+
+<!-- SECTION 1: SINKING VS SOURCING WIRING -->
+<div class="sensor-card">
+  <h2>1. Discrete Wiring Topologies: Sinking (NPN) vs Sourcing (PNP)</h2>
+  <div class="grid-2">
+    <div>
+      <h3>Hardware Hardware Image Reference</h3>
+      <img src="images/plc_field_devices.jpg" class="img-fluid" alt="Industrial PLC Field Wiring Terminal Block Connection">
+      <br>
+      <h4>Conventional Current Flow Rules</h4>
+      <p>Understanding conventional current flow direction is essential when connecting discrete sensors (solid-state 3-wire proximity switches) to PLC input modules:</p>
+      <ul>
+        <li><strong>Sourcing (PNP Transistor):</strong> The sensor acts as a current source, supplying positive $24\text{V DC}$ current out to the PLC input terminal. Requires a <strong>Sinking Input Module</strong>.</li>
+        <li><strong>Sinking (NPN Transistor):</strong> The sensor acts as a current sink, drawing current from the PLC input terminal down to DC Ground ($0\text{V}$). Requires a <strong>Sourcing Input Module</strong>.</li>
+      </ul>
+      <p>Rule of thumb: <em>Sourcing provides $V_+$, Sinking provides Ground ($0\text{V}$).</em></p>
+    </div>
+
+    <div>
+      <h3>Interactive PNP Sourcing Wiring Schematic</h3>
+      <div class="anim-box">
+        <svg viewBox="0 0 400 200" width="100%" height="180">
+          <!-- Power Supply Rails -->
+          <line x1="20" y1="20" x2="380" y2="20" stroke="#ef4444" stroke-width="3"/>
+          <text x="330" y="15" fill="#ef4444" font-size="9" font-weight="bold">+24V DC</text>
+
+          <line x1="20" y1="180" x2="380" y2="180" stroke="#38bdf8" stroke-width="3"/>
+          <text x="330" y="195" fill="#38bdf8" font-size="9" font-weight="bold">0V DC (GND)</text>
+
+          <!-- PNP Sensor Block -->
+          <rect x="40" y="40" width="100" height="110" fill="#0d1f2d" stroke="#f59e0b" stroke-width="2" rx="5"/>
+          <text x="52" y="60" fill="#f59e0b" font-size="9" font-weight="bold">PNP SENSOR</text>
+          
+          <!-- Wire Connections -->
+          <!-- Brown Wire (+24V) -->
+          <line x1="60" y1="20" x2="60" y2="40" stroke="#ef4444" stroke-width="2"/>
+          <text x="65" y="32" fill="#ef4444" font-size="7">Brown (+)</text>
+
+          <!-- Blue Wire (0V) -->
+          <line x1="60" y1="150" x2="60" y2="180" stroke="#38bdf8" stroke-width="2"/>
+          <text x="65" y="170" fill="#38bdf8" font-size="7">Blue (-)</text>
+
+          <!-- Black Wire (Signal Output) -->
+          <line x1="140" y1="95" x2="240" y2="95" stroke="#22c55e" stroke-width="2"/>
+          <text x="160" y="90" fill="#22c55e" font-size="8" font-weight="bold">Black (Out)</text>
+
+          <!-- PLC Input Module (Sinking Type) -->
+          <rect x="240" y="40" width="110" height="110" fill="#0d1f2d" stroke="#38bdf8" stroke-width="2" rx="5"/>
+          <text x="250" y="60" fill="#38bdf8" font-size="9" font-weight="bold">PLC INPUT CARD</text>
+          <text x="255" y="75" fill="#94a3b8" font-size="8">(Sinking Module)</text>
+
+          <!-- Internal Optocoupler LED -->
+          <polygon points="270,90 270,100 280,95" fill="#ef4444"/>
+          <line x1="280" y1="90" x2="280" y2="100" stroke="#ef4444" stroke-width="2"/>
+          <line x1="280" y1="95" x2="310" y2="95" stroke="#38bdf8" stroke-width="2"/>
+          <line x1="310" y1="95" x2="310" y2="180" stroke="#38bdf8" stroke-width="2"/>
+          <text x="285" y="112" fill="#94a3b8" font-size="7">Optocoupler</text>
+
+          <!-- Current Motion Animation -->
+          <circle cx="0" cy="0" r="3" fill="#22c55e">
+            <animateMotion path="M 60 20 L 60 40 L 140 95 L 240 95 L 280 95 L 310 95 L 310 180" dur="2s" repeatCount="indefinite"/>
+          </circle>
+        </svg>
+        <p style="font-size:12px; color:#94a3b8;">PNP Sourcing Sensor Connected to a PLC Sinking Input Module</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SECTION 2: ANALOG CURRENT LOOPS & ACTUATORS -->
+<div class="sensor-card">
+  <h2>2. Analog Interfacing & Industrial Field Actuators</h2>
+  <div class="grid-2">
+    <div>
+      <h3>$4\text{--}20\text{ mA}$ Industrial Current Loops</h3>
+      <p>Analog field transmitters convert physical parameters (temperature, pressure, flow) into proportional electric signals. The $4\text{--}20\text{ mA}$ standard is favored over $0\text{--}10\text{ V}$ due to zero voltage drop over long wire distances and built-in fault detection:</p>
+      <ul>
+        <li><strong>Live Zero ($4\text{ mA}$):</strong> $4\text{ mA}$ represents $0\%$ scale. A reading of $0\text{ mA}$ explicitly flags a broken wire or power loss.</li>
+        <li><strong>Full Scale ($20\text{ mA}$):</strong> $20\text{ mA}$ represents $100\%$ measurement span.</li>
+        <li><strong>Surge Protection:</strong> Inductive output loads like solenoid valves and relays must use freewheeling flyback diodes across DC coils or RC snubbers across AC coils to suppress back-EMF spikes:</li>
+      </ul>
+      <div class="formula">
+        $$V_{spike} = -L \frac{di}{dt}$$
+      </div>
+    </div>
+
+    <div>
+      <h3>2-Wire Loop-Powered Field Transmitter Schematic</h3>
+      <div class="anim-box">
+        <svg viewBox="0 0 400 180" width="100%" height="160">
+          <!-- Loop Power +24V Supply -->
+          <circle cx="40" cy="90" r="15" fill="#0d1f2d" stroke="#ef4444" stroke-width="2"/>
+          <text x="32" y="93" fill="#ef4444" font-size="9" font-weight="bold">+24V</text>
+
+          <line x1="55" y1="90" x2="110" y2="90" stroke="#ef4444" stroke-width="2"/>
+
+          <!-- Pressure Transmitter -->
+          <rect x="110" y="60" width="100" height="60" fill="#0d1f2d" stroke="#f59e0b" stroke-width="2" rx="4"/>
+          <text x="120" y="85" fill="#f59e0b" font-size="9" font-weight="bold">TRANSMITTER</text>
+          <text x="125" y="100" fill="#94a3b8" font-size="8">(4-20 mA Loop)</text>
+
+          <line x1="210" y1="90" x2="270" y2="90" stroke="#22c55e" stroke-width="2"/>
+
+          <!-- Analog Input Card (Precision Resistor Load) -->
+          <rect x="270" y="50" width="100" height="80" fill="#0d1f2d" stroke="#38bdf8" stroke-width="2" rx="4"/>
+          <text x="280" y="70" fill="#38bdf8" font-size="9" font-weight="bold">PLC ANALOG</text>
+          
+          <!-- Precision Load Resistor -->
+          <rect x="310" y="80" width="12" height="25" fill="#f59e0b" stroke="#fff" stroke-width="1"/>
+          <text x="327" y="95" fill="#f59e0b" font-size="8">R_sense = 250Ω</text>
+          
+          <!-- Return Wire to Power Supply Ground -->
+          <line x1="316" y1="105" x2="316" y2="150" stroke="#38bdf8" stroke-width="2"/>
+          <line x1="316" y1="150" x2="40" y2="150" stroke="#38bdf8" stroke-width="2"/>
+          <line x1="40" y1="150" x2="40" y2="105" stroke="#38bdf8" stroke-width="2"/>
+
+          <!-- Current Flow Pulse -->
+          <circle cx="0" cy="0" r="3" fill="#22c55e">
+            <animateMotion path="M 55 90 L 110 90 L 210 90 L 270 90 L 316 90 L 316 150 L 40 150 L 40 105" dur="3s" repeatCount="indefinite"/>
+          </circle>
+        </svg>
+        <p style="font-size:12px; color:#94a3b8;">2-Wire Loop-Powered $4\text{--}20\text{ mA}$ Transmitter Interface</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SECTION 3: COMPARISON TABLE -->
+<div class="sensor-card">
+  <h2>Comparative Analysis: Field Interfacing Device Categories</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>Device Type</th>
+        <th>Signal Format</th>
+        <th>Isolation Technique</th>
+        <th>Max Distance Range</th>
+        <th>Interfacing Considerations</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>Discrete PNP Switch</strong></td>
+        <td>$24\text{V DC}$ High-Side.</td>
+        <td>Optocoupler Input Card.</td>
+        <td>Up to $100\text{ m}$.</td>
+        <td>Requires PLC input channel configured as <em>Sinking</em>.</td>
+      </tr>
+      <tr>
+        <td><strong>Discrete NPN Switch</strong></td>
+        <td>$0\text{V DC}$ Low-Side.</td>
+        <td>Optocoupler Input Card.</td>
+        <td>Up to $100\text{ m}$.</td>
+        <td>Requires PLC input channel configured as <em>Sourcing</em>.</td>
+      </tr>
+      <tr>
+        <td><strong>Analog $4\text{--}20\text{ mA}$ Transmitter</strong></td>
+        <td>Continuous Current Loop.</td>
+        <td>Galvanic Isolation / Transducer.</td>
+        <td>Up to $1000\text{ m}$ (Line drop resilient).</td>
+        <td>Requires precision $250\ \Omega$ load resistor for $1\text{--}5\text{ V}$ sensing.</td>
+      </tr>
+      <tr>
+        <td><strong>Analog $0\text{--}10\text{ V}$ Transmitter</strong></td>
+        <td>Continuous Voltage.</td>
+        <td>Differential ADC Amplifier.</td>
+        <td>$< 15\text{ m}$ (Noise vulnerable).</td>
+        <td>High input impedance required; susceptible to wire resistance drops.</td>
+      </tr>
+      <tr>
+        <td><strong>Inductive Solenoid Valve</strong></td>
+        <td>$24\text{V DC}$ / $120\text{V AC}$ Power Output.</td>
+        <td>Interposing Relay / TRIAC.</td>
+        <td>Up to $100\text{ m}$.</td>
+        <td><strong>Must install flyback diode</strong> or RC snubber to eliminate back-EMF spikes.</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- SECTION 4: NUMERICAL PROBLEMS -->
+<div class="sensor-card">
+  <h2>Numerical Problems: Loop Burden & Sensing Resistor Scaling</h2>
+
+  <!-- Problem 1: Maximum Loop Resistance (Burden) Calculation -->
+  <div class="numerical-card">
+    <h3>Problem 1: 2-Wire Loop Maximum Allowable Wire Resistance</h3>
+    <p><strong>Scenario:</strong> A $24\text{V DC}$ loop-powered temperature transmitter requires a minimum operating voltage $V_{tx\_min} = 11.5\text{ V DC}$ to power its internal electronics. The PLC analog input card uses an internal $R_{sense} = 250\ \Omega$ current-sensing resistor. The signal line operates up to a maximum full-scale current $I_{max} = 20\text{ mA}$.</p>
+    <p>Calculate:</p>
+    <ol type="a">
+      <li>The voltage drop across the PLC input sense resistor $V_{sense}$ at $20\text{ mA}$.</li>
+      <li>The maximum allowable voltage drop $V_{wire\_max}$ available for field wiring.</li>
+      <li>The maximum allowable loop wire resistance $R_{wire\_max}$ in Ohms ($\Omega$).</li>
+      <li>The maximum physical cable length if using 22 AWG copper wire ($R_{AWG} = 53\ \Omega/\text{km}$ loop pair).</li>
+    </ol>
+
+    <h4>Step-by-Step Solution:</h4>
+    <p><strong>1. Compute Sense Resistor Voltage Drop ($V_{sense}$):</strong></p>
+    <div class="formula">
+      $$V_{sense} = I_{max} \times R_{sense} = 0.020\text{ A} \times 250\ \Omega = 5.0\text{ V}$$
+    </div>
+
+    <p><strong>2. Compute Maximum Allowable Wiring Voltage Drop ($V_{wire\_max}$):</strong></p>
+    <div class="formula">
+      $$V_{wire\_max} = V_{supply} - V_{tx\_min} - V_{sense} = 24.0\text{ V} - 11.5\text{ V} - 5.0\text{ V} = 7.5\text{ V}$$
+    </div>
+
+    <p><strong>3. Compute Maximum Loop Resistance ($R_{wire\_max}$):</strong></p>
+    <div class="formula">
+      $$R_{wire\_max} = \frac{V_{wire\_max}}{I_{max}} = \frac{7.5\text{ V}}{0.020\text{ A}} = 375\ \Omega$$
+    </div>
+
+    <p><strong>4. Compute Maximum Cable Run Distance:</strong></p>
+    <div class="formula">
+      $$\text{Max Cable Distance} = \frac{R_{wire\_max}}{R_{AWG}} = \frac{375\ \Omega}{53\ \Omega/\text{km}} \approx 7.075\text{ km} = 7,075\text{ meters}$$
+    </div>
+  </div>
+
+  <!-- Problem 2: Flyback Diode Peak Reverse Voltage Selection -->
+  <div class="numerical-card">
+    <h3>Problem 2: Solenoid Surge Suppression Diode Rating</h3>
+    <p><strong>Scenario:</strong> A PLC output transistor module controls a $24\text{V DC}$ hydraulic solenoid valve drawing a nominal current $I_{coil} = 1.8\text{ A}$ with coil inductance $L = 0.45\text{ H}$. Upon turn-off, a freewheeling flyback diode dissipates the inductive energy.</p>
+    <p>Calculate:</p>
+    <ol type="a">
+      <li>The inductive energy $E_{stored}$ stored in the solenoid magnetic field in Joules ($\text{J}$).</li>
+      <li>The minimum required Peak Inverse Voltage (PIV) rating for the flyback diode using a standard safety factor of $2.5\times$.</li>
+    </ol>
+
+    <h4>Step-by-Step Solution:</h4>
+    <p><strong>1. Calculate Magnetic Stored Energy ($E_{stored}$):</strong></p>
+    <div class="formula">
+      $$E_{stored} = \frac{1}{2} L I_{coil}^2 = \frac{1}{2} (0.45\text{ H}) (1.8\text{ A})^2 = 0.225 \times 3.24 = 0.729\text{ Joules}$$
+    </div>
+
+    <p><strong>2. Compute Diode Peak Inverse Voltage (PIV) Rating:</strong></p>
+    <div class="formula">
+      $$\text{PIV}_{min} = V_{supply} \times \text{Safety Factor} = 24\text{ V} \times 2.5 = 60.0\text{ V DC}$$
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

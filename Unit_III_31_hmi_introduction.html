@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Chapter 31: Introduction to Human-Machine Interface (HMI)</title>
+
+<!-- MathJax Configuration and Script -->
+<script>
+  window.MathJax = {
+    tex: {
+      inlineMath: [['$', '$'], ['\\(', '\\)']],
+      displayMath: [['$$', '$$'], ['\\[', '\\]']]
+    }
+  };
+</script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+<style>
+  :root {
+    --bg-dark: #071017;
+    --panel-bg: #0d1f2d;
+    --border-color: #1e3a50;
+    --accent-blue: #38bdf8;
+    --accent-green: #22c55e;
+    --accent-amber: #f59e0b;
+    --accent-red: #ef4444;
+    --text-main: #e2e8f0;
+    --text-muted: #94a3b8;
+  }
+
+  body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: var(--bg-dark);
+    color: var(--text-main);
+    line-height: 1.6;
+    padding: 24px;
+    margin: 0;
+  }
+
+  h1, h2, h3, h4 {
+    color: var(--accent-blue);
+  }
+
+  h1 {
+    border-bottom: 2px solid var(--border-color);
+    padding-bottom: 10px;
+    margin-bottom: 20px;
+  }
+
+  .sensor-card {
+    background-color: var(--panel-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 10px;
+    padding: 24px;
+    margin-bottom: 30px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+  }
+
+  .grid-2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+  }
+
+  @media (max-width: 900px) {
+    .grid-2 { grid-template-columns: 1fr; }
+  }
+
+  .anim-box {
+    background: #040a0f;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 16px;
+    text-align: center;
+  }
+
+  .img-fluid {
+    max-width: 100%;
+    height: 180px;
+    object-fit: contain;
+    border-radius: 6px;
+    background: #040a0f;
+    padding: 10px;
+    border: 1px solid var(--border-color);
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 15px;
+  }
+
+  th, td {
+    border: 1px solid var(--border-color);
+    padding: 10px;
+    text-align: left;
+  }
+
+  th {
+    background-color: #132b3e;
+    color: var(--accent-blue);
+  }
+
+  .numerical-card {
+    background: #0a1824;
+    border-left: 4px solid var(--accent-amber);
+    padding: 18px;
+    margin-bottom: 20px;
+    border-radius: 0 8px 8px 0;
+  }
+
+  .formula {
+    background: #040a0f;
+    padding: 8px 12px;
+    border-radius: 6px;
+    color: #4ade80;
+    overflow-x: auto;
+    margin: 8px 0;
+  }
+</style>
+</head>
+<body>
+
+<h1>Chapter 31: Introduction to Human-Machine Interface (HMI) Systems</h1>
+<p>This chapter presents the fundamentals of Human-Machine Interfaces (HMIs) in industrial automation. Topics cover HMI hardware architecture, alarm management (ISA-18.2 standards), High-Performance HMI graphics design, real-time tag updating, screen refresh latency, and visual processing calculations.</p>
+
+<!-- SECTION 1: HMI ARCHITECTURE & VISUAL DESIGN -->
+<div class="sensor-card">
+  <h2>1. HMI Subsystem Architecture & High-Performance Visual Design</h2>
+  <div class="grid-2">
+    <div>
+      <h3>HMI Hardware & Operational Overview</h3>
+      <div class="anim-box">
+        <svg viewBox="0 0 300 120" width="100%" height="130">
+          <rect x="20" y="10" width="260" height="100" fill="#0d1f2d" stroke="#38bdf8" stroke-width="2" rx="5"/>
+          <rect x="35" y="20" width="160" height="80" fill="#040a0f" stroke="#1e3a50" stroke-width="1"/>
+          <!-- HMI Screen Elements -->
+          <text x="45" y="38" fill="#22c55e" font-size="8" font-weight="bold">REACTOR TANK 01</text>
+          <rect x="45" y="45" width="40" height="35" fill="#132b3e" stroke="#38bdf8" stroke-width="1"/>
+          <rect x="45" y="60" width="40" height="20" fill="#22c55e"/>
+          <text x="92" y="55" fill="#e2e8f0" font-size="7">Level: 62%</text>
+          <text x="92" y="68" fill="#e2e8f0" font-size="7">Temp: 74.2 °C</text>
+          <text x="92" y="81" fill="#f59e0b" font-size="7">Status: RUNNING</text>
+          
+          <!-- Keypad / Touch Controller -->
+          <circle cx="225" cy="35" r="8" fill="#132b3e" stroke="#f59e0b" stroke-width="1"/>
+          <circle cx="250" cy="35" r="8" fill="#132b3e" stroke="#22c55e" stroke-width="1"/>
+          <circle cx="225" cy="60" r="8" fill="#132b3e" stroke="#38bdf8" stroke-width="1"/>
+          <circle cx="250" cy="60" r="8" fill="#132b3e" stroke="#ef4444" stroke-width="1"/>
+          <rect x="215" y="80" width="45" height="15" fill="#132b3e" stroke="#38bdf8" stroke-width="1" rx="2"/>
+          <text x="223" y="91" fill="#38bdf8" font-size="7">START</text>
+        </svg>
+      </div>
+      <br>
+      <h4>Core Functional Responsibilities</h4>
+      <p>An HMI serves as the localized visual bridge between human operators and field automation devices (PLCs/PACs):</p>
+      <ul>
+        <li><strong>Process Visualization:</strong> Dynamic 2D/3D graphical mapping of process states, tank levels, valve positions, and motor status.</li>
+        <li><strong>Control Setpoint Entry:</strong> Secure manual intervention allowing operators to write setpoints, start/stop sequences, and change modes.</li>
+        <li><strong>Alarm Management:</strong> Real-time event logging, visual annunciation, and alarm priority filtering per ANSI/ISA-18.2 standards.</li>
+      </ul>
+    </div>
+
+    <div>
+      <h3>Interactive Real-Time Tag Refresh Architecture</h3>
+      <div class="anim-box">
+        <svg viewBox="0 0 320 180" width="100%" height="160">
+          <!-- PLC Controller -->
+          <rect x="15" y="25" width="85" height="130" fill="#0d1f2d" stroke="#22c55e" stroke-width="2" rx="4"/>
+          <text x="25" y="45" fill="#22c55e" font-size="9" font-weight="bold">PLC PROCESSOR</text>
+          <rect x="25" y="55" width="65" height="30" fill="#040a0f" stroke="#1e3a50"/>
+          <text x="30" y="73" fill="#94a3b8" font-size="7">Data Table DB1</text>
+          <rect x="25" y="95" width="65" height="45" fill="#040a0f" stroke="#1e3a50"/>
+          <text x="30" y="110" fill="#4ade80" font-size="7">T_Rctr: 74.2°C</text>
+          <text x="30" y="122" fill="#4ade80" font-size="7">P_In: 4.2 Bar</text>
+          <text x="30" y="134" fill="#4ade80" font-size="7">V_Pump: ON</text>
+
+          <!-- Ethernet Link -->
+          <line x1="100" y1="90" x2="200" y2="90" stroke="#38bdf8" stroke-width="2"/>
+          <text x="115" y="82" fill="#38bdf8" font-size="8">EtherNet/IP (CIP)</text>
+
+          <!-- HMI Terminal Engine -->
+          <rect x="200" y="25" width="105" height="130" fill="#0d1f2d" stroke="#38bdf8" stroke-width="2" rx="4"/>
+          <text x="210" y="45" fill="#38bdf8" font-size="9" font-weight="bold">HMI RUNTIME</text>
+          <rect x="210" y="55" width="85" height="30" fill="#040a0f" stroke="#1e3a50"/>
+          <text x="215" y="73" fill="#94a3b8" font-size="7">Tag Client Cache</text>
+          <rect x="210" y="95" width="85" height="45" fill="#040a0f" stroke="#f59e0b"/>
+          <text x="215" y="112" fill="#f59e0b" font-size="8" font-weight="bold">GUI Redraw</text>
+          <text x="215" y="128" fill="#e2e8f0" font-size="7">Update Rate: 250ms</text>
+
+          <!-- Animated Packet Pulse -->
+          <circle cx="0" cy="0" r="3" fill="#38bdf8">
+            <animateMotion path="M 100 90 L 200 90" dur="1.5s" repeatCount="indefinite"/>
+          </circle>
+        </svg>
+        <p style="font-size:12px; color:#94a3b8;">Data Polling and GUI Redraw Pipeline between PLC and HMI Terminal</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SECTION 2: COMPARISON TABLE -->
+<div class="sensor-card">
+  <h2>Comparative Analysis: Industrial HMI Deployment Categories</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>HMI Class</th>
+        <th>Hardware Platform</th>
+        <th>Display Size & Res</th>
+        <th>Primary Use Case</th>
+        <th>Key Features & Limits</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>Panel-Mount Terminal</strong></td>
+        <td>Embedded RISC/ARM, IP65/NEMA 4X Sealed Enclosure.</td>
+        <td>4.3" – 15", $800 \times 480$ to $1920 \times 1080$.</td>
+        <td>Machine-level local control panels (OEM equipment).</td>
+        <td>Low power, ruggedized, limited tag capacity ($< 1000$ tags).</td>
+      </tr>
+      <tr>
+        <td><strong>PC-Based Standalone HMI</strong></td>
+        <td>Industrial PC (IPC), x86 Processor, SSD storage.</td>
+        <td>15" – 24" Touchscreens, Full HD / 4K.</td>
+        <td>Cell supervision, complex machine tools, packaging lines.</td>
+        <td>High tag capacity, local trend database, script support (VBS/Python).</td>
+      </tr>
+      <tr>
+        <td><strong>Distributed Web/Thin Client</strong></td>
+        <td>Centralized Web Server, HTML5/WebSockets client nodes.</td>
+        <td>Variable (Tablets, Mobile, Multi-monitor IPCs).</td>
+        <td>Plant-wide monitoring, multi-operator control rooms.</td>
+        <td>Zero-client footprint, centralized licensing, dependent on network uptime.</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- SECTION 3: NUMERICAL PROBLEMS -->
+<div class="sensor-card">
+  <h2>Numerical Problems: Screen Refresh Latency & Bandwidth Sizing</h2>
+
+  <!-- Problem 1: Screen Tag Polling Bandwidth -->
+  <div class="numerical-card">
+    <h3>Problem 1: HMI Screen Tag Polling Latency and Bandwidth Requirement</h3>
+    <p><strong>Scenario:</strong> An operator switches to an HMI process screen displaying $N = 240$ active tags mapped to a field PLC. Among these tags:</p>
+    <ul>
+      <li>160 tags are 32-bit Floating Point values ($4\text{ bytes}$ each).</li>
+      <li>80 tags are Boolean status flags packaged into 16-bit Integer words ($2\text{ bytes}$ each, $10\text{ words total} = 20\text{ bytes}$).</li>
+    </ul>
+    <p>The HMI terminal polls data using EtherNet/IP explicit messaging. Each read request header incurs an overhead of $56\text{ bytes}$, and the PLC response frame overhead is $64\text{ bytes}$. The screen update rate is set to $R = 4\text{ updates/second}\ (250\text{ ms cycle})$.</p>
+
+    <p>Calculate:</p>
+    <ol type="a">
+      <li>The total data payload size per poll in bytes.</li>
+      <li>The net network bandwidth consumed by this single HMI screen in kilobits per second ($\text{kbps}$).</li>
+      <li>The total time required to transfer one full screen update over a $10\text{ Mbps}$ ethernet connection.</li>
+    </ol>
+
+    <h4>Step-by-Step Solution:</h4>
+    <p><strong>1. Compute Total Payload and Frame Sizes:</strong></p>
+    <div class="formula">
+      $$\text{Data Payload} = (160\text{ tags} \times 4\text{ bytes}) + 20\text{ bytes} = 640 + 20 = 660\text{ bytes}$$
+    </div>
+    <div class="formula">
+      $$\text{Total Frame Size} = 660\text{ (Data)} + 56\text{ (Req Header)} + 64\text{ (Resp Header)} = 780\text{ bytes/poll}$$
+    </div>
+
+    <p><strong>2. Calculate Network Bandwidth Consumption:</strong></p>
+    <div class="formula">
+      $$\text{Data Rate} = 780\text{ bytes/poll} \times 8\text{ bits/byte} \times 4\text{ polls/second} = 24,960\text{ bits/second}$$
+    </div>
+    <div class="formula">
+      $$\text{Bandwidth in kbps} = \frac{24,960}{1000} = 24.96\text{ kbps}$$
+    </div>
+
+    <p><strong>3. Calculate Transfer Time per Screen Update:</strong></p>
+    <div class="formula">
+      $$\text{Total Bits per Poll} = 780 \times 8 = 6240\text{ bits}$$
+    </div>
+    <div class="formula">
+      $$T_{transfer} = \frac{6240\text{ bits}}{10,000,000\text{ bits/sec}} = 0.000624\text{ seconds} = 0.624\text{ ms}$$
+    </div>
+  </div>
+
+  <!-- Problem 2: ISA-18.2 Alarm Response Time -->
+  <div class="numerical-card">
+    <h3>Problem 2: HMI Alarm Processing Capacity and Response Latency</h3>
+    <p><strong>Scenario:</strong> During a plant trip, an HMI receives a burst of $N_a = 150$ alarms within a 1-second interval. The HMI event processor logs each alarm to an onboard SQLite database (taking $t_{db} = 2.5\text{ ms}$ per write) and renders the updated alarm list on screen (taking $t_{render} = 15\text{ ms}$ per batch update of up to 50 alarms).</p>
+
+    <p>Calculate:</p>
+    <ol type="a">
+      <li>The total time required to log all 150 incoming alarms to the database.</li>
+      <li>The total screen rendering latency for processing the full 150-alarm burst.</li>
+      <li>The total worst-case time elapsed before the final alarm is displayed to the operator.</li>
+    </ol>
+
+    <h4>Step-by-Step Solution:</h4>
+    <p><strong>1. Compute Total Database Ingestion Time:</strong></p>
+    <div class="formula">
+      $$T_{db} = 150\text{ alarms} \times 2.5\text{ ms/alarm} = 375.0\text{ ms}$$
+    </div>
+
+    <p><strong>2. Compute Total Render Latency:</strong></p>
+    <div class="formula">
+      $$\text{Render Batches} = \left\lceil \frac{150}{50} \right\rceil = 3\text{ batches}$$
+    </div>
+    <div class="formula">
+      $$T_{render} = 3\text{ batches} \times 15\text{ ms/batch} = 45.0\text{ ms}$$
+    </div>
+
+    <p><strong>3. Calculate Total Alarm Processing Latency:</strong></p>
+    <div class="formula">
+      $$T_{total} = T_{db} + T_{render} = 375.0\text{ ms} + 45.0\text{ ms} = 420.0\text{ ms}$$
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

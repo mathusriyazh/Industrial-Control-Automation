@@ -1,0 +1,3029 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Industrial Control and Automation - Types of Automation</title>
+
+<style>
+
+*{
+    box-sizing:border-box;
+}
+
+html{
+    scroll-behavior:smooth;
+}
+
+body{
+    margin:0;
+    font-family:Arial,Helvetica,sans-serif;
+    background:#071018;
+    color:#edf7fb;
+}
+
+header{
+    background:#0b2533;
+    padding:22px;
+    border-bottom:3px solid #22a6d5;
+    position:sticky;
+    top:0;
+    z-index:1000;
+}
+
+header h1{
+    margin:0;
+    font-size:26px;
+}
+
+header p{
+    margin:7px 0 0;
+    color:#a9ddec;
+}
+
+nav{
+    background:#081720;
+    padding:10px;
+    text-align:center;
+    position:sticky;
+    top:91px;
+    z-index:999;
+    border-bottom:1px solid #294b59;
+}
+
+nav button{
+    background:#12394b;
+    color:white;
+    border:1px solid #477080;
+    border-radius:6px;
+    padding:9px 14px;
+    margin:3px;
+    cursor:pointer;
+}
+
+nav button:hover{
+    background:#1b5a70;
+}
+
+.container{
+    max-width:1400px;
+    margin:auto;
+    padding:22px;
+}
+
+.card{
+    background:#0c1b25;
+    border:1px solid #2d4d5b;
+    border-radius:11px;
+    padding:24px;
+    margin-bottom:22px;
+}
+
+h2{
+    color:#7dd3fc;
+    margin-top:0;
+}
+
+h3{
+    color:#8ddcf0;
+}
+
+p{
+    line-height:1.7;
+}
+
+.highlight{
+    background:#0e2c3a;
+    border-left:5px solid #38bdf8;
+    padding:16px;
+    margin:16px 0;
+    border-radius:4px;
+}
+
+.warning{
+    background:#302716;
+    border-left:5px solid #f59e0b;
+    padding:16px;
+    margin:16px 0;
+}
+
+.grid3{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:18px;
+}
+
+.grid2{
+    display:grid;
+    grid-template-columns:repeat(2,1fr);
+    gap:18px;
+}
+
+.infoBox{
+    background:#102632;
+    border:1px solid #365c6c;
+    padding:20px;
+    border-radius:9px;
+}
+
+.bigIcon{
+    font-size:60px;
+    text-align:center;
+    margin:10px;
+}
+
+.center{
+    text-align:center;
+}
+
+/* IMAGE */
+
+.realImage{
+    width:100%;
+    height:260px;
+    object-fit:cover;
+    border-radius:8px;
+    border:2px solid #385967;
+    background:#020608;
+}
+
+.caption{
+    text-align:center;
+    color:#a7bbc3;
+    font-size:13px;
+    margin-top:7px;
+}
+
+/* AUTOMATION CARDS */
+
+.autoCard{
+    background:#0a1b25;
+    border:2px solid #385a68;
+    border-radius:10px;
+    padding:20px;
+    transition:.3s;
+}
+
+.autoCard:hover{
+    transform:translateY(-3px);
+    border-color:#5eaec5;
+}
+
+.autoCard.active{
+    border-color:#22c55e;
+    box-shadow:0 0 22px rgba(34,197,94,.3);
+}
+
+/* FLOW */
+
+.flow{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    flex-wrap:wrap;
+    gap:12px;
+    margin:25px 0;
+}
+
+.flowBox{
+    background:#102c3a;
+    border:2px solid #467082;
+    padding:18px 25px;
+    border-radius:8px;
+    text-align:center;
+    min-width:130px;
+}
+
+.arrow{
+    font-size:30px;
+    color:#7b9aa5;
+}
+
+.arrow.active{
+    color:#22c55e;
+    text-shadow:0 0 12px #22c55e;
+}
+
+/* FACTORY */
+
+.factory{
+    background:#03090d;
+    border:2px solid #385765;
+    border-radius:10px;
+    padding:25px;
+    overflow:hidden;
+}
+
+.factoryTitle{
+    text-align:center;
+    color:#8ddcf0;
+    font-size:21px;
+    font-weight:bold;
+    margin-bottom:25px;
+}
+
+.productionLine{
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    flex-wrap:wrap;
+    gap:10px;
+}
+
+.machine{
+    width:145px;
+    height:125px;
+    border:3px solid #4c6b76;
+    background:#142a34;
+    border-radius:9px;
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+    align-items:center;
+    transition:.3s;
+}
+
+.machineIcon{
+    font-size:37px;
+}
+
+.machine.active{
+    border-color:#22c55e;
+    box-shadow:0 0 25px rgba(34,197,94,.55);
+    transform:scale(1.04);
+}
+
+.machine.fault{
+    border-color:#ef4444;
+    box-shadow:0 0 25px rgba(239,68,68,.55);
+}
+
+.product{
+    width:25px;
+    height:25px;
+    border-radius:5px;
+    background:#e5e7eb;
+    position:absolute;
+    top:50%;
+    left:-30px;
+    opacity:0;
+}
+
+.product.animate{
+    animation:moveProduct 5s linear forwards;
+}
+
+@keyframes moveProduct{
+
+    0%{
+        left:0%;
+        opacity:1;
+    }
+
+    25%{
+        left:25%;
+    }
+
+    50%{
+        left:50%;
+    }
+
+    75%{
+        left:75%;
+    }
+
+    100%{
+        left:100%;
+        opacity:0;
+    }
+}
+
+.controlPanel{
+    background:#0c202b;
+    padding:18px;
+    border-radius:8px;
+    margin-top:25px;
+    border:1px solid #365a69;
+}
+
+.controlButton{
+    border:0;
+    color:white;
+    padding:12px 18px;
+    border-radius:6px;
+    cursor:pointer;
+    margin:5px;
+    font-weight:bold;
+}
+
+.start{
+    background:#15803d;
+}
+
+.stop{
+    background:#b91c1c;
+}
+
+.reset{
+    background:#2563eb;
+}
+
+.selectButton{
+    background:#143c4d;
+    color:white;
+    border:1px solid #4d7888;
+    padding:12px 18px;
+    border-radius:6px;
+    margin:5px;
+    cursor:pointer;
+}
+
+.selectButton.selected{
+    background:#1d6b83;
+    border-color:#8bdcf1;
+}
+
+/* METRICS */
+
+.metrics{
+    display:grid;
+    grid-template-columns:repeat(4,1fr);
+    gap:14px;
+    margin-top:20px;
+}
+
+.metric{
+    background:#102a35;
+    border:1px solid #3b6270;
+    padding:18px;
+    border-radius:8px;
+    text-align:center;
+}
+
+.metricValue{
+    font-size:28px;
+    font-weight:bold;
+    color:#7dd3fc;
+    margin-top:8px;
+}
+
+/* TABLE */
+
+table{
+    width:100%;
+    border-collapse:collapse;
+}
+
+th,td{
+    border:1px solid #385764;
+    padding:13px;
+    text-align:left;
+}
+
+th{
+    background:#12394b;
+}
+
+/* GRAPH */
+
+.chartArea{
+    background:#061015;
+    border:1px solid #345764;
+    border-radius:8px;
+    padding:20px;
+    height:330px;
+    position:relative;
+}
+
+.axisX{
+    position:absolute;
+    bottom:15px;
+    left:50%;
+}
+
+.axisY{
+    position:absolute;
+    left:10px;
+    top:45%;
+    transform:rotate(-90deg);
+}
+
+.barChart{
+    position:absolute;
+    left:90px;
+    right:40px;
+    bottom:50px;
+    top:30px;
+    display:flex;
+    align-items:flex-end;
+    justify-content:space-around;
+}
+
+.barItem{
+    height:100%;
+    width:24%;
+    display:flex;
+    flex-direction:column;
+    justify-content:flex-end;
+    align-items:center;
+}
+
+.barFill{
+    width:70%;
+    background:#38bdf8;
+    border-radius:5px 5px 0 0;
+    transition:1s;
+}
+
+.barLabel{
+    margin-top:8px;
+    font-size:13px;
+}
+
+/* QUIZ */
+
+.quiz{
+    background:#091923;
+    border:1px solid #355a68;
+    border-radius:8px;
+    padding:18px;
+    margin:15px 0;
+}
+
+.quiz button{
+    width:100%;
+    text-align:left;
+    background:#123548;
+    color:white;
+    border:1px solid #426979;
+    padding:11px;
+    border-radius:5px;
+    margin:6px 0;
+    cursor:pointer;
+}
+
+.quiz button.correct{
+    background:#14532d;
+}
+
+.quiz button.wrong{
+    background:#7f1d1d;
+}
+
+.result{
+    background:#102c38;
+    padding:15px;
+    margin-top:15px;
+    border-left:5px solid #38bdf8;
+}
+
+/* RESPONSIVE */
+
+@media(max-width:900px){
+
+    .grid3,
+    .grid2{
+        grid-template-columns:1fr;
+    }
+
+    .metrics{
+        grid-template-columns:1fr 1fr;
+    }
+
+    nav{
+        position:static;
+    }
+}
+
+@media(max-width:600px){
+
+    .metrics{
+        grid-template-columns:1fr;
+    }
+
+    header h1{
+        font-size:20px;
+    }
+
+    .machine{
+        width:125px;
+    }
+}
+
+</style>
+
+</head>
+
+
+<body>
+
+
+<header>
+
+<h1>📘 INDUSTRIAL CONTROL AND AUTOMATION</h1>
+
+<p>
+UNIT – I | Chapter 3 — Types of Industrial Automation
+</p>
+
+</header>
+
+
+<nav>
+
+<button onclick="go('intro')">Introduction</button>
+
+<button onclick="go('fixed')">Fixed</button>
+
+<button onclick="go('programmable')">Programmable</button>
+
+<button onclick="go('flexible')">Flexible</button>
+
+<button onclick="go('animation')">Animation</button>
+
+<button onclick="go('comparison')">Comparison</button>
+
+<button onclick="go('applications')">Applications</button>
+
+<button onclick="go('quiz')">Quiz</button>
+
+</nav>
+
+
+<div class="container">
+
+
+<!-- =====================================================
+INTRODUCTION
+===================================================== -->
+
+<section id="intro" class="card">
+
+<h2>1. Types of Industrial Automation</h2>
+
+<p>
+
+Industrial automation can be classified according to the
+production volume, product variety, flexibility required
+and method used to control the production equipment.
+
+</p>
+
+<div class="highlight">
+
+<strong>The three major categories are:</strong>
+
+<br><br>
+
+1. Fixed Automation
+
+<br>
+
+2. Programmable Automation
+
+<br>
+
+3. Flexible Automation
+
+</div>
+
+
+<div class="grid3">
+
+<div class="autoCard">
+
+<div class="bigIcon">🏭</div>
+
+<h3>Fixed Automation</h3>
+
+<p>
+
+Special-purpose equipment performs a fixed sequence of
+operations.
+
+</p>
+
+<strong>High volume + Low variety</strong>
+
+</div>
+
+
+<div class="autoCard">
+
+<div class="bigIcon">🖥️</div>
+
+<h3>Programmable Automation</h3>
+
+<p>
+
+The production sequence can be changed by modifying the
+control program.
+
+</p>
+
+<strong>Medium volume + Medium variety</strong>
+
+</div>
+
+
+<div class="autoCard">
+
+<div class="bigIcon">🤖</div>
+
+<h3>Flexible Automation</h3>
+
+<p>
+
+The system can produce different products with little
+manual intervention.
+
+</p>
+
+<strong>Medium volume + High variety</strong>
+
+</div>
+
+</div>
+
+</section>
+
+
+<!-- =====================================================
+PRODUCTION RELATIONSHIP
+===================================================== -->
+
+<section class="card">
+
+<h2>2. Production Volume vs Product Variety</h2>
+
+<p>
+
+One of the most important ideas in industrial automation
+is the relationship between production volume and product
+variety.
+
+</p>
+
+
+<div class="chartArea">
+
+<div class="barChart">
+
+<div class="barItem">
+
+<div
+class="barFill"
+style="height:90%;">
+</div>
+
+<div class="barLabel">
+Fixed
+</div>
+
+</div>
+
+
+<div class="barItem">
+
+<div
+class="barFill"
+style="height:60%;">
+</div>
+
+<div class="barLabel">
+Programmable
+</div>
+
+</div>
+
+
+<div class="barItem">
+
+<div
+class="barFill"
+style="height:45%;">
+</div>
+
+<div class="barLabel">
+Flexible
+</div>
+
+</div>
+
+</div>
+
+<div class="axisY">
+Production Volume
+</div>
+
+<div class="axisX">
+Increasing Product Variety →
+</div>
+
+</div>
+
+
+<div class="highlight">
+
+<strong>Remember:</strong>
+
+As product variety increases, the automation system
+generally needs greater flexibility.
+
+</div>
+
+</section>
+
+
+<!-- =====================================================
+FIXED
+===================================================== -->
+
+<section id="fixed" class="card">
+
+<h2>3. Fixed Automation</h2>
+
+<p>
+
+Fixed automation is also called <strong>hard automation</strong>.
+The equipment is designed to perform a predetermined sequence
+of operations.
+
+</p>
+
+
+<div class="grid2">
+
+<div class="infoBox">
+
+<h3>Characteristics</h3>
+
+<ul>
+
+<li>Dedicated equipment</li>
+
+<li>Fixed sequence</li>
+
+<li>High production rate</li>
+
+<li>Low product variety</li>
+
+<li>High initial investment</li>
+
+<li>Low flexibility</li>
+
+</ul>
+
+</div>
+
+
+<div class="infoBox">
+
+<h3>Typical Applications</h3>
+
+<ul>
+
+<li>Automotive transfer lines</li>
+
+<li>Bottling plants</li>
+
+<li>Assembly lines</li>
+
+<li>High-volume machining</li>
+
+<li>Continuous production</li>
+
+</ul>
+
+</div>
+
+</div>
+
+
+<div class="highlight">
+
+<strong>Example:</strong>
+
+An automobile component production line may perform
+drilling, cutting, machining and inspection in a fixed
+sequence for thousands of identical components.
+
+</div>
+
+<img
+class="realImage"
+src="https://commons.wikimedia.org/wiki/Special:FilePath/Assembly_line.jpg"
+alt="Industrial assembly line">
+
+<div class="caption">
+
+Real industrial assembly-line example.
+
+</div>
+
+
+<h3>Fixed Automation Flow</h3>
+
+<div class="flow">
+
+<div class="flowBox">
+Raw Material
+</div>
+
+<div class="arrow">→</div>
+
+<div class="flowBox">
+Machine 1
+</div>
+
+<div class="arrow">→</div>
+
+<div class="flowBox">
+Machine 2
+</div>
+
+<div class="arrow">→</div>
+
+<div class="flowBox">
+Machine 3
+</div>
+
+<div class="arrow">→</div>
+
+<div class="flowBox">
+Finished Product
+</div>
+
+</div>
+
+
+<div class="warning">
+
+<strong>Limitation:</strong>
+
+If the product design changes significantly, changing a
+fixed automation system can be expensive and time-consuming.
+
+</div>
+
+</section>
+
+
+<!-- =====================================================
+PROGRAMMABLE
+===================================================== -->
+
+<section id="programmable" class="card">
+
+<h2>4. Programmable Automation</h2>
+
+<p>
+
+Programmable automation uses a programmable controller or
+computer-based control system. The production sequence can
+be changed by changing the program.
+
+</p>
+
+
+<div class="grid2">
+
+<div class="infoBox">
+
+<h3>Characteristics</h3>
+
+<ul>
+
+<li>Program-controlled operation</li>
+
+<li>Suitable for batch production</li>
+
+<li>Medium production volume</li>
+
+<li>Higher product variety</li>
+
+<li>Program can be modified</li>
+
+<li>PLC/CNC commonly used</li>
+
+</ul>
+
+</div>
+
+
+<div class="infoBox">
+
+<h3>Examples</h3>
+
+<ul>
+
+<li>CNC machining</li>
+
+<li>PLC-controlled machines</li>
+
+<li>Batch processing</li>
+
+<li>Industrial packaging</li>
+
+<li>Automatic testing systems</li>
+
+</ul>
+
+</div>
+
+</div>
+
+
+<div class="highlight">
+
+<strong>Example:</strong>
+
+A CNC machine can manufacture one component using one
+program and another component by loading a different
+program.
+
+</div>
+
+
+<div class="flow">
+
+<div class="flowBox">
+
+📡
+
+<br>
+
+Sensors
+
+</div>
+
+<div class="arrow">→</div>
+
+<div class="flowBox">
+
+🧠
+
+<br>
+
+PLC / CNC
+
+</div>
+
+<div class="arrow">→</div>
+
+<div class="flowBox">
+
+⚙️
+
+<br>
+
+Actuators
+
+</div>
+
+<div class="arrow">→</div>
+
+<div class="flowBox">
+
+🏭
+
+<br>
+
+Machine
+
+</div>
+
+</div>
+
+</section>
+
+
+<!-- =====================================================
+FLEXIBLE
+===================================================== -->
+
+<section id="flexible" class="card">
+
+<h2>5. Flexible Automation</h2>
+
+<p>
+
+Flexible automation is designed to manufacture different
+products with minimal manual intervention.
+
+</p>
+
+
+<div class="grid2">
+
+<div class="infoBox">
+
+<h3>Characteristics</h3>
+
+<ul>
+
+<li>High flexibility</li>
+
+<li>Automatic product changeover</li>
+
+<li>Computer-based supervisory control</li>
+
+<li>Robots may be used</li>
+
+<li>Industrial communication</li>
+
+<li>Suitable for high product variety</li>
+
+</ul>
+
+</div>
+
+
+<div class="infoBox">
+
+<h3>Typical Technologies</h3>
+
+<ul>
+
+<li>Industrial robots</li>
+
+<li>PLC</li>
+
+<li>CNC</li>
+
+<li>Machine vision</li>
+
+<li>Industrial Ethernet</li>
+
+<li>SCADA/MES integration</li>
+
+</ul>
+
+</div>
+
+</div>
+
+
+<div class="highlight">
+
+<strong>Example:</strong>
+
+A robotic manufacturing cell can automatically change its
+operation according to the product identification and
+production program.
+
+</div>
+
+
+<img
+class="realImage"
+src="https://commons.wikimedia.org/wiki/Special:FilePath/Industrial_robot.jpg"
+alt="Industrial robot">
+
+<div class="caption">
+
+Real industrial robot used in automated manufacturing.
+
+</div>
+
+</section>
+
+
+<!-- =====================================================
+MAIN ANIMATION
+===================================================== -->
+
+<section id="animation" class="card">
+
+<h2>6. Interactive Automation Animation</h2>
+
+<p>
+
+Select an automation type. Then press START to observe the
+corresponding production operation.
+
+</p>
+
+
+<div class="center">
+
+<button
+class="selectButton selected"
+id="btnFixed"
+onclick="selectAutomation('fixed')">
+
+🏭 FIXED AUTOMATION
+
+</button>
+
+
+<button
+class="selectButton"
+id="btnProgrammable"
+onclick="selectAutomation('programmable')">
+
+🖥️ PROGRAMMABLE AUTOMATION
+
+</button>
+
+
+<button
+class="selectButton"
+id="btnFlexible"
+onclick="selectAutomation('flexible')">
+
+🤖 FLEXIBLE AUTOMATION
+
+</button>
+
+</div>
+
+
+<div class="factory">
+
+<div class="factoryTitle" id="factoryTitle">
+
+FIXED AUTOMATION — DEDICATED PRODUCTION LINE
+
+</div>
+
+
+<div
+class="productionLine"
+style="position:relative;">
+
+<div
+class="machine"
+id="machine1">
+
+<div class="machineIcon">📦</div>
+
+<strong>INPUT</strong>
+
+<small>Material</small>
+
+</div>
+
+
+<div
+class="arrow"
+id="arrow1">
+
+→
+
+</div>
+
+
+<div
+class="machine"
+id="machine2">
+
+<div class="machineIcon">⚙️</div>
+
+<strong>PROCESS</strong>
+
+<small id="processText">
+Fixed operation
+</small>
+
+</div>
+
+
+<div
+class="arrow"
+id="arrow2">
+
+→
+
+</div>
+
+
+<div
+class="machine"
+id="machine3">
+
+<div class="machineIcon">🔍</div>
+
+<strong>INSPECTION</strong>
+
+<small>Quality</small>
+
+</div>
+
+
+<div
+class="arrow"
+id="arrow3">
+
+→
+
+</div>
+
+
+<div
+class="machine"
+id="machine4">
+
+<div class="machineIcon">📦</div>
+
+<strong>OUTPUT</strong>
+
+<small>Product</small>
+
+</div>
+
+
+<div
+class="product"
+id="product">
+
+</div>
+
+</div>
+
+
+<div class="controlPanel">
+
+<button
+class="controlButton start"
+onclick="startFactory()">
+
+▶ START
+
+</button>
+
+
+<button
+class="controlButton stop"
+onclick="stopFactory()">
+
+■ STOP
+
+</button>
+
+
+<button
+class="controlButton reset"
+onclick="resetFactory()">
+
+↻ RESET
+
+</button>
+
+
+<div
+class="highlight"
+id="factoryStatus">
+
+SYSTEM READY
+
+</div>
+
+</div>
+
+</div>
+
+
+<div class="metrics">
+
+<div class="metric">
+
+Production Volume
+
+<div
+class="metricValue"
+id="volume">
+
+HIGH
+
+</div>
+
+</div>
+
+
+<div class="metric">
+
+Product Variety
+
+<div
+class="metricValue"
+id="variety">
+
+LOW
+
+</div>
+
+</div>
+
+
+<div class="metric">
+
+Flexibility
+
+<div
+class="metricValue"
+id="flexibility">
+
+LOW
+
+</div>
+
+</div>
+
+
+<div class="metric">
+
+Controller
+
+<div
+class="metricValue"
+id="controller">
+
+DEDICATED
+
+</div>
+
+</div>
+
+</div>
+
+</section>
+
+
+<!-- =====================================================
+PROGRAMMABLE ANIMATION EXPLANATION
+===================================================== -->
+
+<section class="card">
+
+<h2>7. What Changes in Programmable Automation?</h2>
+
+
+<div class="flow">
+
+<div class="flowBox">
+
+📋
+
+<br>
+
+Production Program
+
+</div>
+
+<div class="arrow active">
+
+→
+
+</div>
+
+<div class="flowBox">
+
+🧠
+
+<br>
+
+PLC / CNC
+
+</div>
+
+<div class="arrow active">
+
+→
+
+</div>
+
+<div class="flowBox">
+
+⚙️
+
+<br>
+
+Machine
+
+</div>
+
+<div class="arrow active">
+
+→
+
+</div>
+
+<div class="flowBox">
+
+📦
+
+<br>
+
+Product
+
+</div>
+
+</div>
+
+
+<div class="highlight">
+
+<strong>Key concept:</strong>
+
+The machine hardware may remain the same, while the
+controller program changes the sequence of operations.
+
+</div>
+
+
+<h3>Example</h3>
+
+<p>
+
+Suppose a PLC controls an automatic drilling machine.
+
+</p>
+
+<p>
+
+<strong>Program 1:</strong>
+
+Drill → Inspect → Remove component
+
+</p>
+
+<p>
+
+<strong>Program 2:</strong>
+
+Drill → Rotate component → Drill second hole → Inspect
+
+</p>
+
+<p>
+
+The PLC program determines the sequence.
+
+</p>
+
+</section>
+
+
+<!-- =====================================================
+FLEXIBLE ANIMATION CONCEPT
+===================================================== -->
+
+<section class="card">
+
+<h2>8. Flexible Automation — Automatic Product Change</h2>
+
+<p>
+
+In flexible automation, the controller can select different
+production programs according to the product.
+
+</p>
+
+
+<div class="factory">
+
+<div class="factoryTitle">
+
+AUTOMATIC PRODUCT IDENTIFICATION AND CHANGEOVER
+
+</div>
+
+
+<div class="flow">
+
+<div class="flowBox">
+
+📦 A
+
+<br>
+
+Product A
+
+</div>
+
+<div class="arrow active">
+
+→
+
+</div>
+
+<div class="flowBox">
+
+📷
+
+<br>
+
+Vision / ID
+
+</div>
+
+<div class="arrow active">
+
+→
+
+</div>
+
+<div class="flowBox">
+
+🧠
+
+<br>
+
+Controller
+
+</div>
+
+<div class="arrow active">
+
+→
+
+</div>
+
+<div class="flowBox">
+
+🤖
+
+<br>
+
+Robot
+
+</div>
+
+<div class="arrow active">
+
+→
+
+</div>
+
+<div class="flowBox">
+
+📦
+
+<br>
+
+Finished
+
+</div>
+
+</div>
+
+
+<div class="center">
+
+<button
+class="controlButton start"
+onclick="changeProduct('A')">
+
+PRODUCT A
+
+</button>
+
+
+<button
+class="controlButton reset"
+onclick="changeProduct('B')">
+
+PRODUCT B
+
+</button>
+
+
+<button
+class="controlButton stop"
+onclick="changeProduct('C')">
+
+PRODUCT C
+
+</button>
+
+</div>
+
+
+<div
+class="highlight center"
+id="productStatus">
+
+Product A selected
+
+</div>
+
+</div>
+
+</section>
+
+
+<!-- =====================================================
+COMPARISON
+===================================================== -->
+
+<section id="comparison" class="card">
+
+<h2>9. Comparison of Automation Types</h2>
+
+
+<table>
+
+<tr>
+
+<th>Parameter</th>
+
+<th>Fixed</th>
+
+<th>Programmable</th>
+
+<th>Flexible</th>
+
+</tr>
+
+
+<tr>
+
+<td>Production volume</td>
+
+<td>Very high</td>
+
+<td>Medium</td>
+
+<td>Medium / high</td>
+
+</tr>
+
+
+<tr>
+
+<td>Product variety</td>
+
+<td>Very low</td>
+
+<td>Medium</td>
+
+<td>High</td>
+
+</tr>
+
+
+<tr>
+
+<td>Flexibility</td>
+
+<td>Low</td>
+
+<td>Medium</td>
+
+<td>High</td>
+
+</tr>
+
+
+<tr>
+
+<td>Changeover</td>
+
+<td>Difficult</td>
+
+<td>Program change</td>
+
+<td>Automatic / rapid</td>
+
+</tr>
+
+
+<tr>
+
+<td>Initial investment</td>
+
+<td>High</td>
+
+<td>Medium / high</td>
+
+<td>High</td>
+
+</tr>
+
+
+<tr>
+
+<td>Control</td>
+
+<td>Dedicated control</td>
+
+<td>PLC / CNC / computer</td>
+
+<td>PLC / computer / robot</td>
+
+</tr>
+
+
+<tr>
+
+<td>Typical application</td>
+
+<td>Mass production</td>
+
+<td>Batch production</td>
+
+<td>High-variety production</td>
+
+</tr>
+
+</table>
+
+</section>
+
+
+<!-- =====================================================
+REAL WORLD DECISION
+===================================================== -->
+
+<section class="card">
+
+<h2>10. How Should an Engineer Select the Automation Type?</h2>
+
+
+<div class="grid3">
+
+<div class="infoBox">
+
+<h3>Step 1</h3>
+
+<p>
+
+Determine production volume.
+
+</p>
+
+</div>
+
+
+<div class="infoBox">
+
+<h3>Step 2</h3>
+
+<p>
+
+Determine number of different products.
+
+</p>
+
+</div>
+
+
+<div class="infoBox">
+
+<h3>Step 3</h3>
+
+<p>
+
+Determine required flexibility.
+
+</p>
+
+</div>
+
+
+</div>
+
+
+<div class="flow">
+
+<div class="flowBox">
+
+Production Volume
+
+</div>
+
+<div class="arrow">+</div>
+
+<div class="flowBox">
+
+Product Variety
+
+</div>
+
+<div class="arrow">+</div>
+
+<div class="flowBox">
+
+Required Flexibility
+
+</div>
+
+<div class="arrow">→</div>
+
+<div class="flowBox">
+
+Automation Selection
+
+</div>
+
+</div>
+
+
+<div class="highlight">
+
+<strong>Engineering principle:</strong>
+
+There is no single "best" automation type. The correct
+choice depends on production volume, product variety,
+changeover requirement, investment, safety, quality and
+operating cost.
+
+</div>
+
+</section>
+
+
+<!-- =====================================================
+NUMERICAL
+===================================================== -->
+
+<section class="card">
+
+<h2>11. Numerical Example</h2>
+
+<h3>Production Rate Comparison</h3>
+
+<p>
+
+A manually operated production line produces 120 units
+in 8 hours.
+
+An automated line produces 360 units in 8 hours.
+
+Determine the increase in production rate.
+
+</p>
+
+
+<div class="highlight">
+
+<strong>Manual production rate:</strong>
+
+<br><br>
+
+Production rate = 120 / 8
+
+<br><br>
+
+= <strong>15 units/hour</strong>
+
+</div>
+
+
+<div class="highlight">
+
+<strong>Automated production rate:</strong>
+
+<br><br>
+
+Production rate = 360 / 8
+
+<br><br>
+
+= <strong>45 units/hour</strong>
+
+</div>
+
+
+<div class="highlight">
+
+<strong>Increase in production rate:</strong>
+
+<br><br>
+
+45 − 15 = <strong>30 units/hour</strong>
+
+<br><br>
+
+Percentage increase:
+
+<br><br>
+
+[(45 − 15) / 15] × 100
+
+<br><br>
+
+= <strong>200%</strong>
+
+</div>
+
+</section>
+
+
+<!-- =====================================================
+APPLICATIONS
+===================================================== -->
+
+<section id="applications" class="card">
+
+<h2>12. Industrial Applications</h2>
+
+
+<table>
+
+<tr>
+
+<th>Automation Type</th>
+
+<th>Application</th>
+
+<th>Reason</th>
+
+</tr>
+
+
+<tr>
+
+<td>Fixed</td>
+
+<td>Automotive transfer line</td>
+
+<td>Very high production volume</td>
+
+</tr>
+
+
+<tr>
+
+<td>Fixed</td>
+
+<td>Bottling line</td>
+
+<td>Repeated operation</td>
+
+</tr>
+
+
+<tr>
+
+<td>Programmable</td>
+
+<td>CNC machining</td>
+
+<td>Different products using programs</td>
+
+</tr>
+
+
+<tr>
+
+<td>Programmable</td>
+
+<td>Batch process</td>
+
+<td>Recipe/program changes</td>
+
+</tr>
+
+
+<tr>
+
+<td>Flexible</td>
+
+<td>Robotic manufacturing cell</td>
+
+<td>Different product types</td>
+
+</tr>
+
+
+<tr>
+
+<td>Flexible</td>
+
+<td>Flexible Manufacturing System</td>
+
+<td>Automatic product changeover</td>
+
+</tr>
+
+</table>
+
+</section>
+
+
+<!-- =====================================================
+IMPORTANT STUDENT CONCEPT
+===================================================== -->
+
+<section class="card">
+
+<h2>13. Important Concept — PLC Is Not the Same as Automation</h2>
+
+<p>
+
+A PLC is a controller used in many industrial automation
+systems. However, automation is a complete system consisting
+of sensors, controllers, actuators, machines and communication.
+
+</p>
+
+
+<div class="flow">
+
+<div class="flowBox">
+
+📡
+
+<br>
+
+Sensors
+
+</div>
+
+<div class="arrow">→</div>
+
+<div class="flowBox">
+
+🧠
+
+<br>
+
+PLC / CNC
+
+</div>
+
+<div class="arrow">→</div>
+
+<div class="flowBox">
+
+⚡
+
+<br>
+
+Drive / Relay
+
+</div>
+
+<div class="arrow">→</div>
+
+<div class="flowBox">
+
+⚙️
+
+<br>
+
+Motor / Valve
+
+</div>
+
+<div class="arrow">→</div>
+
+<div class="flowBox">
+
+🏭
+
+<br>
+
+Process
+
+</div>
+
+</div>
+
+
+<div class="highlight">
+
+Later in this digital book, students will study each part
+individually:
+
+<br><br>
+
+<strong>Unit II → Sensors and Actuators</strong>
+
+<br>
+
+<strong>Unit III → PLC, HMI and SCADA</strong>
+
+<br>
+
+<strong>Unit IV → Industrial Communication and IIoT</strong>
+
+</div>
+
+</section>
+
+
+<!-- =====================================================
+ADVANTAGES
+===================================================== -->
+
+<section class="card">
+
+<h2>14. Advantages and Limitations</h2>
+
+
+<div class="grid3">
+
+<div class="infoBox">
+
+<h3>Fixed Automation</h3>
+
+<strong>Advantages</strong>
+
+<ul>
+
+<li>Very high production</li>
+
+<li>Excellent repeatability</li>
+
+<li>Low unit cost at high volume</li>
+
+</ul>
+
+<strong>Limitations</strong>
+
+<ul>
+
+<li>Low flexibility</li>
+
+<li>Expensive modification</li>
+
+</ul>
+
+</div>
+
+
+<div class="infoBox">
+
+<h3>Programmable Automation</h3>
+
+<strong>Advantages</strong>
+
+<ul>
+
+<li>Program can be changed</li>
+
+<li>Suitable for batches</li>
+
+<li>Good flexibility</li>
+
+</ul>
+
+<strong>Limitations</strong>
+
+<ul>
+
+<li>Changeover time</li>
+
+<li>Programming required</li>
+
+</ul>
+
+</div>
+
+
+<div class="infoBox">
+
+<h3>Flexible Automation</h3>
+
+<strong>Advantages</strong>
+
+<ul>
+
+<li>High product variety</li>
+
+<li>Rapid changeover</li>
+
+<li>Reduced manual intervention</li>
+
+</ul>
+
+<strong>Limitations</strong>
+
+<ul>
+
+<li>High initial cost</li>
+
+<li>Complex control</li>
+
+<li>Skilled maintenance required</li>
+
+</ul>
+
+</div>
+
+</div>
+
+</section>
+
+
+<!-- =====================================================
+SUMMARY
+===================================================== -->
+
+<section class="card">
+
+<h2>15. Chapter Summary</h2>
+
+<ul>
+
+<li>Fixed automation is designed for high-volume, low-variety production.</li>
+
+<li>Programmable automation allows the production sequence to be changed through programs.</li>
+
+<li>Flexible automation can produce different products with minimal manual intervention.</li>
+
+<li>PLC and CNC systems are commonly associated with programmable automation.</li>
+
+<li>Robots, PLCs, machine vision and industrial networks are important technologies in flexible automation.</li>
+
+<li>Production volume and product variety are important factors in selecting an automation system.</li>
+
+<li>Higher flexibility normally requires more sophisticated control and system architecture.</li>
+
+</ul>
+
+
+<div class="highlight">
+
+<strong>One-line memory trick:</strong>
+
+<br><br>
+
+🏭 <strong>Fixed</strong> → Same product, very high volume
+
+<br><br>
+
+🖥️ <strong>Programmable</strong> → Change program for different batches
+
+<br><br>
+
+🤖 <strong>Flexible</strong> → Different products with rapid automatic changeover
+
+</div>
+
+</section>
+
+
+<!-- =====================================================
+QUIZ
+===================================================== -->
+
+<section id="quiz" class="card">
+
+<h2>16. Student Self-Assessment</h2>
+
+
+<div class="quiz">
+
+<strong>
+Q1. Which automation is most suitable for very high-volume production of an identical product?
+</strong>
+
+<button onclick="answer(this,false)">
+A. Flexible automation
+</button>
+
+<button onclick="answer(this,true)">
+B. Fixed automation
+</button>
+
+<button onclick="answer(this,false)">
+C. Manual production
+</button>
+
+<button onclick="answer(this,false)">
+D. Experimental automation
+</button>
+
+</div>
+
+
+<div class="quiz">
+
+<strong>
+Q2. Which automation allows the sequence to be changed by modifying the program?
+</strong>
+
+<button onclick="answer(this,false)">
+A. Fixed automation
+</button>
+
+<button onclick="answer(this,true)">
+B. Programmable automation
+</button>
+
+<button onclick="answer(this,false)">
+C. Mechanical automation only
+</button>
+
+<button onclick="answer(this,false)">
+D. Manual automation
+</button>
+
+</div>
+
+
+<div class="quiz">
+
+<strong>
+Q3. Which automation provides the highest product flexibility?
+</strong>
+
+<button onclick="answer(this,false)">
+A. Fixed
+</button>
+
+<button onclick="answer(this,false)">
+B. Manual
+</button>
+
+<button onclick="answer(this,true)">
+C. Flexible
+</button>
+
+<button onclick="answer(this,false)">
+D. Dedicated
+</button>
+
+</div>
+
+
+<div class="quiz">
+
+<strong>
+Q4. CNC machining is generally associated with which type?
+</strong>
+
+<button onclick="answer(this,false)">
+A. Fixed automation
+</button>
+
+<button onclick="answer(this,true)">
+B. Programmable automation
+</button>
+
+<button onclick="answer(this,false)">
+C. Manual automation
+</button>
+
+<button onclick="answer(this,false)">
+D. No automation
+</button>
+
+</div>
+
+
+<div class="quiz">
+
+<strong>
+Q5. Which factor is important when selecting an automation type?
+</strong>
+
+<button onclick="answer(this,false)">
+A. Product volume only
+</button>
+
+<button onclick="answer(this,false)">
+B. Product variety only
+</button>
+
+<button onclick="answer(this,false)">
+C. Investment only
+</button>
+
+<button onclick="answer(this,true)">
+D. Production volume, variety, flexibility and cost
+</button>
+
+</div>
+
+
+<div
+class="result"
+id="quizResult">
+
+Select your answers.
+
+</div>
+
+</section>
+
+
+<!-- =====================================================
+NEXT CHAPTER
+===================================================== -->
+
+<section class="card">
+
+<h2>17. Next Chapter</h2>
+
+<div class="highlight">
+
+<strong>
+UNIT I — Chapter 4: Benefits and Limitations of Industrial Automation
+</strong>
+
+<br><br>
+
+The next chapter will use an interactive industrial
+production-line animation to explain:
+
+<br><br>
+
+✓ Productivity improvement
+
+<br>
+
+✓ Quality improvement
+
+<br>
+
+✓ Reduced production time
+
+<br>
+
+✓ Improved safety
+
+<br>
+
+✓ Reduced human error
+
+<br>
+
+✓ Energy/resource utilization
+
+<br>
+
+✓ Initial investment
+
+<br>
+
+✓ Maintenance
+
+<br>
+
+✓ Skilled manpower
+
+<br>
+
+✓ Cybersecurity
+
+<br>
+
+✓ Reliability and downtime
+
+<br><br>
+
+It will also include **numerical examples for productivity,
+cycle time, utilization and efficiency**.
+
+</div>
+
+</section>
+
+
+</div>
+
+
+<script>
+
+/* =====================================================
+NAVIGATION
+===================================================== */
+
+function go(id){
+
+    document
+    .getElementById(id)
+    .scrollIntoView({
+        behavior:"smooth"
+    });
+
+}
+
+
+/* =====================================================
+AUTOMATION SELECTION
+===================================================== */
+
+let selectedAutomation="fixed";
+
+let running=false;
+
+let animationTimer=null;
+
+
+function selectAutomation(type){
+
+    selectedAutomation=type;
+
+
+    document
+    .getElementById("btnFixed")
+    .classList.remove("selected");
+
+    document
+    .getElementById("btnProgrammable")
+    .classList.remove("selected");
+
+    document
+    .getElementById("btnFlexible")
+    .classList.remove("selected");
+
+
+    if(type==="fixed"){
+
+        document
+        .getElementById("btnFixed")
+        .classList.add("selected");
+
+        document
+        .getElementById("factoryTitle")
+        .innerText=
+        "FIXED AUTOMATION — DEDICATED PRODUCTION LINE";
+
+
+        document
+        .getElementById("processText")
+        .innerText=
+        "Fixed operation";
+
+
+        setMetrics(
+            "HIGH",
+            "LOW",
+            "LOW",
+            "DEDICATED"
+        );
+
+    }
+
+
+    if(type==="programmable"){
+
+        document
+        .getElementById("btnProgrammable")
+        .classList.add("selected");
+
+        document
+        .getElementById("factoryTitle")
+        .innerText=
+        "PROGRAMMABLE AUTOMATION — PLC / CNC CONTROL";
+
+
+        document
+        .getElementById("processText")
+        .innerText=
+        "Program selected";
+
+
+        setMetrics(
+            "MEDIUM",
+            "MEDIUM",
+            "MEDIUM",
+            "PLC / CNC"
+        );
+
+    }
+
+
+    if(type==="flexible"){
+
+        document
+        .getElementById("btnFlexible")
+        .classList.add("selected");
+
+        document
+        .getElementById("factoryTitle")
+        .innerText=
+        "FLEXIBLE AUTOMATION — ROBOTIC / COMPUTER CONTROL";
+
+
+        document
+        .getElementById("processText")
+        .innerText=
+        "Product-dependent";
+
+
+        setMetrics(
+            "MEDIUM",
+            "HIGH",
+            "HIGH",
+            "PLC + ROBOT"
+        );
+
+    }
+
+
+    resetFactory();
+
+}
+
+
+/* =====================================================
+METRICS
+===================================================== */
+
+function setMetrics(
+    volume,
+    variety,
+    flexibility,
+    controller
+){
+
+    document
+    .getElementById("volume")
+    .innerText=volume;
+
+    document
+    .getElementById("variety")
+    .innerText=variety;
+
+    document
+    .getElementById("flexibility")
+    .innerText=flexibility;
+
+    document
+    .getElementById("controller")
+    .innerText=controller;
+
+}
+
+
+/* =====================================================
+START FACTORY
+===================================================== */
+
+function startFactory(){
+
+    running=true;
+
+
+    document
+    .getElementById("factoryStatus")
+    .innerText=
+    "🟢 PRODUCTION RUNNING — "+
+    selectedAutomation.toUpperCase();
+
+
+    animateMachines();
+
+    animateProduct();
+
+}
+
+
+/* =====================================================
+MACHINE ANIMATION
+===================================================== */
+
+function animateMachines(){
+
+    if(!running){
+
+        return;
+
+    }
+
+
+    let machines=[
+        "machine1",
+        "machine2",
+        "machine3",
+        "machine4"
+    ];
+
+
+    let arrows=[
+        "arrow1",
+        "arrow2",
+        "arrow3"
+    ];
+
+
+    machines.forEach(
+        id => {
+
+            document
+            .getElementById(id)
+            .classList.remove("active");
+
+        }
+    );
+
+
+    arrows.forEach(
+        id => {
+
+            document
+            .getElementById(id)
+            .classList.remove("active");
+
+        }
+    );
+
+
+    setTimeout(function(){
+
+        if(!running)return;
+
+        document
+        .getElementById("machine1")
+        .classList.add("active");
+
+    },100);
+
+
+    setTimeout(function(){
+
+        if(!running)return;
+
+        document
+        .getElementById("arrow1")
+        .classList.add("active");
+
+        document
+        .getElementById("machine2")
+        .classList.add("active");
+
+    },900);
+
+
+    setTimeout(function(){
+
+        if(!running)return;
+
+        document
+        .getElementById("arrow2")
+        .classList.add("active");
+
+        document
+        .getElementById("machine3")
+        .classList.add("active");
+
+    },1800);
+
+
+    setTimeout(function(){
+
+        if(!running)return;
+
+        document
+        .getElementById("arrow3")
+        .classList.add("active");
+
+        document
+        .getElementById("machine4")
+        .classList.add("active");
+
+    },2700);
+
+
+    animationTimer=setTimeout(
+        animateMachines,
+        5000
+    );
+
+}
+
+
+/* =====================================================
+PRODUCT ANIMATION
+===================================================== */
+
+function animateProduct(){
+
+    if(!running){
+
+        return;
+
+    }
+
+
+    let product=
+    document
+    .getElementById("product");
+
+
+    product
+    .classList.remove("animate");
+
+
+    void product.offsetWidth;
+
+
+    product
+    .classList.add("animate");
+
+
+    setTimeout(function(){
+
+        if(running){
+
+            animateProduct();
+
+        }
+
+    },5000);
+
+}
+
+
+/* =====================================================
+STOP
+===================================================== */
+
+function stopFactory(){
+
+    running=false;
+
+
+    clearTimeout(animationTimer);
+
+
+    document
+    .getElementById("factoryStatus")
+    .innerText=
+    "🔴 PRODUCTION STOPPED";
+
+
+    clearMachines();
+
+}
+
+
+/* =====================================================
+RESET
+===================================================== */
+
+function resetFactory(){
+
+    running=false;
+
+
+    clearTimeout(animationTimer);
+
+
+    clearMachines();
+
+
+    document
+    .getElementById("factoryStatus")
+    .innerText=
+    "SYSTEM READY";
+
+}
+
+
+/* =====================================================
+CLEAR MACHINES
+===================================================== */
+
+function clearMachines(){
+
+    let machines=[
+        "machine1",
+        "machine2",
+        "machine3",
+        "machine4"
+    ];
+
+
+    let arrows=[
+        "arrow1",
+        "arrow2",
+        "arrow3"
+    ];
+
+
+    machines.forEach(
+        id => {
+
+            document
+            .getElementById(id)
+            .classList.remove("active");
+
+        }
+    );
+
+
+    arrows.forEach(
+        id => {
+
+            document
+            .getElementById(id)
+            .classList.remove("active");
+
+        }
+    );
+
+
+    document
+    .getElementById("product")
+    .classList.remove("animate");
+
+}
+
+
+/* =====================================================
+FLEXIBLE PRODUCT
+===================================================== */
+
+function changeProduct(product){
+
+    let message="";
+
+
+    if(product==="A"){
+
+        message=
+        "📦 Product A selected → Program A → Robot executes operation A";
+
+    }
+
+
+    if(product==="B"){
+
+        message=
+        "📦 Product B selected → Program B → Robot changes operation automatically";
+
+    }
+
+
+    if(product==="C"){
+
+        message=
+        "📦 Product C selected → Program C → Robot performs another sequence";
+
+    }
+
+
+    document
+    .getElementById("productStatus")
+    .innerText=message;
+
+}
+
+
+/* =====================================================
+QUIZ
+===================================================== */
+
+let score=0;
+
+let answered=0;
+
+
+function answer(button,correct){
+
+    let quiz=
+    button.parentElement;
+
+
+    if(quiz.dataset.answered){
+
+        return;
+
+    }
+
+
+    quiz.dataset.answered="yes";
+
+    answered++;
+
+
+    if(correct){
+
+        button.classList.add("correct");
+
+        score++;
+
+
+        document
+        .getElementById("quizResult")
+        .innerText=
+        "✓ Correct | Score: "+
+        score+
+        " / "+
+        answered;
+
+    }
+
+    else{
+
+        button.classList.add("wrong");
+
+
+        document
+        .getElementById("quizResult")
+        .innerText=
+        "✗ Incorrect | Score: "+
+        score+
+        " / "+
+        answered;
+
+    }
+
+}
+
+</script>
+
+
+</body>
+
+</html>

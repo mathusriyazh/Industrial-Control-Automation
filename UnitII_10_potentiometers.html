@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Chapter 10: Position – Linear and Rotary Potentiometers</title>
+
+<!-- MathJax Configuration and Script -->
+<script>
+  window.MathJax = {
+    tex: {
+      inlineMath: [['$', '$'], ['\\(', '\\)']],
+      displayMath: [['$$', '$$'], ['\\[', '\\]']]
+    }
+  };
+</script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+<style>
+  :root {
+    --bg-dark: #071017;
+    --panel-bg: #0d1f2d;
+    --border-color: #1e3a50;
+    --accent-blue: #38bdf8;
+    --accent-green: #22c55e;
+    --accent-amber: #f59e0b;
+    --text-main: #e2e8f0;
+    --text-muted: #94a3b8;
+  }
+
+  body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: var(--bg-dark);
+    color: var(--text-main);
+    line-height: 1.6;
+    padding: 24px;
+    margin: 0;
+  }
+
+  h1, h2, h3, h4 {
+    color: var(--accent-blue);
+  }
+
+  h1 {
+    border-bottom: 2px solid var(--border-color);
+    padding-bottom: 10px;
+    margin-bottom: 20px;
+  }
+
+  .sensor-card {
+    background-color: var(--panel-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 10px;
+    padding: 24px;
+    margin-bottom: 30px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+  }
+
+  .grid-2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+  }
+
+  @media (max-width: 900px) {
+    .grid-2 { grid-template-columns: 1fr; }
+  }
+
+  .anim-box {
+    background: #040a0f;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 16px;
+    text-align: center;
+  }
+
+  .image-attribution {
+    font-size: 11px;
+    color: var(--text-muted);
+    margin-top: 6px;
+  }
+
+  .image-attribution a {
+    color: var(--accent-blue);
+    text-decoration: none;
+  }
+
+  .img-fluid {
+    max-width: 100%;
+    height: 180px;
+    object-fit: contain;
+    border-radius: 6px;
+    background: #000;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 15px;
+  }
+
+  th, td {
+    border: 1px solid var(--border-color);
+    padding: 10px;
+    text-align: left;
+  }
+
+  th {
+    background-color: #132b3e;
+    color: var(--accent-blue);
+  }
+
+  .numerical-card {
+    background: #0a1824;
+    border-left: 4px solid var(--accent-amber);
+    padding: 18px;
+    margin-bottom: 20px;
+    border-radius: 0 8px 8px 0;
+  }
+
+  .formula {
+    background: #040a0f;
+    padding: 8px 12px;
+    border-radius: 6px;
+    color: #4ade80;
+    overflow-x: auto;
+  }
+</style>
+</head>
+<body>
+
+<h1>Chapter 10: Position – Linear and Rotary Potentiometers</h1>
+<p>This chapter explores resistive feedback position transducers. Topics include operating principles, electrical voltage divider behavior, mechanical construction, industrial applications, loading error analysis, and numerical motor-interfacing problems for both <strong>Linear</strong> and <strong>Rotary Potentiometers</strong>.</p>
+
+<!-- SECTION 1: LINEAR POTENTIOMETER -->
+<div class="sensor-card">
+  <h2>1. Linear Displacement Potentiometer (Pot-Slider)</h2>
+  <div class="grid-2">
+    <div>
+      <h3>Industrial Hardware Image</h3>      
+      <img src="images/linear_pot.jpg" class="img-fluid" alt="Linear Displacement Potentiometer Transducer">
+      </div>
+      <br>
+      <h4>Working Principle</h4>
+      <p>A linear potentiometer converts rectilinear displacement into a proportional electrical voltage. It consists of a uniform resistive element (carbon film, conductive plastic, or wire-wound) of total length $L_T$ and total resistance $R_T$. A sliding contact (wiper) attached to a moving shaft divides the element into two variable resistances. Assuming an ideal high-impedance meter, output voltage $V_{out}$ varies linearly with wiper position $x$:</p>
+      <div class="formula">
+        $$V_{out} = V_{in} \times \left( \frac{x}{L_T} \right)$$
+      </div>
+    </div>
+
+    <div>
+      <h3>Interactive Circuit & Principle Animation</h3>
+      <div class="anim-box">
+        <svg viewBox="0 0 400 200" width="100%" height="180">
+          <!-- Excitation Voltage Terminals -->
+          <text x="20" y="35" fill="#38bdf8" font-size="12">+V_in (DC Reference)</text>
+          <text x="20" y="175" fill="#38bdf8" font-size="12">0V (GND)</text>
+          <line x1="100" y1="30" x2="100" y2="50" stroke="#38bdf8" stroke-width="2"/>
+          <line x1="100" y1="150" x2="100" y2="170" stroke="#38bdf8" stroke-width="2"/>
+
+          <!-- Resistive Element Track -->
+          <rect x="90" y="50" width="20" height="100" fill="#334155" stroke="#94a3b8" stroke-width="2"/>
+          
+          <!-- Animated Wiper & Shaft -->
+          <g>
+            <rect x="110" y="90" width="120" height="8" fill="#cbd5e1" stroke="#475569">
+              <animateTransform attributeName="transform" type="translate" values="0,-35; 0,35; 0,-35" dur="4s" repeatCount="indefinite"/>
+            </rect>
+            <!-- Wiper Contact Point -->
+            <polygon points="90,94 110,88 110,100" fill="#f59e0b">
+              <animateTransform attributeName="transform" type="translate" values="0,-35; 0,35; 0,-35" dur="4s" repeatCount="indefinite"/>
+            </polygon>
+          </g>
+
+          <!-- Voltmeter Terminal -->
+          <line x1="230" y1="94" x2="300" y2="94" stroke="#22c55e" stroke-width="2">
+            <animateTransform attributeName="transform" type="translate" values="0,-35; 0,35; 0,-35" dur="4s" repeatCount="indefinite"/>
+          </line>
+
+          <circle cx="330" cy="94" r="24" fill="#0f172a" stroke="#22c55e" stroke-width="2"/>
+          <text x="318" y="98" fill="#4ade80" font-size="12" font-weight="bold">V_out</text>
+          <text x="240" y="180" fill="#94a3b8" font-size="10">Linear Position Displacement (x)</text>
+        </svg>
+        <p style="font-size:12px; color:#94a3b8;">Rectilinear Wiper Displacement Voltage Divider Principle</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SECTION 2: ROTARY POTENTIOMETER -->
+<div class="sensor-card">
+  <h2>2. Rotary Angular Potentiometer</h2>
+  <div class="grid-2">
+    <div>
+      <h3>Industrial Hardware Image</h3>
+     <img src="images/rotary_pot.jpg" class="img-fluid" alt="Precision Industrial Rotary Potentiometer">
+
+      </div>
+      <br>
+      <h4>Working Principle</h4>
+      <p>Rotary potentiometers measure angular position $\theta$ over a defined electrical travel range $\theta_T$ (typically $270^\circ$ for single-turn, or $3600^\circ$ for 10-turn precision units). The wiper arm rotates around a circular track. The output voltage is directly proportional to shaft rotation angle $\theta$:</p>
+      <div class="formula">
+        $$V_{out} = V_{in} \times \left( \frac{\theta}{\theta_T} \right)$$
+      </div>
+      <p><strong>Loading Error Effect:</strong> When connected to a signal conditioner with input impedance $R_L$, non-linear loading error occurs if $R_L$ is not significantly larger than $R_T$ ($R_L \gg R_T$).</p>
+    </div>
+
+    <div>
+      <h3>Interactive Circuit & Principle Animation</h3>
+      <div class="anim-box">
+        <svg viewBox="0 0 400 200" width="100%" height="180">
+          <!-- Circular Track -->
+          <path d="M 130 150 A 60 60 0 1 1 270 150" fill="none" stroke="#334155" stroke-width="16" stroke-linecap="round"/>
+          <path d="M 130 150 A 60 60 0 1 1 270 150" fill="none" stroke="#38bdf8" stroke-width="2" stroke-dasharray="3"/>
+
+          <!-- Terminals -->
+          <circle cx="130" cy="150" r="5" fill="#f59e0b"/>
+          <circle cx="270" cy="150" r="5" fill="#f59e0b"/>
+          <text x="100" y="170" fill="#38bdf8" font-size="10">Terminal 1 (GND)</text>
+          <text x="250" y="170" fill="#38bdf8" font-size="10">Terminal 3 (+V_in)</text>
+
+          <!-- Rotating Shaft & Wiper -->
+          <g transform="translate(200,110)">
+            <circle cx="0" cy="0" r="16" fill="#475569" stroke="#94a3b8" stroke-width="2"/>
+            <line x1="0" y1="0" x2="-42" y2="35" stroke="#ef4444" stroke-width="4" stroke-linecap="round">
+              <animateTransform attributeName="transform" type="rotate" values="0; 240; 0" dur="5s" repeatCount="indefinite"/>
+            </line>
+            <circle cx="0" cy="0" r="4" fill="#ffffff"/>
+          </g>
+
+          <!-- Output Display -->
+          <rect x="300" y="40" width="80" height="50" fill="#091a24" stroke="#22c55e" rx="4"/>
+          <text x="312" y="60" fill="#4ade80" font-size="10">ANGLE (θ)</text>
+
+          <text x="320" y="80" fill="#38bdf8" font-size="14" font-weight="bold">
+            <animate attributeName="opacity" values="1;0.5;1" dur="1s" repeatCount="indefinite"/>V_out
+          </text>
+        </svg>
+        <p style="font-size:12px; color:#94a3b8;">Circular Track Wiper Rotation & Voltage Division</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SECTION 3: COMPARISON & SPECIFICATIONS -->
+<div class="sensor-card">
+  <h2>Practical Applications, Advantages & Disadvantages</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>Potentiometer Type</th>
+        <th>Key Applications</th>
+        <th>Advantages</th>
+        <th>Disadvantages</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>Linear Potentiometer</strong></td>
+        <td>Hydraulic cylinder stroke position feedback, CNC slide tables, injection molding machine stroke, valve positioners.</td>
+        <td>Direct absolute position sensing; no complex decoding electronics required; low cost; simple DC voltage readout.</td>
+        <td>Mechanical wiper friction causes physical wear over time; limited speed capability; vulnerable to dust and vibration noise.</td>
+      </tr>
+      <tr>
+        <td><strong>Rotary Potentiometer</strong></td>
+        <td>RC servo motor position feedback, robot joint angle sensing, throttle position sensors (TPS), crane boom angle detection.</td>
+        <td>Wide angular range options (single-turn vs multi-turn); absolute position memory upon power cycle; high reliability (conductive plastic tracks).</td>
+        <td>Mechanical stop limits; loading error occurs when driving low-impedance loads; wiping noise at high RPM.</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- SECTION 4: NUMERICAL PROBLEMS WITH MOTOR INTERFACING -->
+<div class="sensor-card">
+  <h2>Numerical Problems: Sensor Interfacing & Motor Control</h2>
+
+  <!-- Problem 1: PMDC Motor with Linear Pot -->
+  <div class="numerical-card">
+    <h3>Problem 1: Linear Potentiometer Interfaced with PMDC Linear Actuator</h3>
+    <p><strong>Scenario:</strong> A PMDC motor drives a lead screw linear actuator with a stroke length $L_T = 250\text{ mm}$. A linear potentiometer of total resistance $R_T = 10\text{ k}\Omega$ is mounted parallel to the actuator stroke. The potentiometer is energized with a regulated excitation voltage $V_{in} = 10.0\text{ V DC}$. The output signal is connected to an ADC with an input resistance $R_L = 100\text{ k}\Omega$. When the motor moves the shaft to $x = 100\text{ mm}$, calculate:</p>
+    <ol type="a">
+      <li>The ideal output voltage ($V_{ideal}$) ignoring loading effect.</li>
+      <li>The actual loaded output voltage ($V_{loaded}$) and the resulting percentage loading error.</li>
+    </ol>
+
+    <h4>Step-by-Step Solution:</h4>
+    <p><strong>1. Ideal Voltage Calculation ($V_{ideal}$):</strong></p>
+    <div class="formula">
+      $$V_{\text{ideal}} = V_{\text{in}} \times \left( \frac{x}{L_T} \right) = 10.0 \times \left( \frac{100}{250} \right) = 4.000 \text{ V}$$
+    </div>
+
+    <p><strong>2. Equivalent Resistance Network:</strong> Resistance from GND to wiper is $R_1$, and top segment is $R_2$:</p>
+    <div class="formula">
+      $$R_1 = R_T \times \left( \frac{x}{L_T} \right) = 10\text{ k}\Omega \times 0.40 = 4\text{ k}\Omega$$
+    </div>
+    <div class="formula">
+      $$R_2 = R_T - R_1 = 10\text{ k}\Omega - 4\text{ k}\Omega = 6\text{ k}\Omega$$
+    </div>
+
+    <p><strong>3. Parallel Combination with Load ($R_p$):</strong></p>
+    <div class="formula">
+      $$R_p = \frac{R_1 \times R_L}{R_1 + R_L} = \frac{4 \times 100}{4 + 100} = \frac{400}{104} = 3.846\text{ k}\Omega$$
+    </div>
+
+    <p><strong>4. Actual Loaded Output Voltage ($V_{loaded}$):</strong></p>
+    <div class="formula">
+      $$V_{\text{loaded}} = V_{\text{in}} \times \left( \frac{R_p}{R_2 + R_p} \right) = 10.0 \times \left( \frac{3.846}{6 + 3.846} \right) = 3.906\text{ V}$$
+    </div>
+
+    <p><strong>5. Percentage Loading Error:</strong></p>
+    <div class="formula">
+      $$\text{Loading Error (\%)} = \frac{V_{\text{loaded}} - V_{\text{ideal}}}{V_{\text{ideal}}} \times 100 = \frac{3.906 - 4.000}{4.000} \times 100 = -2.35\%$$
+    </div>
+  </div>
+
+  <!-- Problem 2: Servo Motor with Rotary Pot -->
+  <div class="numerical-card">
+    <h3>Problem 2: Rotary Potentiometer in DC Servo Motor Closed-Loop Position Control</h3>
+    <p><strong>Scenario:</strong> A 10-turn continuous precision rotary potentiometer ($3600^\circ$ total electrical angle, $R_T = 5\text{ k}\Omega$) acts as position feedback for an industrial DC Servo Motor arm. The excitation voltage is $V_{in} = 5.0\text{ V}$. The output drives a 12-bit Analog-to-Digital Converter (ADC) operating over a $0\text{ to }5\text{ V}$ input range.</p>
+
+    <ol type="a">
+      <li>Calculate the potentiometer sensitivity $K_p$ in $\text{mV/degree}$.</li>
+      <li>Determine the minimum detectable angular change ($\Delta\theta_{min}$) corresponding to $1\text{ LSB}$ of the 12-bit ADC.</li>
+      <li>If the servo shaft rotates at $\omega = 45\text{ RPM}$, calculate the rate of change of output voltage ($dV_{out}/dt$).</li>
+    </ol>
+
+    <h4>Step-by-Step Solution:</h4>
+    <p><strong>1. Potentiometer Sensitivity ($K_p$):</strong></p>
+    <div class="formula">
+      $$K_p = \frac{V_{\text{in}}}{\theta_T} = \frac{5.0\text{ V}}{3600^\circ} = 0.0013888\text{ V/deg} = 1.389\text{ mV/deg}$$
+    </div>
+
+    <p><strong>2. ADC Voltage Resolution per LSB ($V_{LSB}$):</strong> For a 12-bit ADC ($2^{12} = 4096$ levels):</p>
+    <div class="formula">
+      $$V_{LSB} = \frac{V_{\text{ref}}}{2^n} = \frac{5.0\text{ V}}{4096} = 0.0012207\text{ V} = 1.221\text{ mV}$$
+    </div>
+
+    <p><strong>3. Minimum Detectable Angular Change ($\Delta\theta_{min}$):</strong></p>
+    <div class="formula">
+      $$\Delta\theta_{min} = \frac{V_{LSB}}{K_p} = \frac{1.2207\text{ mV}}{1.3888\text{ mV/deg}} = 0.879^\circ$$
+    </div>
+
+    <p><strong>4. Rate of Output Voltage Change ($dV_{out}/dt$):</strong> Convert speed $\omega$ to degrees per second ($\text{deg/s}$):</p>
+    <div class="formula">
+      $$\frac{d\theta}{dt} = 45\text{ RPM} \times \left( \frac{360^\circ}{60\text{ s}} \right) = 270\text{ deg/s}$$
+    </div>
+    <div class="formula">
+      $$\frac{dV_{out}}{dt} = K_p \times \frac{d\theta}{dt} = 0.0013888\text{ V/deg} \times 270\text{ deg/s} = 0.375\text{ V/s}$$
+    </div>
+  </div>
+
+  <!-- Problem 3: BLDC Motor Arm -->
+  <div class="numerical-card">
+    <h3>Problem 3: BLDC Motor Robotic Arm Joint Interfacing</h3>
+    <p><strong>Scenario:</strong> A BLDC motor drives a robotic joint through a $100:1$ harmonic gear reducer. A single-turn rotary potentiometer ($\theta_T = 300^\circ$, $V_{in} = 10\text{ V}$) is mounted directly on the output arm to measure actual joint angle $\theta_{arm}$. The BLDC motor rotates at $N_m = 1500\text{ RPM}$.</p>
+    <ol type="a">
+      <li>Calculate the output arm speed in degrees per second ($\text{deg/s}$).</li>
+      <li>Calculate the time required for the potentiometer output voltage to ramp from $1.5\text{ V}$ to $6.5\text{ V}$.</li>
+    </ol>
+
+    <h4>Step-by-Step Solution:</h4>
+    <p><strong>1. Arm Rotational Speed ($N_{arm}$):</strong></p>
+    <div class="formula">
+      $$N_{arm} = \frac{N_m}{GR} = \frac{1500}{100} = 15\text{ RPM}$$
+    </div>
+
+    <p><strong>2. Arm Angular Velocity ($\omega_{arm}$ in deg/s):</strong></p>
+    <div class="formula">
+      $$\omega_{arm} = 15\text{ RPM} \times \left( \frac{360^\circ}{60\text{ s}} \right) = 90\text{ deg/s}$$
+    </div>
+
+    <p><strong>3. Angular Displacement ($\Delta\theta$) for Given Voltage Change:</strong></p>
+    <div class="formula">
+      $$\Delta V = 6.5\text{ V} - 1.5\text{ V} = 5.0\text{ V}$$
+    </div>
+    <div class="formula">
+      $$\Delta\theta = \theta_T \times \left( \frac{\Delta V}{V_{\text{in}}} \right) = 300^\circ \times \left( \frac{5.0}{10.0} \right) = 150^\circ$$
+    </div>
+
+    <p><strong>4. Time Required ($t$):</strong></p>
+    <div class="formula">
+      $$t = \frac{\Delta\theta}{\omega_{arm}} = \frac{150^\circ}{90\text{ deg/s}} = 1.667\text{ seconds}$$
+    </div>
+  </div>
+
+  <!-- Problem 4: Stepper Motor Lead Screw -->
+  <div class="numerical-card">
+    <h3>Problem 4: Stepper Motor Driven Table Calibration using Linear Potentiometer</h3>
+    <p><strong>Scenario:</strong> A microstepping stepper motor ($1.8^\circ/\text{step}$, operated at 8 microsteps/step) drives a precision slide table via a lead screw with pitch $P = 4\text{ mm/rev}$. A linear potentiometer ($L_T = 200\text{ mm}$, $V_{in} = 5\text{ V}$) provides position verification. If the controller outputs a pulse train of $f = 3.2\text{ kHz}$ to the drive, calculate the change in potentiometer output voltage per millisecond ($\Delta V/\Delta t$).</p>
+
+    <h4>Step-by-Step Solution:</h4>
+    <p><strong>1. Total Microsteps per Revolution ($N_{micro}$):</strong></p>
+    <div class="formula">
+      $$N_{micro} = \left( \frac{360^\circ}{1.8^\circ} \right) \times 8 = 200 \times 8 = 1600\text{ microsteps/rev}$$
+    </div>
+
+    <p><strong>2. Linear Speed of Slide Table ($v$):</strong></p>
+    <div class="formula">
+      $$n_{rev} = \frac{f}{N_{micro}} = \frac{3200\text{ pulses/s}}{1600\text{ pulses/rev}} = 2\text{ rev/s}$$
+    </div>
+    <div class="formula">
+      $$v = n_{rev} \times P = 2\text{ rev/s} \times 4\text{ mm/rev} = 8\text{ mm/s}$$
+    </div>
+
+    <p><strong>3. Linear Sensitivity of Potentiometer ($K_L$):</strong></p>
+    <div class="formula">
+      $$K_L = \frac{V_{\text{in}}}{L_T} = \frac{5\text{ V}}{200\text{ mm}} = 0.025\text{ V/mm}$$
+    </div>
+
+    <p><strong>4. Voltage Change Rate per Millisecond ($\Delta V / \Delta t$):</strong></p>
+    <div class="formula">
+      $$\frac{\Delta V}{\Delta t} = K_L \times v = 0.025\text{ V/mm} \times 8\text{ mm/s} = 0.20\text{ V/s} = 0.20\text{ mV/ms}$$
+    </div>
+  </div>
+
+  <!-- Problem 5: AC Induction Motor Valve Positioner -->
+  <div class="numerical-card">
+    <h3>Problem 5: AC Induction Motor Motorized Valve Position Feedback</h3>
+    <p><strong>Scenario:</strong> A 3-phase, 4-pole, $60\text{ Hz}$ AC Induction Motor drives a motorized flow control valve gear mechanism. The motor runs at a rated slip $s = 5\%$. The reduction gearbox has a ratio of $GR = 180:1$. The output gear turns a rotary potentiometer ($\theta_T = 270^\circ$, $V_{in} = 10\text{ V}$) over its full scale to open the valve completely from $0^\circ$ to $90^\circ$. Calculate the time taken to fully open the valve and the corresponding potentiometer output voltage change.</p>
+
+    <h4>Step-by-Step Solution:</h4>
+    <p><strong>1. Synchronous Speed ($N_s$) & Rotor Speed ($N_r$):</strong></p>
+    <div class="formula">
+      $$N_s = \frac{120 \times f}{P} = \frac{120 \times 60}{4} = 1800\text{ RPM}$$
+    </div>
+    <div class="formula">
+      $$N_r = N_s \times (1 - s) = 1800 \times (1 - 0.05) = 1710\text{ RPM}$$
+    </div>
+
+    <p><strong>2. Gearbox Output Speed ($N_{valve}$):</strong></p>
+    <div class="formula">
+      $$N_{valve} = \frac{N_r}{GR} = \frac{1710}{180} = 9.5\text{ RPM}$$
+    </div>
+
+    <p><strong>3. Angular Speed of Valve ($\omega_{valve}$ in deg/s):</strong></p>
+    <div class="formula">
+      $$\omega_{valve} = 9.5\text{ RPM} \times \left( \frac{360^\circ}{60\text{ s}} \right) = 57\text{ deg/s}$$
+    </div>
+
+    <p><strong>4. Time to Open Valve from $0^\circ$ to $90^\circ$ ($t_{open}$):</strong></p>
+    <div class="formula">
+      $$t_{open} = \frac{90^\circ}{57\text{ deg/s}} = 1.579\text{ seconds}$$
+    </div>
+
+    <p><strong>5. Potentiometer Output Voltage Change ($\Delta V_{out}$):</strong></p>
+    <div class="formula">
+      $$\Delta V_{out} = V_{\text{in}} \times \left( \frac{\Delta\theta}{\theta_T} \right) = 10.0 \times \left( \frac{90^\circ}{270^\circ} \right) = 3.333\text{ V}$$
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

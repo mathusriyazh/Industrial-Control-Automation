@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Chapter 16: Pressure Sensing – Strain Gauge Transducer</title>
+
+<!-- MathJax Configuration and Script -->
+<script>
+  window.MathJax = {
+    tex: {
+      inlineMath: [['$', '$'], ['\\(', '\\)']],
+      displayMath: [['$$', '$$'], ['\\[', '\\]']]
+    }
+  };
+</script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+<style>
+  :root {
+    --bg-dark: #071017;
+    --panel-bg: #0d1f2d;
+    --border-color: #1e3a50;
+    --accent-blue: #38bdf8;
+    --accent-green: #22c55e;
+    --accent-amber: #f59e0b;
+    --text-main: #e2e8f0;
+    --text-muted: #94a3b8;
+  }
+
+  body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: var(--bg-dark);
+    color: var(--text-main);
+    line-height: 1.6;
+    padding: 24px;
+    margin: 0;
+  }
+
+  h1, h2, h3, h4 {
+    color: var(--accent-blue);
+  }
+
+  h1 {
+    border-bottom: 2px solid var(--border-color);
+    padding-bottom: 10px;
+    margin-bottom: 20px;
+  }
+
+  .sensor-card {
+    background-color: var(--panel-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 10px;
+    padding: 24px;
+    margin-bottom: 30px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+  }
+
+  .grid-2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+  }
+
+  @media (max-width: 900px) {
+    .grid-2 { grid-template-columns: 1fr; }
+  }
+
+  .anim-box {
+    background: #040a0f;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 16px;
+    text-align: center;
+  }
+
+  .img-fluid {
+    max-width: 100%;
+    height: 180px;
+    object-fit: contain;
+    border-radius: 6px;
+    background: #040a0f;
+    padding: 10px;
+    border: 1px solid var(--border-color);
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 15px;
+  }
+
+  th, td {
+    border: 1px solid var(--border-color);
+    padding: 10px;
+    text-align: left;
+  }
+
+  th {
+    background-color: #132b3e;
+    color: var(--accent-blue);
+  }
+
+  .numerical-card {
+    background: #0a1824;
+    border-left: 4px solid var(--accent-amber);
+    padding: 18px;
+    margin-bottom: 20px;
+    border-radius: 0 8px 8px 0;
+  }
+
+  .formula {
+    background: #040a0f;
+    padding: 8px 12px;
+    border-radius: 6px;
+    color: #4ade80;
+    overflow-x: auto;
+    margin: 8px 0;
+  }
+</style>
+</head>
+<body>
+
+<h1>Chapter 16: Pressure Measurement Transducers & Strain Gauges</h1>
+<p>This chapter explores industrial fluid pressure measurement, diaphragm mechanical deflection, piezoresistive strain gauge sensors, Gauge Factors (GF), full-bridge Wheatstone signal conditioning, and temperature compensation techniques.</p>
+
+<!-- SECTION 1: STRAIN GAUGE PRESSURE SENSOR -->
+<div class="sensor-card">
+  <h2>1. Piezoresistive Strain Gauge Pressure Transducer</h2>
+  <div class="grid-2">
+    <div>
+      <h3>Industrial Hardware Image</h3>
+      <img src="images/pressure.jpg" class="img-fluid" alt="Industrial Strain Gauge Pressure Transducer">
+      <br>
+      <h4>Working Principle</h4>
+      <p>A strain gauge pressure transducer converts applied fluid pressure into a proportional electrical signal. When pressurized media contacts the elastic isolation diaphragm, the diaphragm deforms physically. Foil or semiconductor strain gauges bonded to the reverse side of the diaphragm experience fractional dimensional change ($\Delta L / L$).</p>
+
+      <p>The mechanical deformation alters the strain gauge resistance according to its fundamental sensitivity characteristic, known as the <strong>Gauge Factor ($GF$)</strong>:</p>
+      <div class="formula">
+        $$GF = \frac{\Delta R / R_0}{\Delta L / L} = \frac{\Delta R / R_0}{\varepsilon}$$
+      </div>
+      <p>Where $R_0$ is the nominal unstrained resistance (typically $120\ \Omega$ or $350\ \Omega$), $\Delta R$ is the resistance change, $\varepsilon$ is mechanical strain ($\text{m/m}$ or $\mu\varepsilon$), and Poisson's ratio plus piezoresistive effects define $GF$ (typically $GF \approx 2.0$ for metallic foil and $GF \approx 100-150$ for semiconductor gauges).</p>
+    </div>
+
+    <div>
+      <h3>Interactive Diaphragm Deflection Animation</h3>
+      <div class="anim-box">
+        <svg viewBox="0 0 400 200" width="100%" height="180">
+          <!-- Outer Housing -->
+          <rect x="20" y="20" width="360" height="160" fill="#091a24" stroke="#1e3a50" stroke-width="2" rx="6"/>
+          
+          <!-- Pressure Inlet Port -->
+          <path d="M 50 180 L 50 140 L 90 140 L 90 180" fill="#132b3e" stroke="#38bdf8" stroke-width="2"/>
+          <text x="55" y="165" fill="#38bdf8" font-size="9" font-weight="bold">PRESSURE INLET</text>
+          
+          <!-- Fluid Arrows (Pulsing) -->
+          <path d="M 70 175 L 70 145" stroke="#ef4444" stroke-width="3" marker-end="url(#arrow)">
+            <animate attributeName="opacity" values="0.2;1;0.2" dur="1.2s" repeatCount="indefinite"/>
+          </path>
+          
+          <!-- Flexible Diaphragm (Deflecting curve animation) -->
+          <path d="M 120 40 Q 120 100 120 160" fill="none" stroke="#22c55e" stroke-width="4">
+            <animate attributeName="d" 
+                     values="M 120 40 Q 120 100 120 160; 
+                             M 120 40 Q 145 100 120 160; 
+                             M 120 40 Q 120 100 120 160" 
+                     dur="2s" repeatCount="indefinite"/>
+          </path>
+          
+          <!-- Bonded Strain Gauges -->
+          <rect x="126" y="65" width="8" height="25" fill="#f59e0b" rx="2"/>
+          <text x="140" y="80" fill="#f59e0b" font-size="9">Tension (R1)</text>
+
+          <rect x="126" y="110" width="8" height="25" fill="#38bdf8" rx="2"/>
+          <text x="140" y="125" fill="#38bdf8" font-size="9">Compression (R2)</text>
+          
+          <!-- Full-Bridge Output Block -->
+          <rect x="250" y="60" width="110" height="80" fill="#040a0f" stroke="#22c55e" stroke-width="2" rx="4"/>
+          <text x="260" y="85" fill="#22c55e" font-size="10" font-weight="bold">Wheatstone Bridge</text>
+          <text x="260" y="105" fill="#4ade80" font-size="12" font-weight="bold">Vout ∝ ΔP</text>
+          <text x="260" y="125" fill="#94a3b8" font-size="8">4-Arm Active Sensing</text>
+
+          <!-- Marker Definition -->
+          <defs>
+            <marker id="arrow" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+              <path d="M 0 0 L 10 5 L 0 10 z" fill="#ef4444"/>
+            </marker>
+          </defs>
+        </svg>
+        <p style="font-size:12px; color:#94a3b8;">Diaphragm Deformation under Fluid Pressure and Wheatstone Bridge Conversion</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SECTION 2: WHEATSTONE BRIDGE TOPOLOGY -->
+<div class="sensor-card">
+  <h2>2. Signal Conditioning: Wheatstone Bridge Configurations</h2>
+  <div class="grid-2">
+    <div>
+      <h3>Bridge Circuit Topologies</h3>
+      <p>Because resistance changes in metallic foil strain gauges are extremely small ($\Delta R \ll 1\ \Omega$), bridge circuits are required to convert resistance variation into a measurable millivolt voltage signal.</p>
+
+      <p>For a **Full-Bridge** arrangement (two arms in tension $+ \varepsilon$, two arms in compression $- \varepsilon$), the output signal is maximized and naturally temperature-compensated:</p>
+      <div class="formula">
+        $$V_{OUT} = V_S \times \left( \frac{\Delta R}{R_0} \right) = V_S \times GF \times \varepsilon$$
+      </div>
+      <p>Where $V_S$ is the bridge excitation voltage, $GF$ is the gauge factor, and $\varepsilon$ is the strain induced by fluid pressure.</p>
+    </div>
+
+    <div>
+      <h3>Quarter, Half, vs Full Bridge Comparison</h3>
+      <div class="anim-box">
+        <svg viewBox="0 0 400 200" width="100%" height="180">
+          <!-- Wheatstone Diamond -->
+          <polygon points="200,30 280,100 200,170 120,100" fill="none" stroke="#38bdf8" stroke-width="2"/>
+          
+          <!-- Resistors -->
+          <circle cx="160" cy="65" r="10" fill="#f59e0b"/>
+          <text x="145" y="45" fill="#f59e0b" font-size="9">R1 (+ε)</text>
+
+          <circle cx="240" cy="65" r="10" fill="#38bdf8"/>
+          <text x="245" y="45" fill="#38bdf8" font-size="9">R2 (-ε)</text>
+
+          <circle cx="240" cy="135" r="10" fill="#f59e0b"/>
+          <text x="245" y="155" fill="#f59e0b" font-size="9">R3 (+ε)</text>
+
+          <circle cx="160" cy="135" r="10" fill="#38bdf8"/>
+          <text x="145" y="155" fill="#38bdf8" font-size="9">R4 (-ε)</text>
+          
+          <!-- Terminals -->
+          <text x="195" y="22" fill="#ef4444" font-size="10" font-weight="bold">+Vs</text>
+          <text x="195" y="190" fill="#94a3b8" font-size="10" font-weight="bold">GND</text>
+          <text x="95" y="104" fill="#22c55e" font-size="10" font-weight="bold">-Vout</text>
+          <text x="290" y="104" fill="#22c55e" font-size="10" font-weight="bold">+Vout</text>
+        </svg>
+        <p style="font-size:12px; color:#94a3b8;">4-Active Element Full-Bridge Configuration for Max Sensitivity & Temp Immunity</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SECTION 3: COMPARISON TABLE -->
+<div class="sensor-card">
+  <h2>Comparative Analysis: Pressure Sensor Technologies</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>Parameter / Feature</th>
+        <th>Piezoresistive Strain Gauge</th>
+        <th>Capacitive Pressure Sensor</th>
+        <th>Piezoelectric Transducer</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>Operating Mechanism</strong></td>
+        <td>Diaphragm deflection alters foil/silicon resistance.</td>
+        <td>Diaphragm deflection alters gap capacitance ($C = \frac{\varepsilon A}{d}$).</td>
+        <td>Dynamic force generates surface charge in quartz/ceramics.</td>
+      </tr>
+      <tr>
+        <td><strong>Measurement Type</strong></td>
+        <td>Static & Slow Dynamic Pressure.</td>
+        <td>Static & Precision Low-Pressure.</td>
+        <td><strong>Dynamic Pressure Only</strong> (Transient/Impact).</td>
+      </tr>
+      <tr>
+        <td><strong>Sensitivity</strong></td>
+        <td>Moderate (Foil) to High (Semiconductor).</td>
+        <td><strong>Very High</strong> (Ideal for low differential pressure).</td>
+        <td>High for high-frequency impulses.</td>
+      </tr>
+      <tr>
+        <td><strong>Temperature Drift</strong></td>
+        <td>Requires full-bridge temperature compensation.</td>
+        <td>Low temperature drift.</td>
+        <td>Pyroelectric sensitivity requires filtering.</td>
+      </tr>
+      <tr>
+        <td><strong>Typical Applications</strong></td>
+        <td>Hydraulic lines, industrial automation, process lines.</td>
+        <td>HVAC air ducts, cleanroom differential pressure, barometers.</td>
+        <td>Engine combustion chambers, blast pressure, vibration.</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- SECTION 4: NUMERICAL PROBLEMS -->
+<div class="sensor-card">
+  <h2>Numerical Problems: Strain Gauge & Pressure Calculations</h2>
+
+  <!-- Problem 1: Resistance Change & Strain Gauge Factor -->
+  <div class="numerical-card">
+    <h3>Problem 1: Gauge Factor and Resistance Shift Calculation</h3>
+    <p><strong>Scenario:</strong> A metallic foil strain gauge with an unstrained nominal resistance $R_0 = 120.0\ \Omega$ and a Gauge Factor $GF = 2.05$ is bonded to a diaphragm. When a hydraulic fluid pressure of $10\text{ bar}$ is applied, the diaphragm undergoes a tensile axial strain of $\varepsilon = 800\ \mu\varepsilon$ ($800 \times 10^{-6}\text{ m/m}$). Calculate:</p>
+    <ol type="a">
+      <li>The fractional resistance change $\Delta R / R_0$.</li>
+      <li>The absolute resistance change $\Delta R$ in ohms ($\Omega$).</li>
+      <li>The strained gauge resistance $R_{\text{strained}}$.</li>
+    </ol>
+
+    <h4>Step-by-Step Solution:</h4>
+    <p><strong>1. Calculate Fractional Resistance Change ($\Delta R / R_0$):</strong></p>
+    <div class="formula">
+      $$GF = \frac{\Delta R / R_0}{\varepsilon} \implies \frac{\Delta R}{R_0} = GF \times \varepsilon$$
+    </div>
+    <div class="formula">
+      $$\frac{\Delta R}{R_0} = 2.05 \times (800 \times 10^{-6}) = 1.64 \times 10^{-3} = 0.00164$$
+    </div>
+
+    <p><strong>2. Calculate Absolute Resistance Change ($\Delta R$):</strong></p>
+    <div class="formula">
+      $$\Delta R = R_0 \times 0.00164 = 120.0\ \Omega \times 0.00164 = 0.1968\ \Omega$$
+    </div>
+
+    <p><strong>3. Calculate Strained Gauge Resistance ($R_{\text{strained}}$):</strong></p>
+    <div class="formula">
+      $$R_{\text{strained}} = R_0 + \Delta R = 120.0\ \Omega + 0.1968\ \Omega = 120.1968\ \Omega$$
+    </div>
+  </div>
+
+  <!-- Problem 2: Full Wheatstone Bridge Output Voltage -->
+  <div class="numerical-card">
+    <h3>Problem 2: Full-Bridge Strain Gauge Pressure Sensor Voltage Signal</h3>
+    <p><strong>Scenario:</strong> A pressure sensor incorporates a 4-active arm full-bridge strain gauge layout bonded to a stainless steel diaphragm ($R_1 = R_3 = R_0 + \Delta R$ in tension, $R_2 = R_4 = R_0 - \Delta R$ in compression). The nominal gauge resistance is $350\ \Omega$, $GF = 2.0$, and the bridge is excited with $V_S = 10.0\text{ V DC}$. Full-scale pressure induces a strain magnitude $|\varepsilon| = 1200\ \mu\varepsilon$. Calculate:</p>
+    <ol type="a">
+      <li>The full-scale output voltage $V_{OUT}$ of the bridge circuit.</li>
+      <li>The pressure sensor sensitivity rating in $\text{mV/V}$.</li>
+    </ol>
+
+    <h4>Step-by-Step Solution:</h4>
+    <p><strong>1. Calculate Full-Bridge Output Voltage ($V_{OUT}$):</strong></p>
+    <div class="formula">
+      $$V_{OUT} = V_S \times GF \times \varepsilon$$
+    </div>
+    <div class="formula">
+      $$V_{OUT} = 10.0\text{ V} \times 2.0 \times (1200 \times 10^{-6}) = 10.0 \times 0.0024 = 0.024\text{ V} = 24.0\text{ mV}$$
+    </div>
+
+    <p><strong>2. Calculate Sensitivity Rating ($\text{mV/V}$):</strong></p>
+    <div class="formula">
+      $$\text{Sensitivity} = \frac{V_{OUT}}{V_S} = \frac{24.0\text{ mV}}{10.0\text{ V}} = 2.40\text{ mV/V}$$
+    </div>
+  </div>
+
+  <!-- Problem 3: Diaphragm Stress & Strain Derivation -->
+  <div class="numerical-card">
+    <h3>Problem 3: Mechanical Diaphragm Stress to Strain Conversion</h3>
+    <p><strong>Scenario:</strong> A circular flat diaphragm pressure sensor element made of stainless steel ($E = 200\text{ GPa} = 200 \times 10^9\text{ N/m}^2$, Poisson's ratio $\nu = 0.3$) experiences a tangential surface stress $\sigma = 150\text{ MPa}$ ($150 \times 10^6\text{ N/m}^2$) under peak working pressure. Calculate the induced mechanical strain $\varepsilon$ and the resulting output of a semiconductor strain gauge with $GF = 110$ excited at $V_S = 5\text{ V}$ in a quarter-bridge configuration.</p>
+
+    <h4>Step-by-Step Solution:</h4>
+    <p><strong>1. Calculate Induced Strain ($\varepsilon$):</strong> Using Hooke's Law ($\sigma = E \cdot \varepsilon$):</p>
+    <div class="formula">
+      $$\varepsilon = \frac{\sigma}{E} = \frac{150 \times 10^6\text{ N/m}^2}{200 \times 10^9\text{ N/m}^2} = 7.5 \times 10^{-4} = 750\ \mu\varepsilon$$
+    </div>
+
+    <p><strong>2. Calculate Quarter-Bridge Output Voltage ($V_{OUT}$):</strong> For a quarter-bridge layout ($V_{OUT} \approx \frac{1}{4} V_S \cdot GF \cdot \varepsilon$):</p>
+    <div class="formula">
+      $$V_{OUT} = \frac{1}{4} \times 5.0\text{ V} \times 110 \times (750 \times 10^{-6})$$
+    </div>
+    <div class="formula">
+      $$V_{OUT} = 1.25 \times 110 \times 0.00075 = 0.103125\text{ V} = 103.13\text{ mV}$$
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

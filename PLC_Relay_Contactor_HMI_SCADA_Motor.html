@@ -1,0 +1,1979 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+
+<title>PLC + Relay + Contactor + HMI + SCADA + Motor Virtual Laboratory</title>
+
+<style>
+
+*{
+    box-sizing:border-box;
+}
+
+body{
+    margin:0;
+    font-family:Arial,Helvetica,sans-serif;
+    background:#071018;
+    color:#e8f5fa;
+}
+
+header{
+    background:#102a3b;
+    border-bottom:2px solid #2783a8;
+    padding:15px 22px;
+    display:flex;
+    align-items:center;
+}
+
+header h1{
+    margin:0;
+    font-size:22px;
+}
+
+.status{
+    margin-left:auto;
+    padding:9px 20px;
+    border-radius:5px;
+    background:#555;
+    font-weight:bold;
+}
+
+.status.run{
+    background:#15803d;
+}
+
+.status.fault{
+    background:#b91c1c;
+}
+
+.container{
+    padding:16px;
+}
+
+.card{
+    background:#0c1b26;
+    border:1px solid #294858;
+    border-radius:9px;
+    padding:16px;
+    margin-bottom:16px;
+}
+
+h2{
+    color:#7dd3fc;
+    margin-top:0;
+}
+
+/* ===================================
+REALISTIC IMAGE
+=================================== */
+
+.realisticImage{
+    width:100%;
+    max-height:500px;
+    object-fit:contain;
+    background:#020609;
+    border:2px solid #35586a;
+    border-radius:8px;
+}
+
+/* ===================================
+FLOW
+=================================== */
+
+.flow{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:8px;
+    flex-wrap:wrap;
+}
+
+.flowBox{
+    min-width:125px;
+    padding:16px 12px;
+    text-align:center;
+    background:#102f40;
+    border:2px solid #3b687c;
+    border-radius:8px;
+    transition:.4s;
+}
+
+.flowBox.active{
+    border-color:#22c55e;
+    box-shadow:0 0 20px rgba(34,197,94,.7);
+    background:#103d2c;
+    transform:scale(1.05);
+}
+
+.arrow{
+    font-size:28px;
+    color:#4b91ad;
+    transition:.4s;
+}
+
+.arrow.active{
+    color:#22c55e;
+    text-shadow:0 0 10px #22c55e;
+}
+
+/* ===================================
+CONTROL BUTTONS
+=================================== */
+
+.controls{
+    text-align:center;
+}
+
+button{
+    padding:12px 22px;
+    border:0;
+    border-radius:6px;
+    margin:5px;
+    color:white;
+    font-weight:bold;
+    cursor:pointer;
+}
+
+.start{
+    background:#15803d;
+}
+
+.stop{
+    background:#b91c1c;
+}
+
+.reset{
+    background:#2563eb;
+}
+
+.fault{
+    background:#b45309;
+}
+
+/* ===================================
+INDICATORS
+=================================== */
+
+.grid{
+    display:grid;
+    grid-template-columns:repeat(4,1fr);
+    gap:12px;
+}
+
+.indicator{
+    background:#08151d;
+    border:1px solid #315060;
+    border-radius:8px;
+    padding:15px;
+    text-align:center;
+}
+
+.led{
+    width:22px;
+    height:22px;
+    border-radius:50%;
+    background:#26333b;
+    margin:0 auto 10px;
+}
+
+.led.green{
+    background:#22c55e;
+    box-shadow:0 0 18px #22c55e;
+}
+
+.led.red{
+    background:#ef4444;
+    box-shadow:0 0 18px #ef4444;
+}
+
+.led.yellow{
+    background:#facc15;
+    box-shadow:0 0 18px #facc15;
+}
+
+/* ===================================
+PLC LADDER
+=================================== */
+
+.ladder{
+    background:#020607;
+    border:1px solid #506875;
+    padding:20px;
+    overflow:auto;
+}
+
+.rung{
+    min-width:850px;
+    display:flex;
+    align-items:center;
+    margin:20px 0;
+}
+
+.rail{
+    width:20px;
+    height:60px;
+    border-left:3px solid white;
+}
+
+.line{
+    width:40px;
+    height:3px;
+    background:#8898a0;
+}
+
+.contact{
+    min-width:115px;
+    padding:13px;
+    text-align:center;
+    border:2px solid #71828a;
+    background:#08141b;
+}
+
+.contact.active{
+    border-color:#22c55e;
+    color:#4ade80;
+    background:#103528;
+    box-shadow:0 0 10px #22c55e;
+}
+
+.coil{
+    min-width:120px;
+    padding:13px;
+    text-align:center;
+    border:3px solid #71828a;
+    border-radius:50%;
+}
+
+.coil.active{
+    border-color:#22c55e;
+    color:#4ade80;
+    box-shadow:0 0 16px #22c55e;
+}
+
+/* ===================================
+HMI
+=================================== */
+
+.hmi{
+    max-width:720px;
+    margin:auto;
+    padding:18px;
+    background:#252f34;
+    border:7px solid #697a82;
+    border-radius:10px;
+}
+
+.hmiScreen{
+    background:#061921;
+    border:2px solid #29758c;
+    min-height:300px;
+    padding:20px;
+    text-align:center;
+}
+
+.hmiTitle{
+    font-size:25px;
+    color:#7dd3fc;
+}
+
+.hmiMotor{
+    font-size:65px;
+    margin:15px;
+    display:inline-block;
+}
+
+.hmiMotor.running{
+    animation:rotateMotor 0.8s linear infinite;
+}
+
+@keyframes rotateMotor{
+    from{transform:rotate(0deg)}
+    to{transform:rotate(360deg)}
+}
+
+/* ===================================
+CONTACTOR ANIMATION
+=================================== */
+
+.contactor{
+    width:180px;
+    height:130px;
+    margin:auto;
+    border:3px solid #748893;
+    border-radius:8px;
+    padding:15px;
+    background:#263b45;
+    text-align:center;
+    position:relative;
+}
+
+.contactBar{
+    width:80px;
+    height:8px;
+    background:#888;
+    margin:18px auto;
+    transition:.3s;
+}
+
+.contactor.active .contactBar{
+    background:#22c55e;
+    box-shadow:0 0 15px #22c55e;
+    transform:translateY(12px);
+}
+
+/* ===================================
+RELAY
+=================================== */
+
+.relay{
+    width:160px;
+    height:115px;
+    margin:auto;
+    border:3px solid #71838c;
+    border-radius:7px;
+    background:#182b34;
+    padding:12px;
+    text-align:center;
+}
+
+.relayCoil{
+    width:55px;
+    height:55px;
+    border:4px solid #89979d;
+    border-radius:50%;
+    margin:5px auto;
+    transition:.3s;
+}
+
+.relay.active .relayCoil{
+    border-color:#22c55e;
+    box-shadow:0 0 20px #22c55e;
+}
+
+/* ===================================
+MOTOR
+=================================== */
+
+.motorContainer{
+    text-align:center;
+    padding:25px;
+}
+
+.motorGraphic{
+    display:inline-flex;
+    width:150px;
+    height:150px;
+    border-radius:50%;
+    border:10px solid #56717f;
+    align-items:center;
+    justify-content:center;
+    font-size:65px;
+    background:#173444;
+}
+
+.motorGraphic.running{
+    animation:rotateMotor .8s linear infinite;
+    border-color:#22c55e;
+    box-shadow:0 0 30px rgba(34,197,94,.6);
+}
+
+/* ===================================
+SCADA
+=================================== */
+
+.scada{
+    background:#101b23;
+    border:5px solid #566b76;
+    padding:15px;
+    border-radius:8px;
+}
+
+.scadaTop{
+    display:flex;
+    justify-content:space-between;
+    background:#182d38;
+    padding:12px;
+}
+
+.scadaFlow{
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    gap:15px;
+    padding:30px;
+    flex-wrap:wrap;
+}
+
+.scadaNode{
+    padding:18px;
+    min-width:110px;
+    text-align:center;
+    border:2px solid #3d6172;
+    background:#0b202c;
+    border-radius:6px;
+}
+
+.scadaNode.active{
+    border-color:#22c55e;
+    box-shadow:0 0 15px #22c55e;
+}
+
+.scadaPanel{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:10px;
+}
+
+.scadaValue{
+    padding:20px;
+    background:#07131b;
+    border:1px solid #315060;
+    text-align:center;
+}
+
+.value{
+    font-size:28px;
+    color:#4ade80;
+}
+
+/* ===================================
+TREND
+=================================== */
+
+canvas{
+    width:100%;
+    height:220px;
+    background:#02080c;
+    border:1px solid #294858;
+}
+
+/* ===================================
+MESSAGE
+=================================== */
+
+.message{
+    padding:13px;
+    border-radius:6px;
+    background:#123b28;
+    color:#8ef0ad;
+    text-align:center;
+}
+
+.message.error{
+    background:#451b1b;
+    color:#ff9a9a;
+}
+
+/* ===================================
+RESPONSIVE
+=================================== */
+
+@media(max-width:900px){
+
+.grid{
+    grid-template-columns:repeat(2,1fr);
+}
+
+}
+
+@media(max-width:600px){
+
+.grid{
+    grid-template-columns:1fr;
+}
+
+header h1{
+    font-size:17px;
+}
+
+}
+
+</style>
+</head>
+
+
+<body>
+
+<header>
+
+<h1>
+🏭 PLC + RELAY + CONTACTOR + HMI + SCADA + MOTOR
+</h1>
+
+<div id="systemStatus" class="status">
+SYSTEM STOPPED
+</div>
+
+</header>
+
+
+<div class="container">
+
+
+<!-- =========================================
+INTRODUCTION
+========================================= -->
+
+<div class="card">
+
+<h2>Industrial Motor Control System</h2>
+
+<p>
+This virtual laboratory demonstrates how a PLC controls
+an industrial motor through a relay and contactor while
+the HMI and SCADA system monitor and control the process.
+</p>
+
+<div class="flow">
+
+<div id="fStart" class="flowBox">
+🟢<br>
+START
+<br>
+Push Button
+</div>
+
+<div id="a1" class="arrow">→</div>
+
+<div id="fPLC" class="flowBox">
+🧠<br>
+PLC
+<br>
+Logic
+</div>
+
+<div id="a2" class="arrow">→</div>
+
+<div id="fRelay" class="flowBox">
+🔌<br>
+RELAY
+<br>
+Interface
+</div>
+
+<div id="a3" class="arrow">→</div>
+
+<div id="fContactor" class="flowBox">
+⚡<br>
+CONTACTOR
+<br>
+Power Switching
+</div>
+
+<div id="a4" class="arrow">→</div>
+
+<div id="fMotor" class="flowBox">
+⚙️<br>
+MOTOR
+</div>
+
+</div>
+
+</div>
+
+
+<!-- =========================================
+REALISTIC INDUSTRIAL IMAGE
+========================================= -->
+
+<div class="card">
+
+<h2>Realistic Industrial Equipment</h2>
+
+<p>
+The image below provides a realistic visual reference
+for the industrial components represented in the simulation.
+</p>
+
+<img
+src="industrial_plc_realistic.png"
+class="realisticImage"
+alt="Realistic PLC relay contactor motor HMI SCADA industrial control system">
+
+</div>
+
+
+<!-- =========================================
+CONTROL
+========================================= -->
+
+<div class="card">
+
+<h2>Control Panel</h2>
+
+<div class="controls">
+
+<button class="start" onclick="startSystem()">
+▶ START MOTOR
+</button>
+
+<button class="stop" onclick="stopSystem()">
+■ STOP MOTOR
+</button>
+
+<button class="reset" onclick="resetSystem()">
+↻ RESET
+</button>
+
+<button class="fault" onclick="injectFault()">
+⚠ MOTOR OVERLOAD
+</button>
+
+</div>
+
+<br>
+
+<div id="message" class="message">
+System ready. Press START to begin the sequence.
+</div>
+
+</div>
+
+
+<!-- =========================================
+INPUT OUTPUT STATUS
+========================================= -->
+
+<div class="card">
+
+<h2>PLC I/O Status</h2>
+
+<div class="grid">
+
+<div class="indicator">
+
+<div id="startLED" class="led"></div>
+
+<strong>I0.0</strong>
+
+<br>
+
+START PB
+
+</div>
+
+
+<div class="indicator">
+
+<div id="stopLED" class="led"></div>
+
+<strong>I0.1</strong>
+
+<br>
+
+STOP PB
+
+</div>
+
+
+<div class="indicator">
+
+<div id="relayLED" class="led"></div>
+
+<strong>Q0.0</strong>
+
+<br>
+
+RELAY OUTPUT
+
+</div>
+
+
+<div class="indicator">
+
+<div id="contactorLED" class="led"></div>
+
+<strong>K1</strong>
+
+<br>
+
+CONTACTOR
+
+</div>
+
+</div>
+
+</div>
+
+
+<!-- =========================================
+PLC LADDER
+========================================= -->
+
+<div class="card">
+
+<h2>PLC Ladder Logic</h2>
+
+<div class="ladder">
+
+<div class="rung">
+
+<div class="rail"></div>
+
+<div id="cStart" class="contact">
+START
+</div>
+
+<div class="line"></div>
+
+<div id="cStop" class="contact">
+STOP OK
+</div>
+
+<div class="line"></div>
+
+<div id="cOverload" class="contact">
+OVERLOAD OK
+</div>
+
+<div class="line"></div>
+
+<div id="coilRelay" class="coil">
+RELAY
+</div>
+
+<div class="rail"></div>
+
+</div>
+
+
+<div class="rung">
+
+<div class="rail"></div>
+
+<div id="cRelay" class="contact">
+RELAY ON
+</div>
+
+<div class="line"></div>
+
+<div id="coilMotor" class="coil">
+MOTOR
+</div>
+
+<div class="rail"></div>
+
+</div>
+
+</div>
+
+</div>
+
+
+<!-- =========================================
+RELAY
+========================================= -->
+
+<div class="card">
+
+<h2>Relay Operation</h2>
+
+<div class="flow">
+
+<div class="flowBox">
+PLC
+<br>
+Q0.0
+</div>
+
+<div class="arrow">→</div>
+
+<div>
+
+<div id="relay" class="relay">
+
+RELAY K0
+
+<div id="relayCoil" class="relayCoil">
+</div>
+
+CONTACT
+
+</div>
+
+</div>
+
+<div class="arrow">→</div>
+
+<div class="flowBox">
+CONTACTOR
+<br>
+COIL
+</div>
+
+</div>
+
+<p style="text-align:center">
+
+When the PLC output energizes the relay,
+the relay contact closes and energizes the contactor coil.
+
+</p>
+
+</div>
+
+
+<!-- =========================================
+CONTACTOR
+========================================= -->
+
+<div class="card">
+
+<h2>Contactor Operation</h2>
+
+<div class="contactor" id="contactor">
+
+<strong>K1 CONTACTOR</strong>
+
+<div id="contactBar" class="contactBar"></div>
+
+<p>
+Main Power Contacts
+</p>
+
+</div>
+
+<p style="text-align:center">
+
+The contactor switches the high-power motor circuit.
+The PLC does <strong>not</strong> normally switch the motor
+power directly.
+
+</p>
+
+</div>
+
+
+<!-- =========================================
+MOTOR
+========================================= -->
+
+<div class="card">
+
+<h2>Motor Operation</h2>
+
+<div class="motorContainer">
+
+<div id="motorGraphic"
+class="motorGraphic">
+
+⚙
+
+</div>
+
+<h3 id="motorState">
+MOTOR STOPPED
+</h3>
+
+<div>
+
+Speed:
+
+<span id="speed"
+class="value">
+0
+</span>
+
+RPM
+
+</div>
+
+</div>
+
+</div>
+
+
+<!-- =========================================
+HMI
+========================================= -->
+
+<div class="card">
+
+<h2>HMI – Human Machine Interface</h2>
+
+<div class="hmi">
+
+<div class="hmiScreen">
+
+<div class="hmiTitle">
+MOTOR CONTROL
+</div>
+
+<div id="hmiMotor"
+class="hmiMotor">
+⚙️
+</div>
+
+<h2 id="hmiStatus">
+STOPPED
+</h2>
+
+<p>
+Motor Speed:
+<strong>
+<span id="hmiSpeed">0</span> RPM
+</strong>
+</p>
+
+<p>
+PLC:
+<strong id="hmiPLC">
+STOP
+</strong>
+</p>
+
+<p>
+Contactor:
+<strong id="hmiContactor">
+OFF
+</strong>
+</p>
+
+</div>
+
+</div>
+
+</div>
+
+
+<!-- =========================================
+SCADA
+========================================= -->
+
+<div class="card">
+
+<h2>SCADA Monitoring</h2>
+
+<div class="scada">
+
+<div class="scadaTop">
+
+<strong>
+SCADA – MOTOR CONTROL SYSTEM
+</strong>
+
+<span id="scadaStatus">
+OFFLINE
+</span>
+
+</div>
+
+
+<div class="scadaFlow">
+
+<div id="scadaPLC" class="scadaNode">
+🧠
+<br>
+PLC
+</div>
+
+<div class="arrow">
+→
+</div>
+
+<div id="scadaRelay" class="scadaNode">
+🔌
+<br>
+RELAY
+</div>
+
+<div class="arrow">
+→
+</div>
+
+<div id="scadaContactor" class="scadaNode">
+⚡
+<br>
+CONTACTOR
+</div>
+
+<div class="arrow">
+→
+</div>
+
+<div id="scadaMotor" class="scadaNode">
+⚙️
+<br>
+MOTOR
+</div>
+
+</div>
+
+
+<div class="scadaPanel">
+
+<div class="scadaValue">
+
+PLC STATUS
+
+<br>
+
+<span id="scadaPLCValue"
+class="value">
+STOP
+</span>
+
+</div>
+
+
+<div class="scadaValue">
+
+MOTOR STATUS
+
+<br>
+
+<span id="scadaMotorValue"
+class="value">
+OFF
+</span>
+
+</div>
+
+
+<div class="scadaValue">
+
+MOTOR SPEED
+
+<br>
+
+<span id="scadaSpeed"
+class="value">
+0
+</span>
+
+RPM
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+
+<!-- =========================================
+TREND
+========================================= -->
+
+<div class="card">
+
+<h2>SCADA Real-Time Motor Speed Trend</h2>
+
+<canvas id="trendCanvas"
+width="1000"
+height="250">
+</canvas>
+
+</div>
+
+
+<!-- =========================================
+SEQUENCE
+========================================= -->
+
+<div class="card">
+
+<h2>Working Sequence</h2>
+
+<div class="flow">
+
+<div id="seq1" class="flowBox">
+1<br>
+START BUTTON
+</div>
+
+<div class="arrow">→</div>
+
+<div id="seq2" class="flowBox">
+2<br>
+PLC INPUT
+</div>
+
+<div class="arrow">→</div>
+
+<div id="seq3" class="flowBox">
+3<br>
+PLC LOGIC
+</div>
+
+<div class="arrow">→</div>
+
+<div id="seq4" class="flowBox">
+4<br>
+RELAY
+</div>
+
+<div class="arrow">→</div>
+
+<div id="seq5" class="flowBox">
+5<br>
+CONTACTOR
+</div>
+
+<div class="arrow">→</div>
+
+<div id="seq6" class="flowBox">
+6<br>
+MOTOR
+</div>
+
+</div>
+
+</div>
+
+
+<!-- =========================================
+EDUCATIONAL EXPLANATION
+========================================= -->
+
+<div class="card">
+
+<h2>What Each Component Does</h2>
+
+<table style="width:100%;border-collapse:collapse">
+
+<tr>
+<th style="padding:10px;border:1px solid #315060">
+Component
+</th>
+
+<th style="padding:10px;border:1px solid #315060">
+Function
+</th>
+</tr>
+
+<tr>
+<td style="padding:10px;border:1px solid #315060">
+PLC
+</td>
+
+<td style="padding:10px;border:1px solid #315060">
+Executes the control logic and decides when the motor should run.
+</td>
+</tr>
+
+<tr>
+<td style="padding:10px;border:1px solid #315060">
+Relay
+</td>
+
+<td style="padding:10px;border:1px solid #315060">
+Provides an electrical interface between the PLC output and the contactor circuit.
+</td>
+</tr>
+
+<tr>
+<td style="padding:10px;border:1px solid #315060">
+Contactor
+</td>
+
+<td style="padding:10px;border:1px solid #315060">
+Switches the high-power motor supply.
+</td>
+</tr>
+
+<tr>
+<td style="padding:10px;border:1px solid #315060">
+Motor
+</td>
+
+<td style="padding:10px;border:1px solid #315060">
+Converts electrical energy into mechanical rotation.
+</td>
+</tr>
+
+<tr>
+<td style="padding:10px;border:1px solid #315060">
+HMI
+</td>
+
+<td style="padding:10px;border:1px solid #315060">
+Allows an operator to start, stop and monitor the machine.
+</td>
+</tr>
+
+<tr>
+<td style="padding:10px;border:1px solid #315060">
+SCADA
+</td>
+
+<td style="padding:10px;border:1px solid #315060">
+Provides supervisory monitoring, alarms, trends and system-level visualization.
+</td>
+</tr>
+
+</table>
+
+</div>
+
+
+</div>
+
+
+<script>
+
+/* =========================================
+PLC MODEL
+========================================= */
+
+let system = {
+
+    plc:false,
+
+    start:false,
+
+    stop:true,
+
+    relay:false,
+
+    contactor:false,
+
+    motor:false,
+
+    overload:false,
+
+    speed:0,
+
+    targetSpeed:0,
+
+    trend:[]
+
+};
+
+
+/* =========================================
+ELEMENT HELPER
+========================================= */
+
+function E(id){
+
+    return document.getElementById(id);
+
+}
+
+
+/* =========================================
+START
+========================================= */
+
+function startSystem(){
+
+    if(system.overload){
+
+        showMessage(
+            "START BLOCKED – MOTOR OVERLOAD",
+            true
+        );
+
+        return;
+
+    }
+
+
+    system.plc=true;
+
+    system.start=true;
+
+    system.stop=false;
+
+    system.targetSpeed=1450;
+
+
+    showMessage(
+        "START COMMAND RECEIVED – PLC EXECUTING SEQUENCE",
+        false
+    );
+
+
+    animateSequence();
+
+    update();
+
+}
+
+
+/* =========================================
+STOP
+========================================= */
+
+function stopSystem(){
+
+    system.start=false;
+
+    system.stop=true;
+
+    system.relay=false;
+
+    system.contactor=false;
+
+    system.motor=false;
+
+    system.targetSpeed=0;
+
+
+    showMessage(
+        "STOP COMMAND – MOTOR STOPPED",
+        false
+    );
+
+
+    update();
+
+}
+
+
+/* =========================================
+RESET
+========================================= */
+
+function resetSystem(){
+
+    system.plc=false;
+
+    system.start=false;
+
+    system.stop=true;
+
+    system.relay=false;
+
+    system.contactor=false;
+
+    system.motor=false;
+
+    system.overload=false;
+
+    system.speed=0;
+
+    system.targetSpeed=0;
+
+
+    showMessage(
+        "SYSTEM RESET – READY",
+        false
+    );
+
+
+    update();
+
+}
+
+
+/* =========================================
+FAULT
+========================================= */
+
+function injectFault(){
+
+    system.overload=true;
+
+    system.relay=false;
+
+    system.contactor=false;
+
+    system.motor=false;
+
+    system.targetSpeed=0;
+
+
+    showMessage(
+        "⚠ MOTOR OVERLOAD DETECTED – PLC REMOVED MOTOR COMMAND",
+        true
+    );
+
+
+    update();
+
+}
+
+
+/* =========================================
+MESSAGE
+========================================= */
+
+function showMessage(text,error){
+
+    E("message").innerText=text;
+
+    if(error){
+
+        E("message").classList.add("error");
+
+    }else{
+
+        E("message").classList.remove("error");
+
+    }
+
+}
+
+
+/* =========================================
+PLC CONTROL LOGIC
+========================================= */
+
+function plcLogic(){
+
+    if(!system.plc){
+
+        system.relay=false;
+
+        return;
+
+    }
+
+
+    if(system.start &&
+       !system.stop &&
+       !system.overload){
+
+        system.relay=true;
+
+    }else{
+
+        system.relay=false;
+
+    }
+
+
+    if(system.relay){
+
+        system.contactor=true;
+
+    }else{
+
+        system.contactor=false;
+
+    }
+
+
+    if(system.contactor){
+
+        system.motor=true;
+
+    }else{
+
+        system.motor=false;
+
+    }
+
+}
+
+
+/* =========================================
+MOTOR DYNAMICS
+========================================= */
+
+function motorDynamics(){
+
+    if(system.motor){
+
+        system.speed += 45;
+
+        if(system.speed >
+           system.targetSpeed){
+
+            system.speed =
+            system.targetSpeed;
+
+        }
+
+    }else{
+
+        system.speed -= 70;
+
+        if(system.speed<0){
+
+            system.speed=0;
+
+        }
+
+    }
+
+}
+
+
+/* =========================================
+MAIN UPDATE
+========================================= */
+
+function update(){
+
+    plcLogic();
+
+    motorDynamics();
+
+
+    /* PLC status */
+
+    E("systemStatus").innerText =
+        system.plc ?
+        "PLC RUN" :
+        "SYSTEM STOPPED";
+
+
+    E("systemStatus").className =
+        system.overload ?
+        "status fault" :
+        system.plc ?
+        "status run" :
+        "status";
+
+
+    /* LEDs */
+
+    E("startLED")
+    .classList.toggle(
+        "green",
+        system.start
+    );
+
+
+    E("stopLED")
+    .classList.toggle(
+        "red",
+        system.stop
+    );
+
+
+    E("relayLED")
+    .classList.toggle(
+        "green",
+        system.relay
+    );
+
+
+    E("contactorLED")
+    .classList.toggle(
+        "green",
+        system.contactor
+    );
+
+
+    /* Ladder */
+
+    E("cStart")
+    .classList.toggle(
+        "active",
+        system.start
+    );
+
+
+    E("cStop")
+    .classList.toggle(
+        "active",
+        !system.stop
+    );
+
+
+    E("cOverload")
+    .classList.toggle(
+        "active",
+        !system.overload
+    );
+
+
+    E("coilRelay")
+    .classList.toggle(
+        "active",
+        system.relay
+    );
+
+
+    E("cRelay")
+    .classList.toggle(
+        "active",
+        system.relay
+    );
+
+
+    E("coilMotor")
+    .classList.toggle(
+        "active",
+        system.motor
+    );
+
+
+    /* Relay */
+
+    E("relay")
+    .classList.toggle(
+        "active",
+        system.relay
+    );
+
+
+    E("relayCoil")
+    .classList.toggle(
+        "green",
+        system.relay
+    );
+
+
+    /* Contactor */
+
+    E("contactor")
+    .classList.toggle(
+        "active",
+        system.contactor
+    );
+
+
+    /* Motor */
+
+    E("motorGraphic")
+    .classList.toggle(
+        "running",
+        system.motor
+    );
+
+
+    E("motorState").innerText =
+        system.motor ?
+        "MOTOR RUNNING" :
+        "MOTOR STOPPED";
+
+
+    E("speed").innerText =
+        Math.round(system.speed);
+
+
+    /* HMI */
+
+    E("hmiMotor")
+    .classList.toggle(
+        "running",
+        system.motor
+    );
+
+
+    E("hmiStatus").innerText =
+        system.motor ?
+        "RUNNING" :
+        "STOPPED";
+
+
+    E("hmiSpeed").innerText =
+        Math.round(system.speed);
+
+
+    E("hmiPLC").innerText =
+        system.plc ?
+        "RUN" :
+        "STOP";
+
+
+    E("hmiContactor").innerText =
+        system.contactor ?
+        "ON" :
+        "OFF";
+
+
+    /* SCADA */
+
+    E("scadaStatus").innerText =
+        system.plc ?
+        "ONLINE" :
+        "OFFLINE";
+
+
+    E("scadaPLCValue").innerText =
+        system.plc ?
+        "RUN" :
+        "STOP";
+
+
+    E("scadaMotorValue").innerText =
+        system.motor ?
+        "ON" :
+        "OFF";
+
+
+    E("scadaSpeed").innerText =
+        Math.round(system.speed);
+
+
+    E("scadaPLC")
+    .classList.toggle(
+        "active",
+        system.plc
+    );
+
+
+    E("scadaRelay")
+    .classList.toggle(
+        "active",
+        system.relay
+    );
+
+
+    E("scadaContactor")
+    .classList.toggle(
+        "active",
+        system.contactor
+    );
+
+
+    E("scadaMotor")
+    .classList.toggle(
+        "active",
+        system.motor
+    );
+
+
+    /* Main flow */
+
+    E("fStart")
+    .classList.toggle(
+        "active",
+        system.start
+    );
+
+
+    E("fPLC")
+    .classList.toggle(
+        "active",
+        system.plc
+    );
+
+
+    E("fRelay")
+    .classList.toggle(
+        "active",
+        system.relay
+    );
+
+
+    E("fContactor")
+    .classList.toggle(
+        "active",
+        system.contactor
+    );
+
+
+    E("fMotor")
+    .classList.toggle(
+        "active",
+        system.motor
+    );
+
+
+    E("a1")
+    .classList.toggle(
+        "active",
+        system.start
+    );
+
+
+    E("a2")
+    .classList.toggle(
+        "active",
+        system.plc
+    );
+
+
+    E("a3")
+    .classList.toggle(
+        "active",
+        system.relay
+    );
+
+
+    E("a4")
+    .classList.toggle(
+        "active",
+        system.contactor
+    );
+
+
+    /* Trend */
+
+    system.trend.push(system.speed);
+
+    if(system.trend.length>100){
+
+        system.trend.shift();
+
+    }
+
+    drawTrend();
+
+}
+
+
+/* =========================================
+SEQUENCE ANIMATION
+========================================= */
+
+function animateSequence(){
+
+    let boxes=[
+        "seq1",
+        "seq2",
+        "seq3",
+        "seq4",
+        "seq5",
+        "seq6"
+    ];
+
+
+    boxes.forEach(id=>{
+
+        E(id).classList.remove("active");
+
+    });
+
+
+    boxes.forEach((id,index)=>{
+
+        setTimeout(()=>{
+
+            E(id)
+            .classList.add("active");
+
+        },index*350);
+
+    });
+
+}
+
+
+/* =========================================
+TREND GRAPH
+========================================= */
+
+function drawTrend(){
+
+    let canvas=
+        E("trendCanvas");
+
+    let ctx=
+        canvas.getContext("2d");
+
+
+    ctx.clearRect(
+        0,
+        0,
+        canvas.width,
+        canvas.height
+    );
+
+
+    /* Grid */
+
+    ctx.strokeStyle="#294858";
+
+    ctx.lineWidth=1;
+
+
+    for(let x=0;x<canvas.width;x+=50){
+
+        ctx.beginPath();
+
+        ctx.moveTo(x,0);
+
+        ctx.lineTo(
+            x,
+            canvas.height
+        );
+
+        ctx.stroke();
+
+    }
+
+
+    for(let y=0;y<canvas.height;y+=40){
+
+        ctx.beginPath();
+
+        ctx.moveTo(0,y);
+
+        ctx.lineTo(
+            canvas.width,
+            y
+        );
+
+        ctx.stroke();
+
+    }
+
+
+    /* Trend */
+
+    ctx.strokeStyle="#22c55e";
+
+    ctx.lineWidth=3;
+
+    ctx.beginPath();
+
+
+    system.trend.forEach(
+        (value,index)=>{
+
+            let x=
+                index*
+                (canvas.width/
+                100);
+
+
+            let y=
+                canvas.height-
+                (value/1500)*
+                (canvas.height-20);
+
+
+            if(index===0){
+
+                ctx.moveTo(x,y);
+
+            }else{
+
+                ctx.lineTo(x,y);
+
+            }
+
+        }
+    );
+
+
+    ctx.stroke();
+
+
+    /* Label */
+
+    ctx.fillStyle="#7dd3fc";
+
+    ctx.font="16px Arial";
+
+    ctx.fillText(
+        "Motor Speed (RPM)",
+        20,
+        25
+    );
+
+}
+
+
+/* =========================================
+SCAN LOOP
+========================================= */
+
+setInterval(()=>{
+
+    update();
+
+},100);
+
+
+/* =========================================
+INITIALIZATION
+========================================= */
+
+resetSystem();
+
+</script>
+
+</body>
+</html>

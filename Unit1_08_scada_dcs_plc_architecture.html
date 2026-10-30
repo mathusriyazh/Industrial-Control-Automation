@@ -1,0 +1,623 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Industrial Automation Architectures: SCADA, DCS, and PLC</title>
+
+<!-- ADD THIS SCRIPT TO RENDER LATEX MATH PROPERLY -->
+<!-- MATHJAX SETUP (NO POLYFILL NEEDED) -->
+<script>
+  window.MathJax = {
+    tex: {
+      inlineMath: [['$', '$'], ['\\(', '\\)']]
+    }
+  };
+</script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+
+<style>
+*{box-sizing:border-box}
+
+body{
+    margin:0;
+    font-family:Arial,Helvetica,sans-serif;
+    background:#071017;
+    color:#edf7fb;
+}
+
+header{
+    background:#0b2533;
+    padding:22px;
+    border-bottom:3px solid #28a9d6;
+    position:sticky;
+    top:0;
+    z-index:1000;
+}
+
+header h1{margin:0;font-size:25px}
+header p{margin:7px 0;color:#a9ddec}
+
+nav{
+    background:#081720;
+    padding:10px;
+    text-align:center;
+    border-bottom:1px solid #31505d;
+}
+
+nav button{
+    background:#12394b;
+    color:white;
+    border:1px solid #477080;
+    padding:9px 13px;
+    border-radius:6px;
+    margin:3px;
+    cursor:pointer;
+}
+
+nav button:hover{background:#1c5b71}
+
+.container{
+    max-width:1400px;
+    margin:auto;
+    padding:22px;
+}
+
+.card{
+    background:#0c1b25;
+    border:1px solid #2c4d5b;
+    border-radius:11px;
+    padding:24px;
+    margin-bottom:22px;
+}
+
+h2{color:#7dd3fc}
+h3{color:#8ddcf0}
+
+p{line-height:1.7}
+
+.highlight{
+    background:#0e2d3b;
+    border-left:5px solid #38bdf8;
+    padding:16px;
+    margin:16px 0;
+    border-radius:5px;
+}
+
+.warning{
+    background:#332717;
+    border-left:5px solid #f59e0b;
+    padding:16px;
+    margin:16px 0;
+}
+
+.grid2{
+    display:grid;
+    grid-template-columns:repeat(2,1fr);
+    gap:18px;
+}
+
+.grid3{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:18px;
+}
+
+.info{
+    background:#102632;
+    border:1px solid #3b6170;
+    border-radius:9px;
+    padding:20px;
+}
+
+.icon{
+    font-size:48px;
+    text-align:center;
+    margin:10px;
+}
+
+/* ANIMATION CONTAINER */
+
+.animContainer{
+    background:#03090d;
+    border:2px solid #385765;
+    border-radius:10px;
+    padding:25px;
+    text-align:center;
+}
+
+.animTitle{
+    color:#8ddcf0;
+    font-size:20px;
+    font-weight:bold;
+    margin-bottom:15px;
+}
+
+.svgWrapper{
+    width:100%;
+    max-width:1000px;
+    margin:0 auto;
+    background:#08131a;
+    border:1px solid #284450;
+    border-radius:8px;
+    padding:10px;
+}
+
+svg text{
+    font-family:Arial, sans-serif;
+    user-select:none;
+}
+
+/* DATA PACKET ANIMATIONS */
+
+.packet-scada{
+    fill:#38bdf8;
+    animation: moveScada 3s infinite linear;
+}
+
+.packet-dcs{
+    fill:#f59e0b;
+    animation: moveDcs 2.5s infinite ease-in-out;
+}
+
+.packet-plc{
+    fill:#22c55e;
+    animation: movePlc 1.5s infinite linear;
+}
+
+@keyframes moveScada {
+    0% { transform: translate(0px, 0px); opacity:0; }
+    10% { opacity:1; }
+    90% { opacity:1; }
+    100% { transform: translate(0px, 120px); opacity:0; }
+}
+
+@keyframes moveDcs {
+    0% { transform: translate(0px, 0px); opacity:0; }
+    20% { opacity:1; }
+    80% { opacity:1; }
+    100% { transform: translate(0px, 100px); opacity:0; }
+}
+
+@keyframes movePlc {
+    0% { transform: translate(0px, 0px); opacity:0; }
+    20% { opacity:1; }
+    80% { opacity:1; }
+    100% { transform: translate(0px, 70px); opacity:0; }
+}
+
+/* METRICS & CONTROLS */
+
+.metrics{
+    display:grid;
+    grid-template-columns:repeat(4,1fr);
+    gap:14px;
+    margin-top:20px;
+}
+
+.metric{
+    background:#102a35;
+    border:1px solid #3b6270;
+    padding:18px;
+    border-radius:8px;
+    text-align:center;
+}
+
+.metricValue{
+    font-size:22px;
+    font-weight:bold;
+    color:#7dd3fc;
+    margin-top:8px;
+}
+
+.btn{
+    border:0;
+    color:white;
+    padding:12px 18px;
+    border-radius:6px;
+    margin:5px;
+    cursor:pointer;
+    font-weight:bold;
+}
+
+.green{background:#15803d}
+.red{background:#b91c1c}
+.blue{background:#2563eb}
+.orange{background:#b45309}
+
+/* TABLE */
+
+table{
+    width:100%;
+    border-collapse:collapse;
+}
+
+th,td{
+    border:1px solid #3b5d68;
+    padding:13px;
+}
+
+th{
+    background:#12394b;
+}
+
+/* QUIZ */
+
+.quiz{
+    background:#091923;
+    border:1px solid #355a68;
+    padding:18px;
+    margin:15px 0;
+    border-radius:8px;
+}
+
+.quiz button{
+    display:block;
+    width:100%;
+    text-align:left;
+    padding:11px;
+    margin:6px 0;
+    background:#123548;
+    color:white;
+    border:1px solid #426979;
+    border-radius:5px;
+    cursor:pointer;
+}
+
+.quiz button.correct{background:#14532d}
+.quiz button.wrong{background:#7f1d1d}
+
+.result{
+    background:#102c38;
+    padding:15px;
+    border-left:5px solid #38bdf8;
+}
+
+.center{text-align:center}
+
+@media(max-width:900px){
+    .grid2,.grid3{grid-template-columns:1fr}
+    .metrics{grid-template-columns:1fr 1fr}
+}
+
+@media(max-width:600px){
+    .metrics{grid-template-columns:1fr}
+    header h1{font-size:20px}
+}
+</style>
+</head>
+
+<body>
+
+<header>
+<h1>📘 INDUSTRIAL CONTROL AND AUTOMATION</h1>
+<p>UNIT – I | Chapter 8 — Industrial Architectures: SCADA, DCS, and PLC</p>
+</header>
+
+<nav>
+<button onclick="go('overview')">Overview</button>
+<button onclick="go('relationship')">Architecture & Animation</button>
+<button onclick="go('comparison')">Comparison Matrix</button>
+<button onclick="go('simulation')">Interactive Network Test</button>
+<button onclick="go('quiz')">Quiz</button>
+</nav>
+
+<div class="container">
+
+<!-- OVERVIEW SECTION -->
+<section id="overview" class="card">
+<h2>1. Core Concepts: PLC, DCS, and SCADA</h2>
+<p>
+Modern automation systems rely on a 3-tier operational hierarchy specified by the <strong>Purdue Enterprise Reference Architecture (PERA / ISA-95)</strong>. Each technology functions at a distinct level of latency, scale, and control authority.
+</p>
+
+<div class="grid3">
+    <div class="info">
+        <div class="icon">⚡</div>
+        <h3>PLC (Programmable Logic Controller)</h3>
+        <p><strong>Deterministic Local Control (Level 1):</strong> High-speed industrial computer engineered to execute fast control loops (1–20 ms), discrete logic, interlocks, and PID control directly tied to physical sensors and actuators.</p>
+    </div>
+
+    <div class="info">
+        <div class="icon">🏭</div>
+        <h3>DCS (Distributed Control System)</h3>
+        <p><strong>Process-Centric Integrated Architecture (Level 2):</strong> Process-oriented control system using autonomous controllers distributed throughout a plant. Designed for large continuous operations (e.g., refineries, chemical plants) with thousands of analog PID loops.</p>
+    </div>
+
+    <div class="info">
+        <div class="icon">🌐</div>
+        <h3>SCADA (Supervisory Control and Data Acquisition)</h3>
+        <p><strong>Data-Centric Supervisory System (Level 3):</strong> Software and network layer designed for enterprise-wide monitoring, historical data logging, trending, and alarm management across geographically dispersed sites (e.g., power grids, pipelines).</p>
+    </div>
+</div>
+</section>
+
+<!-- ANIMATED RELATIONSHIP SECTION -->
+<section id="relationship" class="card">
+<h2>2. Physical Architecture & System Relationship</h2>
+<p>
+The core distinction between these systems lies in <strong>data flow, physical topology, and loop latency</strong>. The diagram below illustrates how field telemetry flows upward while supervisory commands flow downward.
+</p>
+
+<div class="animContainer">
+    <div class="animTitle">INTERACTIVE PURDUE MODEL SIGNAL FLOW DIAGRAM</div>
+    
+    <div class="svgWrapper">
+        <svg viewBox="0 0 800 520" width="100%" height="100%">
+            <!-- LEVEL 3: SCADA -->
+            <rect x="50" y="20" width="700" height="90" rx="8" fill="#0c2738" stroke="#38bdf8" stroke-width="2"/>
+            <text x="70" y="45" fill="#7dd3fc" font-weight="bold" font-size="16">LEVEL 3: Enterprise SCADA Layer (Supervisory & Historian)</text>
+            <text x="70" y="68" fill="#94a3b8" font-size="12">Functions: Wide-area monitoring, alarming, long-term trends, telemetry (Modbus/TCP, OPC UA, DNP3)</text>
+            <rect x="550" y="35" width="170" height="65" rx="5" fill="#1e3a8a" stroke="#60a5fa"/>
+            <text x="560" y="60" fill="#ffffff" font-weight="bold" font-size="13">SCADA Master Server</text>
+            <text x="560" y="80" fill="#93c5fd" font-size="11">HMI & Data Historian</text>
+
+            <!-- BUS LINES SCADA TO DCS/PLC -->
+            <line x1="250" y1="110" x2="250" y2="180" stroke="#38bdf8" stroke-width="3" stroke-dasharray="6,6"/>
+            <line x1="635" y1="100" x2="635" y2="180" stroke="#38bdf8" stroke-width="3" stroke-dasharray="6,6"/>
+            
+            <!-- Animated Packets: SCADA -->
+            <circle cx="250" cy="110" r="5" class="packet-scada"/>
+            <circle cx="635" cy="100" r="5" class="packet-scada"/>
+
+            <!-- LEVEL 2: DCS & PLC CONTROLLERS -->
+            <!-- Left Side: DCS Zone -->
+            <rect x="50" y="180" width="400" height="150" rx="8" fill="#1f2937" stroke="#f59e0b" stroke-width="2"/>
+            <text x="70" y="205" fill="#fbbf24" font-weight="bold" font-size="15">LEVEL 2: DCS Architecture (Continuous Process)</text>
+            <rect x="70" y="220" width="160" height="85" rx="5" fill="#374151" stroke="#d97706"/>
+            <text x="80" y="245" fill="#ffffff" font-size="13" font-weight="bold">DCS Controller A</text>
+            <text x="80" y="265" fill="#fcd34d" font-size="11">Redundant Processors</text>
+            <text x="80" y="285" fill="#fcd34d" font-size="11">Global Tag Database</text>
+
+            <rect x="260" y="220" width="170" height="85" rx="5" fill="#374151" stroke="#d97706"/>
+            <text x="270" y="245" fill="#ffffff" font-size="13" font-weight="bold">DCS Controller B</text>
+            <text x="270" y="265" fill="#fcd34d" font-size="11">Integrated Batch Control</text>
+            <text x="270" y="285" fill="#fcd34d" font-size="11">System-Wide Clock Sync</text>
+
+            <!-- Right Side: PLC Zone -->
+            <rect x="470" y="180" width="280" height="150" rx="8" fill="#064e3b" stroke="#22c55e" stroke-width="2"/>
+            <text x="485" y="205" fill="#4ade80" font-weight="bold" font-size="15">LEVEL 2: Standalone PLCs</text>
+            <rect x="520" y="220" width="180" height="85" rx="5" fill="#047857" stroke="#a7f3d0"/>
+            <text x="535" y="245" fill="#ffffff" font-size="13" font-weight="bold">Modular PLC Rack</text>
+            <text x="535" y="265" fill="#ecfdf5" font-size="11">High-Speed Logic Execution</text>
+            <text x="535" y="285" fill="#ecfdf5" font-size="11">Scan Time: 2 ms - 10 ms</text>
+
+            <!-- BUS LINES DCS/PLC TO FIELD -->
+            <line x1="150" y1="305" x2="150" y2="400" stroke="#f59e0b" stroke-width="3"/>
+            <line x1="345" y1="305" x2="345" y2="400" stroke="#f59e0b" stroke-width="3"/>
+            <line x1="610" y1="305" x2="610" y2="400" stroke="#22c55e" stroke-width="3"/>
+
+            <!-- Animated Packets: DCS & PLC -->
+            <circle cx="150" cy="305" r="5" class="packet-dcs"/>
+            <circle cx="345" cy="305" r="5" class="packet-dcs"/>
+            <circle cx="610" cy="305" r="5" class="packet-plc"/>
+
+            <!-- LEVEL 0 & 1: FIELD DEVICES -->
+            <rect x="50" y="400" width="700" height="95" rx="8" fill="#111827" stroke="#6b7280" stroke-width="2"/>
+            <text x="70" y="425" fill="#e5e7eb" font-weight="bold" font-size="15">LEVEL 0 / 1: Field Instrumentation (Physical Process)</text>
+            
+            <rect x="80" y="435" width="140" height="45" rx="4" fill="#1f2937" stroke="#9ca3af"/>
+            <text x="90" y="462" fill="#d1d5db" font-size="12">🌡️ Temp Sensors</text>
+            
+            <rect x="270" y="435" width="150" height="45" rx="4" fill="#1f2937" stroke="#9ca3af"/>
+            <text x="280" y="462" fill="#d1d5db" font-size="12">🚰 Control Valves</text>
+            
+            <rect x="540" y="435" width="150" height="45" rx="4" fill="#1f2937" stroke="#9ca3af"/>
+            <text x="550" y="462" fill="#d1d5db" font-size="12">⚙️ Motors & Drives</text>
+        </svg>
+    </div>
+</div>
+
+<div class="highlight">
+    <h3>Detailed Relationship Breakdown:</h3>
+    <ul>
+        <li><strong>PLC to Field:</strong> PLCs sit closest to the machinery. They read local inputs (switches, sensors) and drive outputs (relays, valves) deterministically inside strict real-time deadlines.</li>
+        <li><strong>DCS as an Integrated Plant Ecosystem:</strong> A DCS combines hundreds of controllers and I/O sub-modules across an entire plant into a single integrated software database. It abstracts complex continuous processes so operators manage unit operations rather than isolated loops.</li>
+        <li><strong>SCADA as the Supervisory Umbrella:</strong> SCADA sits above PLCs and DCS installations. It does not replace local controllers; instead, it polls them over long-distance networks to collect data, display high-level HMIs, handle alarms, and log historian records.</li>
+    </ul>
+</div>
+</section>
+
+<!-- COMPARISON MATRIX -->
+<section id="comparison" class="card">
+<h2>3. Architectural Comparison Matrix</h2>
+<table>
+    <tr>
+        <th>Feature</th>
+        <th>PLC (Programmable Logic Controller)</th>
+        <th>DCS (Distributed Control System)</th>
+        <th>SCADA (Supervisory Control & Data Acquisition)</th>
+    </tr>
+    <tr>
+        <td><strong>Primary Focus</strong></td>
+        <td>High-speed discrete logic, safety interlocking, machine control</td>
+        <td>Continuous analog process control, complex PID, batch processing</td>
+        <td>Supervisory visual monitoring, data acquisition, multi-site telemetry</td>
+    </tr>
+    <tr>
+        <td><strong>Response Time / Latency</strong></td>
+        <td><strong>Ultra-Fast:</strong> 1 ms to 20 ms (Hard Real-Time)</td>
+        <td><strong>Fast:</strong> 50 ms to 500 ms (Deterministic real-time)</td>
+        <td><strong>Slow / Latency Tolerant:</strong> 1 s to several seconds (Asynchronous)</td>
+    </tr>
+    <tr>
+        <td><strong>Database Architecture</strong></td>
+        <td>Independent/local tag addresses per PLC unit</td>
+        <td>Single, unified system-wide global database</td>
+        <td>Centralized server database polled from remote RTUs/PLCs</td>
+    </tr>
+    <tr>
+        <td><strong>Failure Domain</strong></td>
+        <td>Isolated to single machine/skid</td>
+        <td>Redundant architecture protects plant-wide loops</td>
+        <td>Loss of SCADA server stops monitoring, but field controllers keep running</td>
+    </tr>
+    <tr>
+        <td><strong>Typical Applications</strong></td>
+        <td>Packaging, assembly lines, conveyor belts, compressor skids</td>
+        <td>Oil refineries, chemical plants, thermal power generation, paper mills</td>
+        <td>Electrical grids, municipal water distribution networks, gas pipelines</td>
+    </tr>
+</table>
+</section>
+
+<!-- INTERACTIVE NETWORK TEST -->
+<section id="simulation" class="card">
+<h2>4. Interactive Network Latency & Architecture Test</h2>
+<p>
+Select a control scenario to simulate network response times and trace how control signals travel through PLC, DCS, and SCADA infrastructure.
+</p>
+
+<div class="animContainer">
+    <div class="simTitle">ARCHITECTURE DYNAMIC RESPONDER</div>
+
+    <div class="metrics">
+        <div class="metric">
+            System Mode
+            <div class="metricValue" id="sysMode">PLC Active</div>
+        </div>
+        <div class="metric">
+            Target Latency
+            <div class="metricValue" id="sysLatency">4 ms</div>
+        </div>
+        <div class="metric">
+            Network Overhead
+            <div class="metricValue" id="sysOverhead">Minimal</div>
+        </div>
+        <div class="metric">
+            Database Type
+            <div class="metricValue" id="sysDb">Local Hardware Tags</div>
+        </div>
+    </div>
+
+    <br>
+    <div class="center">
+        <button class="btn green" onclick="setArchitecture('plc')">Select PLC Mode (Machine Interlock)</button>
+        <button class="btn orange" onclick="setArchitecture('dcs')">Select DCS Mode (Refinery Plant)</button>
+        <button class="btn blue" onclick="setArchitecture('scada')">Select SCADA Mode (Pipeline Network)</button>
+    </div>
+
+    <div class="highlight center" id="archStatus">
+        PLC Mode Active: Hard real-time control via local I/O wiring. High deterministic reliability.
+    </div>
+</div>
+</section>
+
+<!-- CHAPTER SUMMARY -->
+<section class="card">
+<h2>5. Chapter Summary</h2>
+<ul>
+    <li><strong>PLCs</strong> handle fast, discrete machine control with sub-10ms deterministic scan times.</li>
+    <li><strong>DCSs</strong> manage vast continuous process operations using redundant, pre-integrated controller nodes and a unified system database.</li>
+    <li><strong>SCADA</strong> sits at the top level, monitoring geographically dispersed assets over asynchronous communications.</li>
+    <li>In modern industrial facilities, these technologies work together: PLCs feed local data up to DCS controllers, which in turn report supervisory status to enterprise SCADA servers.</li>
+</ul>
+
+<div class="highlight">
+<strong>Quick Memory Rule:</strong><br><br>
+⚡ <strong>PLC:</strong> Fast action on a single machine.<br>
+🏭 <strong>DCS:</strong> Integrated control across an entire factory floor.<br>
+🌐 <strong>SCADA:</strong> High-level visual tracking across wide geographical areas.
+</div>
+</section>
+
+<!-- QUIZ SECTION -->
+<section id="quiz" class="card">
+<h2>6. Student Self-Assessment</h2>
+
+<div class="quiz">
+    <strong>Q1. Which system architecture is best suited for high-speed discrete interlocking (e.g., stopping a conveyor in under 5 ms)?</strong>
+    <button onclick="answer(this, true)">A. Programmable Logic Controller (PLC)</button>
+    <button onclick="answer(this, false)">B. Distributed Control System (DCS)</button>
+    <button onclick="answer(this, false)">C. Supervisory Control and Data Acquisition (SCADA)</button>
+    <button onclick="answer(this, false)">D. Enterprise Resource Planning (ERP)</button>
+</div>
+
+<div class="quiz">
+    <strong>Q2. What happens to local field operations if a SCADA master server loses network connectivity?</strong>
+    <button onclick="answer(this, false)">A. The physical field actuators immediately shut down</button>
+    <button onclick="answer(this, true)">B. Field PLCs and local controllers continue running autonomously</button>
+    <button onclick="answer(this, false)">C. Field devices lose their internal control logic</button>
+    <button onclick="answer(this, false)">D. The DCS database becomes permanently corrupted</button>
+</div>
+
+<div class="quiz">
+    <strong>Q3. What is a key architectural feature of a Distributed Control System (DCS)?</strong>
+    <button onclick="answer(this, false)">A. It relies exclusively on long-distance telemetry networks</button>
+    <button onclick="answer(this, true)">B. It utilizes a single, unified database across all controllers and HMIs</button>
+    <button onclick="answer(this, false)">C. It is designed for low-cost, single-loop on/off control</button>
+    <button onclick="answer(this, false)">D. It operates asynchronously without real-time clock synchronization</button>
+</div>
+
+<div class="result" id="quizResult">
+Select an answer above to test your knowledge.
+</div>
+</section>
+
+</div>
+
+<script>
+/* NAVIGATION */
+function go(id){
+    document.getElementById(id).scrollIntoView({
+        behavior:"smooth"
+    });
+}
+
+/* ARCHITECTURE INTERACTIVE SIMULATOR */
+function setArchitecture(type){
+    const sysMode = document.getElementById("sysMode");
+    const sysLatency = document.getElementById("sysLatency");
+    const sysOverhead = document.getElementById("sysOverhead");
+    const sysDb = document.getElementById("sysDb");
+    const archStatus = document.getElementById("archStatus");
+
+    if(type === 'plc'){
+        sysMode.innerText = "PLC Active";
+        sysLatency.innerText = "2 - 10 ms";
+        sysOverhead.innerText = "Minimal";
+        sysDb.innerText = "Local Tags";
+        archStatus.innerText = "PLC Mode Active: Hard real-time control via local I/O wiring. High deterministic reliability.";
+    } else if(type === 'dcs'){
+        sysMode.innerText = "DCS Active";
+        sysLatency.innerText = "50 - 200 ms";
+        sysOverhead.innerText = "Moderate (Deterministic)";
+        sysDb.innerText = "Unified Global DB";
+        archStatus.innerText = "DCS Mode Active: Integrated controller nodes executing continuous PID loops across plant units.";
+    } else if(type === 'scada'){
+        sysMode.innerText = "SCADA Active";
+        sysLatency.innerText = "1 - 5 Seconds";
+        sysOverhead.innerText = "High (Telemetry / WAN)";
+        sysDb.innerText = "Central Historian";
+        archStatus.innerText = "SCADA Mode Active: Asynchronous supervisory monitoring across remote pipeline/grid sites.";
+    }
+}
+
+/* QUIZ MODULE */
+let score = 0;
+let answered = 0;
+
+function answer(button, correct){
+    let quiz = button.parentElement;
+
+    if(quiz.dataset.answered){
+        return;
+    }
+
+    quiz.dataset.answered = "yes";
+    answered++;
+
+    if(correct){
+        button.classList.add("correct");
+        score++;
+        document.getElementById("quizResult").innerText = "✓ Correct | Score: " + score + " / " + answered;
+    } else {
+        button.classList.add("wrong");
+        document.getElementById("quizResult").innerText = "✗ Incorrect | Score: " + score + " / " + answered;
+    }
+}
+</script>
+
+</body>
+</html>

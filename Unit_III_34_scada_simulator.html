@@ -1,0 +1,1777 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SCADA Virtual Laboratory</title>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<style>
+*{
+    box-sizing:border-box;
+}
+
+body{
+    margin:0;
+    font-family:Arial,Helvetica,sans-serif;
+    background:#101820;
+    color:#e8f0f5;
+}
+
+.header{
+    height:65px;
+    background:#18242d;
+    border-bottom:2px solid #30434f;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    padding:0 20px;
+}
+
+.header h1{
+    margin:0;
+    font-size:22px;
+}
+
+.clock{
+    font-size:18px;
+    font-weight:bold;
+}
+
+.container{
+    display:grid;
+    grid-template-columns:1fr 350px;
+    gap:12px;
+    padding:12px;
+}
+
+.main{
+    display:flex;
+    flex-direction:column;
+    gap:12px;
+}
+
+.panel{
+    background:#17232c;
+    border:1px solid #344955;
+    border-radius:8px;
+    padding:12px;
+}
+
+.panel-title{
+    font-size:17px;
+    font-weight:bold;
+    border-bottom:1px solid #344955;
+    padding-bottom:8px;
+    margin-bottom:10px;
+}
+
+/* PROCESS */
+
+.process{
+    height:440px;
+    position:relative;
+    overflow:hidden;
+    background:#0d151b;
+}
+
+.pipe{
+    position:absolute;
+    height:8px;
+    background:#6d8794;
+}
+
+.pipe.active{
+    animation:flow 0.8s linear infinite;
+}
+
+@keyframes flow{
+    from{background-position:0 0;}
+    to{background-position:30px 0;}
+}
+
+.pipe1{
+    left:300px;
+    top:155px;
+    width:260px;
+}
+
+.pipe2{
+    left:300px;
+    top:275px;
+    width:260px;
+}
+
+.pipe3{
+    left:555px;
+    top:155px;
+    height:125px;
+    width:8px;
+}
+
+.tank{
+    position:absolute;
+    left:100px;
+    top:80px;
+    width:200px;
+    height:280px;
+    border:5px solid #8da3ad;
+    border-radius:12px 12px 25px 25px;
+    overflow:hidden;
+    background:#111b20;
+}
+
+.water{
+    position:absolute;
+    bottom:0;
+    left:0;
+    width:100%;
+    height:60%;
+    background:#217da5;
+    transition:height .5s;
+}
+
+.water-wave{
+    position:absolute;
+    top:-6px;
+    left:0;
+    width:200%;
+    height:12px;
+    background:#5cb8dd;
+    animation:wave 2s linear infinite;
+}
+
+@keyframes wave{
+    from{transform:translateX(0);}
+    to{transform:translateX(-50%);}
+}
+
+.tank-label{
+    position:absolute;
+    width:100%;
+    text-align:center;
+    top:105px;
+    z-index:2;
+    font-size:20px;
+    font-weight:bold;
+}
+
+.tank-value{
+    position:absolute;
+    width:100%;
+    text-align:center;
+    top:140px;
+    z-index:2;
+    font-size:30px;
+    font-weight:bold;
+}
+
+.pump{
+    position:absolute;
+    left:560px;
+    top:110px;
+    width:105px;
+    height:90px;
+    border:4px solid #899da7;
+    border-radius:50%;
+    background:#202f38;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+}
+
+.pump-wheel{
+    width:45px;
+    height:45px;
+    border:6px dotted #6cc5e8;
+    border-radius:50%;
+}
+
+.pump.running .pump-wheel{
+    animation:rotate .7s linear infinite;
+}
+
+@keyframes rotate{
+    to{transform:rotate(360deg);}
+}
+
+.pump-label{
+    position:absolute;
+    top:205px;
+    left:555px;
+    width:115px;
+    text-align:center;
+    font-weight:bold;
+}
+
+.valve{
+    position:absolute;
+    left:520px;
+    top:245px;
+    width:70px;
+    height:70px;
+    border:5px solid #899da7;
+    transform:rotate(45deg);
+    background:#25343d;
+}
+
+.valve.open{
+    background:#245e42;
+}
+
+.valve-label{
+    position:absolute;
+    left:500px;
+    top:320px;
+    width:110px;
+    text-align:center;
+}
+
+.motor{
+    position:absolute;
+    right:80px;
+    top:100px;
+    width:170px;
+    height:120px;
+    border:4px solid #899da7;
+    border-radius:12px;
+    background:#202d35;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+}
+
+.motor-fan{
+    width:65px;
+    height:65px;
+    border:7px dotted #5fb7d6;
+    border-radius:50%;
+}
+
+.motor.running .motor-fan{
+    animation:rotate .5s linear infinite;
+}
+
+.motor-label{
+    position:absolute;
+    top:230px;
+    right:100px;
+    width:130px;
+    text-align:center;
+    font-weight:bold;
+}
+
+/* STATUS */
+
+.status-grid{
+    display:grid;
+    grid-template-columns:repeat(4,1fr);
+    gap:8px;
+}
+
+.value-card{
+    background:#10191f;
+    border:1px solid #334954;
+    padding:12px;
+    border-radius:6px;
+}
+
+.value-name{
+    color:#9db0ba;
+    font-size:13px;
+}
+
+.value{
+    font-size:24px;
+    font-weight:bold;
+    margin-top:5px;
+}
+
+/* CONTROLS */
+
+.controls{
+    display:grid;
+    grid-template-columns:repeat(4,1fr);
+    gap:8px;
+}
+
+button{
+    border:none;
+    border-radius:5px;
+    padding:12px;
+    font-size:14px;
+    font-weight:bold;
+    cursor:pointer;
+}
+
+.start{
+    background:#287a4c;
+    color:white;
+}
+
+.stop{
+    background:#963b3b;
+    color:white;
+}
+
+.reset{
+    background:#576b77;
+    color:white;
+}
+
+.auto{
+    background:#286d92;
+    color:white;
+}
+
+.manual{
+    background:#765d25;
+    color:white;
+}
+
+button:hover{
+    opacity:.8;
+}
+
+/* RIGHT SIDE */
+
+.side{
+    display:flex;
+    flex-direction:column;
+    gap:12px;
+}
+
+.mode{
+    display:flex;
+    gap:8px;
+}
+
+.mode button{
+    flex:1;
+}
+
+.selected{
+    outline:3px solid #8ecae6;
+}
+
+.fault{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    padding:7px;
+}
+
+.fault input{
+    width:18px;
+    height:18px;
+}
+
+.alarm-list{
+    height:180px;
+    overflow:auto;
+}
+
+.alarm{
+    padding:8px;
+    margin-bottom:5px;
+    border-left:5px solid #e74c3c;
+    background:#251b1b;
+    font-size:13px;
+}
+
+.alarm.warning{
+    border-left-color:#e5a93b;
+}
+
+.noalarm{
+    color:#76c893;
+    padding:10px;
+}
+
+.status-indicator{
+    display:inline-block;
+    width:13px;
+    height:13px;
+    border-radius:50%;
+    background:#777;
+    margin-right:6px;
+}
+
+.status-indicator.green{
+    background:#39d98a;
+    box-shadow:0 0 10px #39d98a;
+}
+
+.status-indicator.red{
+    background:#e74c3c;
+    box-shadow:0 0 10px #e74c3c;
+}
+
+.status-indicator.yellow{
+    background:#e5a93b;
+    box-shadow:0 0 10px #e5a93b;
+}
+
+canvas{
+    max-height:230px;
+}
+
+.footer{
+    text-align:center;
+    padding:10px;
+    color:#8498a3;
+    font-size:12px;
+}
+
+@media(max-width:1000px){
+
+    .container{
+        grid-template-columns:1fr;
+    }
+
+    .status-grid{
+        grid-template-columns:repeat(2,1fr);
+    }
+
+    .controls{
+        grid-template-columns:repeat(2,1fr);
+    }
+}
+</style>
+</head>
+
+<body>
+
+<header class="header">
+
+    <h1>🏭 SCADA VIRTUAL LABORATORY</h1>
+
+    <div>
+        SYSTEM:
+        <span class="status-indicator green"></span>
+        ONLINE
+        &nbsp;&nbsp;
+        <span id="clock" class="clock"></span>
+    </div>
+
+</header>
+
+
+<div class="container">
+
+<!-- =====================================================
+     MAIN SCADA AREA
+===================================================== -->
+
+<div class="main">
+
+    <div class="panel">
+
+        <div class="panel-title">
+            WATER TREATMENT PROCESS
+        </div>
+
+        <div class="process">
+
+            <!-- TANK -->
+
+            <div class="tank">
+
+                <div id="water" class="water">
+                    <div class="water-wave"></div>
+                </div>
+
+                <div class="tank-label">
+                    TANK T-101
+                </div>
+
+                <div id="tankProcessValue"
+                     class="tank-value">
+                    60 %
+                </div>
+
+            </div>
+
+
+            <!-- PIPES -->
+
+            <div id="pipe1" class="pipe pipe1"></div>
+
+            <div id="pipe2" class="pipe pipe2"></div>
+
+            <div id="pipe3" class="pipe pipe3"></div>
+
+
+            <!-- PUMP -->
+
+            <div id="pump" class="pump">
+
+                <div class="pump-wheel"></div>
+
+            </div>
+
+            <div class="pump-label">
+
+                <span id="pumpStatusIndicator"
+                      class="status-indicator"></span>
+
+                PUMP P-101
+
+            </div>
+
+
+            <!-- VALVE -->
+
+            <div id="valve"
+                 class="valve">
+            </div>
+
+            <div class="valve-label">
+
+                VALVE V-101
+                <br>
+
+                <span id="valveStatus">
+                    CLOSED
+                </span>
+
+            </div>
+
+
+            <!-- MOTOR -->
+
+            <div id="motor"
+                 class="motor">
+
+                <div class="motor-fan"></div>
+
+            </div>
+
+            <div class="motor-label">
+
+                <span id="motorStatusIndicator"
+                      class="status-indicator"></span>
+
+                MOTOR M-101
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- PROCESS VALUES -->
+
+    <div class="panel">
+
+        <div class="panel-title">
+            REAL-TIME PROCESS VALUES
+        </div>
+
+        <div class="status-grid">
+
+            <div class="value-card">
+                <div class="value-name">TANK LEVEL</div>
+                <div id="levelValue" class="value">60 %</div>
+            </div>
+
+            <div class="value-card">
+                <div class="value-name">PRESSURE</div>
+                <div id="pressureValue" class="value">3.2 bar</div>
+            </div>
+
+            <div class="value-card">
+                <div class="value-name">FLOW RATE</div>
+                <div id="flowValue" class="value">20 L/min</div>
+            </div>
+
+            <div class="value-card">
+                <div class="value-name">TEMPERATURE</div>
+                <div id="temperatureValue" class="value">30 °C</div>
+            </div>
+
+            <div class="value-card">
+                <div class="value-name">MOTOR SPEED</div>
+                <div id="speedValue" class="value">0 RPM</div>
+            </div>
+
+            <div class="value-card">
+                <div class="value-name">MOTOR CURRENT</div>
+                <div id="currentValue" class="value">0 A</div>
+            </div>
+
+            <div class="value-card">
+                <div class="value-name">MOTOR POWER</div>
+                <div id="powerValue" class="value">0 kW</div>
+            </div>
+
+            <div class="value-card">
+                <div class="value-name">VALVE POSITION</div>
+                <div id="valveValue" class="value">0 %</div>
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- CONTROLS -->
+
+    <div class="panel">
+
+        <div class="panel-title">
+            OPERATOR CONTROL
+        </div>
+
+        <div class="controls">
+
+            <button class="start"
+                    onclick="startSystem()">
+                ▶ START
+            </button>
+
+            <button class="stop"
+                    onclick="stopSystem()">
+                ■ STOP
+            </button>
+
+            <button class="reset"
+                    onclick="resetSystem()">
+                ↻ RESET
+            </button>
+
+            <button class="auto"
+                    onclick="setAuto()">
+                AUTO
+            </button>
+
+        </div>
+
+    </div>
+
+
+    <!-- TREND -->
+
+    <div class="panel">
+
+        <div class="panel-title">
+            REAL-TIME TREND
+        </div>
+
+        <canvas id="trendChart"></canvas>
+
+    </div>
+
+</div>
+
+
+<!-- =====================================================
+     RIGHT SIDE SCADA PANEL
+===================================================== -->
+
+<div class="side">
+
+    <!-- MODE -->
+
+    <div class="panel">
+
+        <div class="panel-title">
+            CONTROL MODE
+        </div>
+
+        <div class="mode">
+
+            <button id="manualBtn"
+                    class="manual selected"
+                    onclick="setManual()">
+                MANUAL
+            </button>
+
+            <button id="autoBtn"
+                    class="auto"
+                    onclick="setAuto()">
+                AUTO
+            </button>
+
+        </div>
+
+        <br>
+
+        Current Mode:
+        <b id="modeText">MANUAL</b>
+
+    </div>
+
+
+    <!-- EQUIPMENT -->
+
+    <div class="panel">
+
+        <div class="panel-title">
+            EQUIPMENT STATUS
+        </div>
+
+        <p>
+            <span id="motorStatus"
+                  class="status-indicator"></span>
+            Motor:
+            <b id="motorText">STOPPED</b>
+        </p>
+
+        <p>
+            <span id="pumpStatus"
+                  class="status-indicator"></span>
+            Pump:
+            <b id="pumpText">STOPPED</b>
+        </p>
+
+        <p>
+            <span id="valveStatusIndicator"
+                  class="status-indicator"></span>
+            Valve:
+            <b id="valveText">CLOSED</b>
+        </p>
+
+        <p>
+            <span id="systemStatus"
+                  class="status-indicator green"></span>
+            System:
+            <b id="systemText">READY</b>
+        </p>
+
+    </div>
+
+
+    <!-- FAULT INJECTION -->
+
+    <div class="panel">
+
+        <div class="panel-title">
+            ⚠ FAULT INJECTION
+        </div>
+
+        <div class="fault">
+            <input type="checkbox"
+                   id="motorFault"
+                   onchange="updateFaults()">
+            Motor Overload
+        </div>
+
+        <div class="fault">
+            <input type="checkbox"
+                   id="pumpFault"
+                   onchange="updateFaults()">
+            Pump Failure
+        </div>
+
+        <div class="fault">
+            <input type="checkbox"
+                   id="highTempFault"
+                   onchange="updateFaults()">
+            High Temperature
+        </div>
+
+        <div class="fault">
+            <input type="checkbox"
+                   id="lowLevelFault"
+                   onchange="updateFaults()">
+            Low Tank Level
+        </div>
+
+        <div class="fault">
+            <input type="checkbox"
+                   id="sensorFault"
+                   onchange="updateFaults()">
+            Sensor Failure
+        </div>
+
+    </div>
+
+
+    <!-- ALARMS -->
+
+    <div class="panel">
+
+        <div class="panel-title">
+            🚨 ALARM MANAGEMENT
+        </div>
+
+        <div id="alarmList"
+             class="alarm-list">
+
+            <div class="noalarm">
+                ● No active alarms
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- TAGS -->
+
+    <div class="panel">
+
+        <div class="panel-title">
+            SCADA TAGS
+        </div>
+
+        <small>
+
+            MOTOR_START =
+            <b id="tagMotorStart">0</b>
+            <br><br>
+
+            MOTOR_RUNNING =
+            <b id="tagMotorRunning">0</b>
+            <br><br>
+
+            PUMP_RUNNING =
+            <b id="tagPumpRunning">0</b>
+            <br><br>
+
+            TANK_LEVEL =
+            <b id="tagTankLevel">60</b>
+            %
+            <br><br>
+
+            VALVE_POSITION =
+            <b id="tagValve">0</b>
+            %
+
+        </small>
+
+    </div>
+
+</div>
+
+</div>
+
+
+<div class="footer">
+
+SCADA Virtual Laboratory | PLC–SCADA Process Simulation
+
+</div>
+
+
+<script>
+
+/* =====================================================
+   SCADA TAG DATABASE
+===================================================== */
+
+const tags = {
+
+    MOTOR_START:false,
+
+    MOTOR_STOP:false,
+
+    MOTOR_RUNNING:false,
+
+    MOTOR_SPEED:0,
+
+    MOTOR_CURRENT:0,
+
+    MOTOR_POWER:0,
+
+    PUMP_RUNNING:false,
+
+    VALVE_POSITION:0,
+
+    TANK_LEVEL:60,
+
+    PRESSURE:3.2,
+
+    FLOW:20,
+
+    TEMPERATURE:30
+
+};
+
+
+/* =====================================================
+   SYSTEM VARIABLES
+===================================================== */
+
+let mode = "MANUAL";
+
+let lastTime = Date.now();
+
+let alarmHistory = [];
+
+
+/* =====================================================
+   START SYSTEM
+===================================================== */
+
+function startSystem(){
+
+    tags.MOTOR_START = true;
+
+    if(
+        !document.getElementById("motorFault").checked &&
+        !document.getElementById("pumpFault").checked
+    ){
+
+        tags.MOTOR_RUNNING = true;
+        tags.PUMP_RUNNING = true;
+
+    }
+
+}
+
+
+/* =====================================================
+   STOP SYSTEM
+===================================================== */
+
+function stopSystem(){
+
+    tags.MOTOR_START = false;
+
+    tags.MOTOR_RUNNING = false;
+
+    tags.PUMP_RUNNING = false;
+
+    tags.MOTOR_SPEED = 0;
+
+    tags.MOTOR_CURRENT = 0;
+
+    tags.MOTOR_POWER = 0;
+
+}
+
+
+/* =====================================================
+   RESET
+===================================================== */
+
+function resetSystem(){
+
+    stopSystem();
+
+    tags.TANK_LEVEL = 60;
+
+    tags.PRESSURE = 3.2;
+
+    tags.FLOW = 20;
+
+    tags.TEMPERATURE = 30;
+
+    document.querySelectorAll(
+        '.fault input'
+    ).forEach(
+        checkbox => checkbox.checked=false
+    );
+
+    alarmHistory=[];
+
+    updateAlarms();
+
+}
+
+
+/* =====================================================
+   MANUAL MODE
+===================================================== */
+
+function setManual(){
+
+    mode="MANUAL";
+
+    document.getElementById(
+        "modeText"
+    ).innerText="MANUAL";
+
+    document.getElementById(
+        "manualBtn"
+    ).classList.add("selected");
+
+    document.getElementById(
+        "autoBtn"
+    ).classList.remove("selected");
+
+}
+
+
+/* =====================================================
+   AUTO MODE
+===================================================== */
+
+function setAuto(){
+
+    mode="AUTO";
+
+    document.getElementById(
+        "modeText"
+    ).innerText="AUTO";
+
+    document.getElementById(
+        "autoBtn"
+    ).classList.add("selected");
+
+    document.getElementById(
+        "manualBtn"
+    ).classList.remove("selected");
+
+}
+
+
+/* =====================================================
+   FAULT PROCESSING
+===================================================== */
+
+function updateFaults(){
+
+    if(
+        document.getElementById(
+            "motorFault"
+        ).checked
+    ){
+
+        tags.MOTOR_RUNNING=false;
+        tags.PUMP_RUNNING=false;
+
+    }
+
+    if(
+        document.getElementById(
+            "pumpFault"
+        ).checked
+    ){
+
+        tags.PUMP_RUNNING=false;
+
+    }
+
+}
+
+
+/* =====================================================
+   AUTO PROCESS
+===================================================== */
+
+function automaticControl(){
+
+    if(mode !== "AUTO")
+        return;
+
+
+    /*
+       Low level:
+       Start pump
+    */
+
+    if(tags.TANK_LEVEL < 30){
+
+        if(
+            !document.getElementById(
+                "motorFault"
+            ).checked &&
+            !document.getElementById(
+                "pumpFault"
+            ).checked
+        ){
+
+            tags.MOTOR_RUNNING=true;
+            tags.PUMP_RUNNING=true;
+
+        }
+
+    }
+
+
+    /*
+       High level:
+       Stop pump
+    */
+
+    if(tags.TANK_LEVEL > 90){
+
+        tags.MOTOR_RUNNING=false;
+        tags.PUMP_RUNNING=false;
+
+    }
+
+}
+
+
+/* =====================================================
+   PROCESS SIMULATION
+===================================================== */
+
+function simulateProcess(){
+
+    automaticControl();
+
+
+    /*
+       Tank dynamics
+    */
+
+    if(tags.PUMP_RUNNING){
+
+        tags.TANK_LEVEL += 0.08;
+
+        tags.FLOW = 25;
+
+    }
+    else{
+
+        tags.TANK_LEVEL -= 0.025;
+
+        tags.FLOW = 0;
+
+    }
+
+
+    /*
+       Limits
+    */
+
+    if(tags.TANK_LEVEL > 100)
+        tags.TANK_LEVEL=100;
+
+    if(tags.TANK_LEVEL < 0)
+        tags.TANK_LEVEL=0;
+
+
+    /*
+       Motor
+    */
+
+    if(tags.MOTOR_RUNNING){
+
+        tags.MOTOR_SPEED +=
+            (1450-tags.MOTOR_SPEED)*0.08;
+
+        tags.MOTOR_CURRENT =
+            6.5 + Math.random()*0.8;
+
+        tags.MOTOR_POWER =
+            3.8 + Math.random()*0.3;
+
+    }
+    else{
+
+        tags.MOTOR_SPEED *= 0.9;
+
+        if(tags.MOTOR_SPEED < 1)
+            tags.MOTOR_SPEED=0;
+
+        tags.MOTOR_CURRENT=0;
+
+        tags.MOTOR_POWER=0;
+
+    }
+
+
+    /*
+       Pressure
+    */
+
+    tags.PRESSURE =
+        1.5 +
+        tags.TANK_LEVEL/40 +
+        Math.random()*0.1;
+
+
+    /*
+       Temperature
+    */
+
+    tags.TEMPERATURE =
+        28 +
+        tags.MOTOR_CURRENT*0.8;
+
+    if(
+        document.getElementById(
+            "highTempFault"
+        ).checked
+    ){
+
+        tags.TEMPERATURE=90;
+
+    }
+
+
+    /*
+       Valve
+    */
+
+    if(tags.PUMP_RUNNING){
+
+        tags.VALVE_POSITION=100;
+
+    }
+    else{
+
+        tags.VALVE_POSITION=0;
+
+    }
+
+}
+
+
+/* =====================================================
+   ALARM SYSTEM
+===================================================== */
+
+function updateAlarms(){
+
+    let alarms=[];
+
+
+    if(
+        document.getElementById(
+            "motorFault"
+        ).checked
+    ){
+
+        alarms.push({
+            text:"MOTOR OVERLOAD / TRIP",
+            type:"critical"
+        });
+
+    }
+
+
+    if(
+        document.getElementById(
+            "pumpFault"
+        ).checked
+    ){
+
+        alarms.push({
+            text:"PUMP FAILURE",
+            type:"critical"
+        });
+
+    }
+
+
+    if(tags.TEMPERATURE > 80){
+
+        alarms.push({
+            text:"HIGH TEMPERATURE",
+            type:"critical"
+        });
+
+    }
+
+
+    if(tags.TANK_LEVEL < 20){
+
+        alarms.push({
+            text:"LOW TANK LEVEL",
+            type:"warning"
+        });
+
+    }
+
+
+    if(
+        document.getElementById(
+            "sensorFault"
+        ).checked
+    ){
+
+        alarms.push({
+            text:"SENSOR COMMUNICATION FAILURE",
+            type:"critical"
+        });
+
+    }
+
+
+    const container =
+        document.getElementById(
+            "alarmList"
+        );
+
+
+    if(alarms.length===0){
+
+        container.innerHTML=
+            '<div class="noalarm">● No active alarms</div>';
+
+        return;
+
+    }
+
+
+    container.innerHTML="";
+
+
+    alarms.forEach(
+        alarm => {
+
+            const div =
+                document.createElement(
+                    "div"
+                );
+
+            div.className =
+                alarm.type==="warning"
+                ? "alarm warning"
+                : "alarm";
+
+            div.innerHTML =
+                `<b>${new Date().toLocaleTimeString()}</b>
+                 &nbsp; ${alarm.text}`;
+
+            container.appendChild(div);
+
+        }
+    );
+
+}
+
+
+/* =====================================================
+   UPDATE SCADA GRAPHICS
+===================================================== */
+
+function updateGraphics(){
+
+    /*
+       Tank
+    */
+
+    document.getElementById(
+        "water"
+    ).style.height =
+        tags.TANK_LEVEL+"%";
+
+
+    document.getElementById(
+        "tankProcessValue"
+    ).innerText =
+        tags.TANK_LEVEL.toFixed(1)+" %";
+
+
+    /*
+       Pump
+    */
+
+    const pump =
+        document.getElementById(
+            "pump"
+        );
+
+    if(tags.PUMP_RUNNING){
+
+        pump.classList.add("running");
+
+        document.getElementById(
+            "pumpStatusIndicator"
+        ).className =
+            "status-indicator green";
+
+    }
+    else{
+
+        pump.classList.remove("running");
+
+        document.getElementById(
+            "pumpStatusIndicator"
+        ).className =
+            "status-indicator";
+
+    }
+
+
+    /*
+       Motor
+    */
+
+    const motor =
+        document.getElementById(
+            "motor"
+        );
+
+    if(tags.MOTOR_RUNNING){
+
+        motor.classList.add("running");
+
+        document.getElementById(
+            "motorStatusIndicator"
+        ).className =
+            "status-indicator green";
+
+    }
+    else{
+
+        motor.classList.remove("running");
+
+        document.getElementById(
+            "motorStatusIndicator"
+        ).className =
+            "status-indicator";
+
+    }
+
+
+    /*
+       Valve
+    */
+
+    const valve =
+        document.getElementById(
+            "valve"
+        );
+
+    if(tags.VALVE_POSITION>50){
+
+        valve.classList.add("open");
+
+        document.getElementById(
+            "valveStatus"
+        ).innerText="OPEN";
+
+    }
+    else{
+
+        valve.classList.remove("open");
+
+        document.getElementById(
+            "valveStatus"
+        ).innerText="CLOSED";
+
+    }
+
+
+    /*
+       Pipes
+    */
+
+    document
+        .querySelectorAll(".pipe")
+        .forEach(
+            p => {
+
+                if(tags.PUMP_RUNNING)
+                    p.classList.add("active");
+
+                else
+                    p.classList.remove("active");
+
+            }
+        );
+
+
+    /*
+       Text status
+    */
+
+    document.getElementById(
+        "motorText"
+    ).innerText =
+        tags.MOTOR_RUNNING
+        ? "RUNNING"
+        : "STOPPED";
+
+
+    document.getElementById(
+        "pumpText"
+    ).innerText =
+        tags.PUMP_RUNNING
+        ? "RUNNING"
+        : "STOPPED";
+
+
+    document.getElementById(
+        "valveText"
+    ).innerText =
+        tags.VALVE_POSITION>50
+        ? "OPEN"
+        : "CLOSED";
+
+
+    /*
+       Numeric values
+    */
+
+    document.getElementById(
+        "levelValue"
+    ).innerText =
+        tags.TANK_LEVEL.toFixed(1)+" %";
+
+
+    document.getElementById(
+        "pressureValue"
+    ).innerText =
+        tags.PRESSURE.toFixed(2)+" bar";
+
+
+    document.getElementById(
+        "flowValue"
+    ).innerText =
+        tags.FLOW.toFixed(1)+" L/min";
+
+
+    document.getElementById(
+        "temperatureValue"
+    ).innerText =
+        tags.TEMPERATURE.toFixed(1)+" °C";
+
+
+    document.getElementById(
+        "speedValue"
+    ).innerText =
+        Math.round(tags.MOTOR_SPEED)+" RPM";
+
+
+    document.getElementById(
+        "currentValue"
+    ).innerText =
+        tags.MOTOR_CURRENT.toFixed(2)+" A";
+
+
+    document.getElementById(
+        "powerValue"
+    ).innerText =
+        tags.MOTOR_POWER.toFixed(2)+" kW";
+
+
+    document.getElementById(
+        "valveValue"
+    ).innerText =
+        tags.VALVE_POSITION.toFixed(0)+" %";
+
+
+    /*
+       TAG DISPLAY
+    */
+
+    document.getElementById(
+        "tagMotorStart"
+    ).innerText =
+        tags.MOTOR_START ? 1 : 0;
+
+
+    document.getElementById(
+        "tagMotorRunning"
+    ).innerText =
+        tags.MOTOR_RUNNING ? 1 : 0;
+
+
+    document.getElementById(
+        "tagPumpRunning"
+    ).innerText =
+        tags.PUMP_RUNNING ? 1 : 0;
+
+
+    document.getElementById(
+        "tagTankLevel"
+    ).innerText =
+        tags.TANK_LEVEL.toFixed(1);
+
+
+    document.getElementById(
+        "tagValve"
+    ).innerText =
+        tags.VALVE_POSITION.toFixed(0);
+
+}
+
+
+/* =====================================================
+   REAL-TIME CLOCK
+===================================================== */
+
+function updateClock(){
+
+    document.getElementById(
+        "clock"
+    ).innerText =
+        new Date().toLocaleTimeString();
+
+}
+
+
+/* =====================================================
+   CHART
+===================================================== */
+
+const ctx =
+    document
+        .getElementById(
+            "trendChart"
+        )
+        .getContext("2d");
+
+
+const trendChart =
+    new Chart(
+        ctx,
+        {
+
+            type:"line",
+
+            data:{
+
+                labels:[],
+
+                datasets:[
+
+                    {
+                        label:"Tank Level (%)",
+                        data:[],
+                        tension:.3
+                    },
+
+                    {
+                        label:"Temperature (°C)",
+                        data:[],
+                        tension:.3
+                    },
+
+                    {
+                        label:"Motor Current (A)",
+                        data:[],
+                        tension:.3
+                    }
+
+                ]
+
+            },
+
+            options:{
+
+                responsive:true,
+
+                animation:false,
+
+                scales:{
+
+                    x:{
+                        title:{
+                            display:true,
+                            text:"Time"
+                        }
+                    },
+
+                    y:{
+                        beginAtZero:true
+                    }
+
+                }
+
+            }
+
+        }
+    );
+
+
+function updateChart(){
+
+    const time =
+        new Date()
+        .toLocaleTimeString();
+
+
+    trendChart.data.labels.push(
+        time
+    );
+
+
+    trendChart.data.datasets[0]
+        .data.push(
+            tags.TANK_LEVEL
+        );
+
+
+    trendChart.data.datasets[1]
+        .data.push(
+            tags.TEMPERATURE
+        );
+
+
+    trendChart.data.datasets[2]
+        .data.push(
+            tags.MOTOR_CURRENT
+        );
+
+
+    /*
+       Keep last 30 points
+    */
+
+    if(
+        trendChart.data.labels.length>30
+    ){
+
+        trendChart.data.labels.shift();
+
+        trendChart.data.datasets
+            .forEach(
+                dataset =>
+                    dataset.data.shift()
+            );
+
+    }
+
+
+    trendChart.update();
+
+}
+
+
+/* =====================================================
+   MAIN SCADA LOOP
+===================================================== */
+
+setInterval(
+
+    function(){
+
+        simulateProcess();
+
+        updateGraphics();
+
+        updateAlarms();
+
+    },
+
+    500
+);
+
+
+/* =====================================================
+   TREND UPDATE
+===================================================== */
+
+setInterval(
+
+    function(){
+
+        updateChart();
+
+    },
+
+    1000
+);
+
+
+/* =====================================================
+   CLOCK
+===================================================== */
+
+setInterval(
+
+    updateClock,
+
+    1000
+);
+
+
+updateClock();
+
+</script>
+
+</body>
+</html>

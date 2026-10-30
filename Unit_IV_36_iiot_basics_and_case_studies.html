@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Chapter 35: IIoT Architecture & Industry Case Studies</title>
+
+<!-- MathJax Configuration -->
+<script>
+  window.MathJax = {
+    tex: {
+      inlineMath: [['$', '$'], ['\\(', '\\)']],
+      displayMath: [['$$', '$$'], ['\\[', '\\]']]
+    }
+  };
+</script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+<style>
+  :root {
+    --bg-dark: #071017;
+    --panel-bg: #0d1f2d;
+    --border-color: #1e3a50;
+    --accent-blue: #38bdf8;
+    --accent-green: #22c55e;
+    --accent-amber: #f59e0b;
+    --accent-red: #ef4444;
+    --accent-purple: #a855f7;
+    --text-main: #e2e8f0;
+    --text-muted: #94a3b8;
+  }
+
+  body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: var(--bg-dark);
+    color: var(--text-main);
+    line-height: 1.6;
+    padding: 24px;
+    margin: 0;
+  }
+
+  h1, h2, h3, h4 { color: var(--accent-blue); }
+  h1 { border-bottom: 2px solid var(--border-color); padding-bottom: 10px; margin-bottom: 20px; }
+
+  .sensor-card {
+    background-color: var(--panel-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 10px;
+    padding: 24px;
+    margin-bottom: 30px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+  }
+
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+  @media (max-width: 900px) { .grid-2 { grid-template-columns: 1fr; } }
+
+  .anim-box {
+    background: #040a0f;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 16px;
+    text-align: center;
+  }
+
+  table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+  th, td { border: 1px solid var(--border-color); padding: 10px; text-align: left; }
+  th { background-color: #132b3e; color: var(--accent-blue); }
+
+  .numerical-card {
+    background: #0a1824;
+    border-left: 4px solid var(--accent-amber);
+    padding: 18px;
+    margin-bottom: 20px;
+    border-radius: 0 8px 8px 0;
+  }
+
+  .formula {
+    background: #040a0f;
+    padding: 8px 12px;
+    border-radius: 6px;
+    color: #4ade80;
+    overflow-x: auto;
+    margin: 8px 0;
+  }
+</style>
+</head>
+<body>
+
+<h1>Chapter 35: IIoT Architecture, Telemetry Pipelines & Real Industry Case Studies</h1>
+<p>This chapter examines the convergence of Operational Technology (OT) and Information Technology (IT). Key concepts include Edge-to-Cloud telemetry, publish/subscribe broker mechanics (MQTT/Sparkplug B), predictive maintenance pipelines, and field deployments across thermal power generation and robotic assembly lines.</p>
+
+<!-- SECTION 1: ANIMATED PIPELINES -->
+<div class="sensor-card">
+  <h2>1. IIoT Dynamic Data Telemetry Pipeline</h2>
+  <div class="grid-2">
+    <div>
+      <h3>Edge-to-Cloud Pub/Sub Architecture</h3>
+      <div class="anim-box">
+        <svg viewBox="0 0 320 180" width="100%" height="170">
+          <rect x="10" y="10" width="300" height="160" fill="#0d1f2d" stroke="#1e3a50" stroke-width="2" rx="4"/>
+          
+          <!-- Field Layer -->
+          <rect x="25" y="30" width="55" height="40" fill="#040a0f" stroke="#22c55e" stroke-width="1.5" rx="3"/>
+          <text x="31" y="48" fill="#22c55e" font-size="7" font-weight="bold">Sensors /</text>
+          <text x="34" y="58" fill="#22c55e" font-size="7" font-weight="bold">Actuators</text>
+
+          <!-- Edge Gateway -->
+          <rect x="115" y="30" width="65" height="40" fill="#040a0f" stroke="#f59e0b" stroke-width="1.5" rx="3"/>
+          <text x="122" y="48" fill="#f59e0b" font-size="7" font-weight="bold">Edge Gateway</text>
+          <text x="121" y="58" fill="#f59e0b" font-size="6">(MQTT Payload)</text>
+
+          <!-- Cloud Broker / Platform -->
+          <rect x="220" y="30" width="65" height="40" fill="#040a0f" stroke="#38bdf8" stroke-width="1.5" rx="3"/>
+          <text x="226" y="48" fill="#38bdf8" font-size="7" font-weight="bold">Cloud Platform</text>
+          <text x="224" y="58" fill="#38bdf8" font-size="6">(Time-Series DB)</text>
+
+          <!-- Analytics & ML -->
+          <rect x="220" y="110" width="65" height="40" fill="#040a0f" stroke="#a855f7" stroke-width="1.5" rx="3"/>
+          <text x="226" y="128" fill="#a855f7" font-size="7" font-weight="bold">AI / ML Engine</text>
+          <text x="229" y="138" fill="#a855f7" font-size="6">(PdM Model)</text>
+
+          <!-- Dynamic Connecting Lines -->
+          <line x1="80" y1="50" x2="115" y2="50" stroke="#e2e8f0" stroke-width="1.5"/>
+          <line x1="180" y1="50" x2="220" y2="50" stroke="#e2e8f0" stroke-width="1.5"/>
+          <line x1="252" y1="70" x2="252" y2="110" stroke="#e2e8f0" stroke-width="1.5"/>
+
+          <!-- Packets: Field to Edge -->
+          <circle cx="0" cy="0" r="3" fill="#22c55e">
+            <animateMotion path="M 80 50 L 115 50" dur="1s" repeatCount="indefinite"/>
+          </circle>
+
+          <!-- Packets: Edge to Broker -->
+          <circle cx="0" cy="0" r="3" fill="#f59e0b">
+            <animateMotion path="M 180 50 L 220 50" dur="1.5s" repeatCount="indefinite"/>
+          </circle>
+
+          <!-- Packets: Cloud Storage to ML -->
+          <circle cx="0" cy="0" r="3" fill="#38bdf8">
+            <animateMotion path="M 252 70 L 252 110" dur="1.2s" repeatCount="indefinite"/>
+          </circle>
+        </svg>
+      </div>
+      <br>
+      <h4>Edge Processing & Telemetry Ingestion</h4>
+      <p>Decoupled enterprise architectures handle massive sensor sampling rates cleanly:</p>
+      <ul>
+        <li><strong>Edge Normalization:</strong> Translates proprietary field protocols (Modbus, BACnet) into uniform JSON/Protobuf schemas.</li>
+        <li><strong>MQTT Broker:</strong> Uses lightweight publish/subscribe routing to minimize bandwidth usage over industrial links.</li>
+      </ul>
+    </div>
+
+    <div>
+      <h3>Case Study: Power Plant Boiler Health System</h3>
+      <div class="anim-box">
+        <svg viewBox="0 0 320 180" width="100%" height="170">
+          <rect x="10" y="10" width="300" height="160" fill="#0d1f2d" stroke="#1e3a50" stroke-width="2" rx="4"/>
+          
+          <!-- Boiler Structure -->
+          <path d="M 60 40 L 130 40 L 140 140 L 50 140 Z" fill="#132b3e" stroke="#38bdf8" stroke-width="2"/>
+          <text x="73" y="80" fill="#e2e8f0" font-size="8" font-weight="bold">Boiler Vessel</text>
+          
+          <!-- Dynamic Flame Animation -->
+          <polygon points="75,135 85,105 95,135" fill="#ef4444">
+            <animate attributeName="points" values="75,135 85,105 95,135; 75,135 85,95 95,135; 75,135 85,105 95,135" dur="0.8s" repeatCount="indefinite"/>
+          </polygon>
+
+          <!-- Telemetry Points -->
+          <circle cx="100" cy="60" r="4" fill="#f59e0b"/>
+          <text x="108" y="63" fill="#f59e0b" font-size="7">Pressure (P1)</text>
+
+          <circle cx="65" cy="110" r="4" fill="#22c55e"/>
+          <text x="15" y="113" fill="#22c55e" font-size="7">Vibration (V1)</text>
+
+          <!-- Predictive Dashboard Overlay -->
+          <rect x="200" y="35" width="95" height="110" fill="#040a0f" stroke="#a855f7" stroke-width="1.5" rx="4"/>
+          <text x="210" y="55" fill="#a855f7" font-size="8" font-weight="bold">Cloud Dashboard</text>
+          
+          <text x="210" y="75" fill="#94a3b8" font-size="7">Thermal Efficiency:</text>
+          <text x="210" y="87" fill="#22c55e" font-size="9" font-weight="bold">91.4 %</text>
+
+          <text x="210" y="105" fill="#94a3b8" font-size="7">Remaining Life</text>
+          <text x="210" y="115" fill="#94a3b8" font-size="7">(RUL Expectancy):</text>
+          <text x="210" y="130" fill="#f59e0b" font-size="9" font-weight="bold">142 Days</text>
+        </svg>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SECTION 2: CASE STUDIES TABLE -->
+<div class="sensor-card">
+  <h2>Real-World IIoT Industrial Implementations</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>Industry Domain</th>
+        <th>IIoT Application & Strategy</th>
+        <th>Sensory & Hardware Layer</th>
+        <th>Communication Stack</th>
+        <th>Quantifiable Business Impact</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>Thermal Power Generation</strong></td>
+        <td>Turbine bearing condition analysis and continuous boiler tube thermal stress monitoring.</td>
+        <td>Piezoelectric accelerometers, thermocouples, pressure transducers.</td>
+        <td>OPC UA, MQTT, Modbus TCP over Fiber</td>
+        <td>Prevents catastrophic un-tripped thermal events; reduces unplanned downtime by up to $35\%$.</td>
+      </tr>
+      <tr>
+        <td><strong>Automotive Manufacturing</strong></td>
+        <td>Joint degradation tracking in 6-axis welding robots and stamping press hydraulic pressure analytics.</td>
+        <td>Current transformers, tri-axial vibration sensors, optical rotary encoders.</td>
+        <td>PROFINET, EtherCAT, Sparkplug B over Edge IPC</td>
+        <td>Improves Overall Equipment Effectiveness (OEE) by $12\%$ and maximizes asset availability.</td>
+      </tr>
+      <tr>
+        <td><strong>Water & Utilities Management</strong></td>
+        <td>Smart pumping station power optimization and acoustic pipeline leak detection.</td>
+        <td>Ultrasonic flow meters, acoustic hydrophones, power quality analyzer units.</td>
+        <td>Cellular (NB-IoT/LTE-M), Private 5G, WirelessHART</td>
+        <td>Reduces non-revenue water (NRW) losses by $22\%$ while lowering power consumption.</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- SECTION 3: NUMERICAL PROBLEMS -->
+<div class="sensor-card">
+  <h2>Numerical Engineering Problems: Bandwidth & Data Ingestion Budgeting</h2>
+
+  <!-- Problem 1: MQTT Payload & Bandwidth -->
+  <div class="numerical-card">
+    <h3>Problem 1: MQTT Network Bandwidth Estimation for a Manufacturing Unit</h3>
+    <p><strong>Scenario:</strong> An automotive stamping unit installs $N = 400$ smart vibration sensors on its press line. Sensors package data into JSON payloads transmitted over an MQTT broker connection:</p>
+    <ul>
+      <li>JSON Data Payload Size: $64\text{ bytes}$</li>
+      <li>MQTT Header & Topic Overhead: $16\text{ bytes}$</li>
+      <li>TCP/IP & Frame Overhead: $54\text{ bytes}$</li>
+      <li>Publish Rate ($f_{pub}$): $2\text{ Hz}$ per sensor (2 packets per second).</li>
+    </ul>
+
+    <p>Calculate:</p>
+    <ol type="a">
+      <li>The total packet size ($S_{frame}$) per telemetry message.</li>
+      <li>The total continuous bandwidth requirement for the entire network in $\text{Kbps}$ and $\text{Mbps}$.</li>
+      <li>The total raw data volume ingested by the broker over a 24-hour shift in gigabytes ($\text{GB}$).</li>
+    </ol>
+
+    <h4>Step-by-Step Solution:</h4>
+    <p><strong>1. Single Packet Frame Size ($S_{frame}$):</strong></p>
+    <div class="formula">
+      $$S_{frame} = S_{payload} + S_{MQTT} + S_{Network} = 64 + 16 + 54 = 134\text{ bytes/message}$$
+    </div>
+
+    <p><strong>2. Total Continuous Network Bandwidth:</strong></p>
+    <div class="formula">
+      $$\text{Message Rate} = 400\text{ nodes} \times 2\text{ msgs/sec} = 800\text{ msgs/sec}$$
+    </div>
+    <div class="formula">
+      $$\text{Data Rate} = 800\text{ msgs/sec} \times 134\text{ bytes/msg} = 107,200\text{ bytes/sec}$$
+    </div>
+    <div class="formula">
+      $$\text{Bandwidth (Kbps)} = \frac{107,200 \times 8}{1,000} = 857.6\text{ Kbps}$$
+    </div>
+    <div class="formula">
+      $$\text{Bandwidth (Mbps)} = \frac{857.6}{1,000} \approx 0.858\text{ Mbps}$$
+    </div>
+
+    <p><strong>3. Total 24-Hour Shift Data Volume:</strong></p>
+    <div class="formula">
+      $$\text{Data Volume} = \frac{107,200\text{ bytes/sec} \times (24 \times 3,600\text{ sec})}{1,024^3} \approx 8.627\text{ GB}$$
+    </div>
+  </div>
+
+  <!-- Problem 2: Time-Series Storage -->
+  <div class="numerical-card">
+    <h3>Problem 2: Time-Series Database Storage Capacity Sizing for a Power Plant</h3>
+    <p><strong>Scenario:</strong> A power generation utility manages $M = 12$ thermal power units. Each unit logs $N_{tags} = 1,500$ operational tags into a cloud Time-Series Database (TSDB):</p>
+    <ul>
+      <li>Sampling Frequency: $1\text{ Hz}$ (1 sample per second per tag).</li>
+      <li>Uncompressed Sample Size: Timestamp (8 bytes) + Value (8 bytes) = $16\text{ bytes/sample}$.</li>
+      <li>The TSDB applies lossless Gorilla compression, reducing storage footprint by $4:1$ ($25\%$ retained size).</li>
+    </ul>
+
+    <p>Calculate:</p>
+    <ol type="a">
+      <li>The raw uncompressed data ingestion rate across all 12 units in megabytes per second ($\text{MB/s}$).</li>
+      <li>The effective compressed data storage rate per second in kilobytes per second ($\text{KB/s}$).</li>
+      <li>The total annual compressed storage required for $1\text{ year}$ ($365\text{ days}$) of continuous operational telemetry in terabytes ($\text{TB}$).</li>
+    </ol>
+
+    <h4>Step-by-Step Solution:</h4>
+    <p><strong>1. Raw Ingestion Rate:</strong></p>
+    <div class="formula">
+      $$\text{Total Active Tags} = 12\text{ units} \times 1,500\text{ tags} = 18,000\text{ tags}$$
+    </div>
+    <div class="formula">
+      $$\text{Raw Rate} = 18,000\text{ samples/sec} \times 16\text{ bytes} = 288,000\text{ bytes/sec} = 0.288\text{ MB/s}$$
+    </div>
+
+    <p><strong>2. Compressed Ingestion Rate:</strong></p>
+    <div class="formula">
+      $$\text{Compressed Rate} = \frac{288,000\text{ bytes/sec}}{4} = 72,000\text{ bytes/sec} = 72\text{ KB/s}$$
+    </div>
+
+    <p><strong>3. Annual Compressed Storage Capacity Budget:</strong></p>
+    <div class="formula">
+      $$\text{Annual Storage} = \frac{72,000\text{ bytes/sec} \times 31,536,000\text{ sec/year}}{1,024^4} \approx 2.065\text{ TiB (or } 2.271\text{ TB decimal)}$$
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

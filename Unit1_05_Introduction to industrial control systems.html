@@ -1,0 +1,727 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Industrial Control Systems (ICS) - Hierarchy, Architecture & Components</title>
+
+<style>
+*{box-sizing:border-box}
+
+body{
+    margin:0;
+    font-family:Arial,Helvetica,sans-serif;
+    background:#071017;
+    color:#edf7fb;
+}
+
+header{
+    background:#0b2533;
+    padding:22px;
+    border-bottom:3px solid #28a9d6;
+    position:sticky;
+    top:0;
+    z-index:1000;
+}
+
+header h1{margin:0;font-size:25px}
+header p{margin:7px 0;color:#a9ddec}
+
+nav{
+    background:#081720;
+    padding:10px;
+    text-align:center;
+    border-bottom:1px solid #31505d;
+}
+
+nav button{
+    background:#12394b;
+    color:white;
+    border:1px solid #477080;
+    padding:9px 13px;
+    border-radius:6px;
+    margin:3px;
+    cursor:pointer;
+}
+
+nav button:hover{background:#1c5b71}
+
+.container{
+    max-width:1400px;
+    margin:auto;
+    padding:22px;
+}
+
+.card{
+    background:#0c1b25;
+    border:1px solid #2c4d5b;
+    border-radius:11px;
+    padding:24px;
+    margin-bottom:22px;
+}
+
+h2{color:#7dd3fc}
+h3{color:#8ddcf0}
+
+p{line-height:1.7}
+
+.highlight{
+    background:#0e2d3b;
+    border-left:5px solid #38bdf8;
+    padding:16px;
+    margin:16px 0;
+    border-radius:5px;
+}
+
+.warning{
+    background:#332717;
+    border-left:5px solid #f59e0b;
+    padding:16px;
+    margin:16px 0;
+}
+
+.grid2{
+    display:grid;
+    grid-template-columns:repeat(2,1fr);
+    gap:18px;
+}
+
+.grid3{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:18px;
+}
+
+.info{
+    background:#102632;
+    border:1px solid #3b6170;
+    border-radius:9px;
+    padding:20px;
+}
+
+.icon{
+    font-size:48px;
+    text-align:center;
+    margin:10px;
+}
+
+/* FLOW & HIERARCHY */
+
+.flow{
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    flex-wrap:wrap;
+    gap:12px;
+    margin:25px 0;
+}
+
+.flowBox{
+    min-width:135px;
+    padding:18px;
+    text-align:center;
+    background:#102c3a;
+    border:2px solid #456d7b;
+    border-radius:8px;
+    transition: .3s;
+}
+
+.flowBox.active{
+    border-color:#38bdf8;
+    box-shadow:0 0 15px rgba(56,189,248,.4);
+    background:#164257;
+}
+
+.arrow{
+    font-size:30px;
+    color:#758f99;
+}
+
+.arrow.active{
+    color:#22c55e;
+    text-shadow:0 0 12px #22c55e;
+}
+
+.pyramidLevel{
+    border:2px solid #385765;
+    border-radius:8px;
+    padding:15px;
+    margin:10px 0;
+    background:#0b1922;
+    transition: .3s;
+}
+
+.pyramidLevel:hover{
+    border-color:#38bdf8;
+    background:#102633;
+}
+
+.levelBadge{
+    display:inline-block;
+    background:#1d4ed8;
+    color:white;
+    padding:4px 10px;
+    border-radius:4px;
+    font-size:12px;
+    font-weight:bold;
+    margin-bottom:8px;
+}
+
+/* SIMULATION CELL */
+
+.factory{
+    background:#03090d;
+    border:2px solid #385765;
+    border-radius:10px;
+    padding:25px;
+}
+
+.factoryTitle{
+    text-align:center;
+    color:#8ddcf0;
+    font-size:20px;
+    font-weight:bold;
+    margin-bottom:25px;
+}
+
+.line{
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    flex-wrap:wrap;
+    gap:10px;
+}
+
+.machine{
+    width:150px;
+    height:125px;
+    background:#142a34;
+    border:3px solid #4b6975;
+    border-radius:9px;
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+    align-items:center;
+    transition:.3s;
+}
+
+.machineIcon{
+    font-size:38px;
+}
+
+.machine.active{
+    border-color:#22c55e;
+    box-shadow:0 0 25px rgba(34,197,94,.55);
+    transform:scale(1.04);
+}
+
+.machine.warning{
+    border-color:#f59e0b;
+    box-shadow:0 0 20px rgba(245,158,11,.4);
+}
+
+/* METRICS & GAUGES */
+
+.metrics{
+    display:grid;
+    grid-template-columns:repeat(4,1fr);
+    gap:14px;
+    margin-top:20px;
+}
+
+.metric{
+    background:#102a35;
+    border:1px solid #3b6270;
+    padding:18px;
+    border-radius:8px;
+    text-align:center;
+}
+
+.metricValue{
+    font-size:27px;
+    font-weight:bold;
+    color:#7dd3fc;
+    margin-top:8px;
+}
+
+/* BUTTONS */
+
+.btn{
+    border:0;
+    color:white;
+    padding:12px 18px;
+    border-radius:6px;
+    margin:5px;
+    cursor:pointer;
+    font-weight:bold;
+}
+
+.green{background:#15803d}
+.red{background:#b91c1c}
+.blue{background:#2563eb}
+.orange{background:#b45309}
+
+/* TABLE */
+
+table{
+    width:100%;
+    border-collapse:collapse;
+}
+
+th,td{
+    border:1px solid #3b5d68;
+    padding:13px;
+}
+
+th{
+    background:#12394b;
+}
+
+/* QUIZ */
+
+.quiz{
+    background:#091923;
+    border:1px solid #355a68;
+    padding:18px;
+    margin:15px 0;
+    border-radius:8px;
+}
+
+.quiz button{
+    display:block;
+    width:100%;
+    text-align:left;
+    padding:11px;
+    margin:6px 0;
+    background:#123548;
+    color:white;
+    border:1px solid #426979;
+    border-radius:5px;
+    cursor:pointer;
+}
+
+.quiz button.correct{background:#14532d}
+.quiz button.wrong{background:#7f1d1d}
+
+.result{
+    background:#102c38;
+    padding:15px;
+    border-left:5px solid #38bdf8;
+}
+
+.center{text-align:center}
+
+@media(max-width:900px){
+    .grid2,.grid3{grid-template-columns:1fr}
+    .metrics{grid-template-columns:1fr 1fr}
+}
+
+@media(max-width:600px){
+    .metrics{grid-template-columns:1fr}
+    header h1{font-size:20px}
+}
+</style>
+</head>
+
+<body>
+
+<header>
+<h1>📘 INDUSTRIAL CONTROL AND AUTOMATION</h1>
+<p>UNIT – I | Chapter 5 — Introduction to Industrial Control Systems (ICS)</p>
+</header>
+
+<nav>
+<button onclick="go('concept')">Concept</button>
+<button onclick="go('hierarchy')">Purdue Model</button>
+<button onclick="go('components')">Core Components</button>
+<button onclick="go('loop')">Control Loop</button>
+<button onclick="go('comparison')">PLC vs RTU vs DCS</button>
+<button onclick="go('simulation')">ICS Interactive</button>
+<button onclick="go('quiz')">Quiz</button>
+</nav>
+
+<div class="container">
+
+<!-- INTRODUCTION -->
+<section id="concept" class="card">
+<h2>1. What is an Industrial Control System (ICS)?</h2>
+<p>
+An <strong>Industrial Control System (ICS)</strong> is a collective term used to describe the hardware, software, network protocols, and instrumentation used to operate, monitor, and automate industrial processes across facilities like power plants, water treatment facilities, oil refineries, and automated factories.
+</p>
+
+<div class="highlight">
+<strong>Primary Objective:</strong>
+ICS provides real-time closed-loop control, real-time telemetry, supervisory management, and automatic safety interlocks to ensure safe, continuous, and optimized industrial operations.
+</div>
+
+<div class="grid3">
+<div class="info">
+<div class="icon">🕹️</div>
+<h3>Process Control</h3>
+<p>Executes closed-loop algorithms (like PID) to keep variables (temp, pressure) at desired setpoints.</p>
+</div>
+
+<div class="info">
+<div class="icon">🖥️</div>
+<h3>Human Interface</h3>
+<p>Provides visual graphics (HMI) for operators to inspect alarms and issue commands.</p>
+</div>
+
+<div class="info">
+<div class="icon">🌐</div>
+<h3>Supervisory Oversight</h3>
+<p>Gathers data across geographically dispersed assets via SCADA networks.</p>
+</div>
+</div>
+</section>
+
+<!-- PURDUE MODEL / HIERARCHY -->
+<section id="hierarchy" class="card">
+<h2>2. Functional Hierarchy of ICS (Purdue Model Architecture)</h2>
+<p>
+Modern Industrial Control Systems are structured into levels using the <strong>ISA-95 / Purdue Reference Model</strong>. This standardizes how data flows from physical sensors up to corporate business systems.
+</p>
+
+<div class="pyramidLevel" style="border-left:5px solid #a855f7">
+<span class="levelBadge" style="background:#6b21a8">LEVEL 4 — Enterprise Network (ERP)</span>
+<h3>Business & Enterprise Resource Planning</h3>
+<p>Manages inventory, plant scheduling, logistics, and supply chain. System: SAP, ERP databases.</p>
+</div>
+
+<div class="pyramidLevel" style="border-left:5px solid #3b82f6">
+<span class="levelBadge" style="background:#1e40af">LEVEL 3 — Site Operations (MES / Historian)</span>
+<h3>Manufacturing Execution Systems & Data Historians</h3>
+<p>Monitors production workflows, tracks batch history, long-term analytics, and quality control.</p>
+</div>
+
+<div class="pyramidLevel" style="border-left:5px solid #06b6d4">
+<span class="levelBadge" style="background:#0e7490">LEVEL 2 — Supervisory Control (HMI / SCADA)</span>
+<h3>Control Center & Operator Supervision</h3>
+<p>Provides control room visualization, alarm tracking, and central parameter changes via HMI & SCADA server.</p>
+</div>
+
+<div class="pyramidLevel" style="border-left:5px solid #10b981">
+<span class="levelBadge" style="background:#047857">LEVEL 1 — Basic Control (PLC / RTU / DCS)</span>
+<h3>Local Automation Controllers</h3>
+<p>Executes deterministic microsecond/millisecond logic algorithms (PLCs, PACs, Safety Systems).</p>
+</div>
+
+<div class="pyramidLevel" style="border-left:5px solid #f59e0b">
+<span class="levelBadge" style="background:#b45309">LEVEL 0 — Physical Process (Sensors & Actuators)</span>
+<h3>Field Devices & Instrumentation</h3>
+<p>Physical hardware directly contacting the process: RTDs, pressure transmitters, valves, motors, drives.</p>
+</div>
+</section>
+
+<!-- CORE COMPONENTS -->
+<section id="components" class="card">
+<h2>3. Key Structural Components of an ICS</h2>
+<div class="grid2">
+<div class="info">
+<h3>🧠 PLC (Programmable Logic Controller)</h3>
+<p>Solid-state industrial computer tailored for fast, deterministic control of local factory machinery. Executes relay-ladder logic, function blocks, or structured text.</p>
+</div>
+
+<div class="info">
+<h3>📡 RTU (Remote Terminal Unit)</h3>
+<p>Ruggedized, low-power telemetry computer deployed at remote locations (e.g., oil pipelines, electrical substations) over long-distance wireless networks.</p>
+</div>
+
+<div class="info">
+<h3>🌐 SCADA (Supervisory Control and Data Acquisition)</h3>
+<p>High-level software architecture operating across wide geographic regions to collect telemetry, record historian data, and issue supervisory setpoints.</p>
+</div>
+
+<div class="info">
+<h3>🏭 DCS (Distributed Control System)</h3>
+<p>Integrated control architecture used in massive continuous process plants (chemical plants, refineries) where autonomous controllers manage distinct plant sub-zones.</p>
+</div>
+</div>
+</section>
+
+<!-- CONTROL LOOP -->
+<section id="loop" class="card">
+<h2>4. Closed-Loop Process Control Architecture</h2>
+<p>
+Every industrial automation sequence relies on a closed feedback loop: measuring a physical variable, calculating error relative to a desired setpoint, and adjusting an output device.
+</p>
+
+<div class="flow">
+<div class="flowBox" id="step1">📡<br>Sensor<br><small>(Measure Process)</small></div>
+<div class="arrow active" id="arr1">→</div>
+<div class="flowBox" id="step2">🧠<br>Controller / PLC<br><small>(Calculate Error)</small></div>
+<div class="arrow active" id="arr2">→</div>
+<div class="flowBox" id="step3">⚡<br>Drive / Output<br><small>(Amplify Signal)</small></div>
+<div class="arrow active" id="arr3">→</div>
+<div class="flowBox" id="step4">⚙️<br>Actuator<br><small>(Valve/Motor)</small></div>
+<div class="arrow active" id="arr4">→</div>
+<div class="flowBox" id="step5">🏭<br>Process<br><small>(Physical State)</small></div>
+</div>
+
+<div class="center">
+<button class="btn blue" onclick="traceLoop()">Trace Signal Flow</button>
+</div>
+<div class="highlight center" id="loopStatus">System Idle - Click to trace control loop sequence.</div>
+</section>
+
+<!-- COMPARISON TABLE -->
+<section id="comparison" class="card">
+<h2>5. Architectural Comparison: PLC vs. RTU vs. DCS</h2>
+<table>
+<tr>
+<th>Parameter</th>
+<th>PLC (Programmable Controller)</th>
+<th>RTU (Remote Terminal Unit)</th>
+<th>DCS (Distributed Control System)</th>
+</tr>
+<tr>
+<td><strong>Primary Focus</strong></td>
+<td>Discrete automation & fast local control</td>
+<td>Remote telemetry & wide-area monitoring</td>
+<td>Continuous process plant control</td>
+</tr>
+<tr>
+<td><strong>Geographic Scope</strong></td>
+<td>Local plant floor / machine cell</td>
+<td>Wide-area (pipelines, power grids)</td>
+<td>Plant-wide (refineries, power plants)</td>
+</tr>
+<tr>
+<td><strong>Response Time</strong></td>
+<td>Ultra-fast (milliseconds)</td>
+<td>Moderate (seconds to minutes)</td>
+<td>Fast to Moderate (milliseconds to seconds)</td>
+</tr>
+<tr>
+<td><strong>Environment</strong></td>
+<td>Factory floor panels</td>
+<td>Extreme outdoor/rugged environments</td>
+<td>Centralized plant control rooms</td>
+</tr>
+<tr>
+<td><strong>Architecture</strong></td>
+<td>Standalone with modular expansion</td>
+<td>Stand-alone telemetry with radio/cellular</td>
+<td>Fully integrated vendor ecosystem</td>
+</tr>
+</table>
+</section>
+
+<!-- INTERACTIVE ICS SIMULATION -->
+<section id="simulation" class="card">
+<h2>6. Interactive ICS Process Dashboard</h2>
+<p>Demonstration of a closed-loop tank level and temperature control system supervised by a PLC and HMI console.</p>
+
+<div class="factory">
+<div class="factoryTitle">PROCESS CONTROL CELL — FLUID HEATING TANK</div>
+
+<div class="line">
+<div class="machine" id="m_sensor">
+<div class="machineIcon">📡</div>
+<strong>Level Sensor</strong>
+</div>
+
+<div class="arrow" id="a_s1">→</div>
+
+<div class="machine" id="m_plc">
+<div class="machineIcon">🧠</div>
+<strong>PLC Controller</strong>
+</div>
+
+<div class="arrow" id="a_s2">→</div>
+
+<div class="machine" id="m_heater">
+<div class="machineIcon">🔥</div>
+<strong>Heater Drive</strong>
+</div>
+
+<div class="arrow" id="a_s3">→</div>
+
+<div class="machine" id="m_valve">
+<div class="machineIcon">🚰</div>
+<strong>Discharge Valve</strong>
+</div>
+</div>
+
+<div class="metrics">
+<div class="metric">
+Tank Temp
+<div class="metricValue" id="val_temp">25 °C</div>
+</div>
+
+<div class="metric">
+Fill Level
+<div class="metricValue" id="val_level">40 %</div>
+</div>
+
+<div class="metric">
+Pump Status
+<div class="metricValue" id="val_pump">OFF</div>
+</div>
+
+<div class="metric">
+PLC Output
+<div class="metricValue" id="val_plc">0 %</div>
+</div>
+</div>
+
+<br>
+<div class="center">
+<button class="btn green" onclick="runICSProcess()">▶ RUN CLOSED-LOOP AUTO</button>
+<button class="btn red" onclick="tripEmergencyStop()">🚨 EMERGENCY TRIP</button>
+</div>
+
+<div class="highlight center" id="simStatus">SYSTEM STANDBY — Press RUN CLOSED-LOOP AUTO</div>
+</div>
+</section>
+
+<!-- QUIZ -->
+<section id="quiz" class="card">
+<h2>7. Student Self-Assessment</h2>
+
+<div class="quiz">
+<strong>Q1. Which Purdue Model level contains field sensors and actuators?</strong>
+<button onclick="answer(this,false)">A. Level 3 - Site Operations</button>
+<button onclick="answer(this,true)">B. Level 0 - Physical Process</button>
+<button onclick="answer(this,false)">C. Level 2 - Supervisory Control</button>
+<button onclick="answer(this,false)">D. Level 4 - Enterprise ERP</button>
+</div>
+
+<div class="quiz">
+<strong>Q2. What controller is best suited for wide geographic telemetry like gas pipelines?</strong>
+<button onclick="answer(this,false)">A. Discrete relay</button>
+<button onclick="answer(this,true)">B. RTU (Remote Terminal Unit)</button>
+<button onclick="answer(this,false)">C. Desktop PC</button>
+<button onclick="answer(this,false)">D. Basic Timer</button>
+</div>
+
+<div class="quiz">
+<strong>Q3. Which system is designed for plant-wide continuous process control with integrated controllers?</strong>
+<button onclick="answer(this,false)">A. Standalone Microcontroller</button>
+<button onclick="answer(this,false)">B. Enterprise Resource Planning (ERP)</button>
+<button onclick="answer(this,true)">C. DCS (Distributed Control System)</button>
+<button onclick="answer(this,false)">D. Unmanaged Network Switch</button>
+</div>
+
+<div class="quiz">
+<strong>Q4. What is the primary role of an HMI in an ICS?</strong>
+<button onclick="answer(this,true)">A. Provides visual control interfaces and alarm displays for operators</button>
+<button onclick="answer(this,false)">B. Converts AC high voltage to DC supply</button>
+<button onclick="answer(this,false)">C. Directly operates pneumatic piston chambers</button>
+<button onclick="answer(this,false)">D. Manages corporate employee payroll</button>
+</div>
+
+<div class="result" id="quizResult">Select an answer.</div>
+</section>
+
+</div>
+
+<script>
+/* NAVIGATION */
+function go(id){
+    document.getElementById(id).scrollIntoView({behavior:"smooth"});
+}
+
+/* LOOP TRACE */
+function traceLoop(){
+    let steps = ["step1", "step2", "step3", "step4", "step5"];
+    let arrows = ["arr1", "arr2", "arr3", "arr4"];
+    let status = document.getElementById("loopStatus");
+
+    steps.forEach(s => document.getElementById(s).classList.remove("active"));
+    arrows.forEach(a => document.getElementById(a).classList.remove("active"));
+
+    steps.forEach((s, idx) => {
+        setTimeout(() => {
+            document.getElementById(s).classList.add("active");
+            status.innerText = "Tracing Signal: Step " + (idx+1) + " of 5 active...";
+            if(idx < arrows.length){
+                document.getElementById(arrows[idx]).classList.add("active");
+            }
+        }, idx * 500);
+    });
+
+    setTimeout(() => {
+        status.innerText = "✅ Closed-Loop Signal Flow Cycle Completed";
+    }, steps.length * 500);
+}
+
+/* SIMULATION PROCESS */
+let simInterval = null;
+
+function runICSProcess(){
+    clearInterval(simInterval);
+    let temp = 25;
+    let level = 40;
+    
+    document.getElementById("m_sensor").classList.add("active");
+    document.getElementById("m_plc").classList.add("active");
+    document.getElementById("m_heater").classList.add("active");
+    document.getElementById("m_valve").classList.add("active");
+    
+    document.getElementById("a_s1").classList.add("active");
+    document.getElementById("a_s2").classList.add("active");
+    document.getElementById("a_s3").classList.add("active");
+
+    document.getElementById("val_pump").innerText = "AUTO ON";
+    document.getElementById("simStatus").innerText = "🟢 ICS Closed-Loop Auto Control Executing...";
+
+    simInterval = setInterval(() => {
+        if(temp < 75) temp += 5;
+        if(level < 90) level += 4;
+
+        let plcOut = Math.min(100, Math.round((75 - temp) * 2 + 30));
+
+        document.getElementById("val_temp").innerText = temp + " °C";
+        document.getElementById("val_level").innerText = level + " %";
+        document.getElementById("val_plc").innerText = plcOut + " %";
+
+        if(temp >= 75 && level >= 90){
+            clearInterval(simInterval);
+            document.getElementById("simStatus").innerText = "✅ Setpoint Reached: Process Stabilized by PLC Loop";
+            document.getElementById("val_plc").innerText = "15 % (Hold)";
+        }
+    }, 400);
+}
+
+function tripEmergencyStop(){
+    clearInterval(simInterval);
+    document.getElementById("val_temp").innerText = "TRIPPED";
+    document.getElementById("val_level").innerText = "HOLD";
+    document.getElementById("val_pump").innerText = "TRIPPED";
+    document.getElementById("val_plc").innerText = "0 %";
+
+    let machines = ["m_sensor", "m_plc", "m_heater", "m_valve"];
+    machines.forEach(m => {
+        let el = document.getElementById(m);
+        el.classList.remove("active");
+        el.classList.add("warning");
+    });
+
+    document.getElementById("simStatus").innerText = "🚨 EMERGENCY INTERLOCK TRIPPED — ALL DRIVES SHUT DOWN";
+}
+
+/* QUIZ */
+let score = 0;
+let answered = 0;
+
+function answer(button, correct){
+    let quiz = button.parentElement;
+    if(quiz.dataset.answered) return;
+    
+    quiz.dataset.answered = "yes";
+    answered++;
+
+    if(correct){
+        button.classList.add("correct");
+        score++;
+        document.getElementById("quizResult").innerText = "✓ Correct | Score: " + score + " / " + answered;
+    }else{
+        button.classList.add("wrong");
+        document.getElementById("quizResult").innerText = "✗ Incorrect | Score: " + score + " / " + answered;
+    }
+}
+</script>
+
+</body>
+</html>

@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Chapter 12: Speed Measurement – Hall Effect, Magnetic & Tachogenerator</title>
+
+<!-- MathJax Configuration and Script -->
+<script>
+  window.MathJax = {
+    tex: {
+      inlineMath: [['$', '$'], ['\\(', '\\)']],
+      displayMath: [['$$', '$$'], ['\\[', '\\]']]
+    }
+  };
+</script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+<style>
+  :root {
+    --bg-dark: #071017;
+    --panel-bg: #0d1f2d;
+    --border-color: #1e3a50;
+    --accent-blue: #38bdf8;
+    --accent-green: #22c55e;
+    --accent-amber: #f59e0b;
+    --text-main: #e2e8f0;
+    --text-muted: #94a3b8;
+  }
+
+  body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: var(--bg-dark);
+    color: var(--text-main);
+    line-height: 1.6;
+    padding: 24px;
+    margin: 0;
+  }
+
+  h1, h2, h3, h4 {
+    color: var(--accent-blue);
+  }
+
+  h1 {
+    border-bottom: 2px solid var(--border-color);
+    padding-bottom: 10px;
+    margin-bottom: 20px;
+  }
+
+  .sensor-card {
+    background-color: var(--panel-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 10px;
+    padding: 24px;
+    margin-bottom: 30px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+  }
+
+  .grid-2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+  }
+
+  @media (max-width: 900px) {
+    .grid-2 { grid-template-columns: 1fr; }
+  }
+
+  .anim-box {
+    background: #040a0f;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 16px;
+    text-align: center;
+  }
+
+  .img-fluid {
+    max-width: 100%;
+    height: 180px;
+    object-fit: contain;
+    border-radius: 6px;
+    background: #040a0f;
+    padding: 10px;
+    border: 1px solid var(--border-color);
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 15px;
+  }
+
+  th, td {
+    border: 1px solid var(--border-color);
+    padding: 10px;
+    text-align: left;
+  }
+
+  th {
+    background-color: #132b3e;
+    color: var(--accent-blue);
+  }
+
+  .numerical-card {
+    background: #0a1824;
+    border-left: 4px solid var(--accent-amber);
+    padding: 18px;
+    margin-bottom: 20px;
+    border-radius: 0 8px 8px 0;
+  }
+
+  .formula {
+    background: #040a0f;
+    padding: 8px 12px;
+    border-radius: 6px;
+    color: #4ade80;
+    overflow-x: auto;
+    margin: 8px 0;
+  }
+</style>
+</head>
+<body>
+
+<h1>Chapter 12: Rotational Speed Measurement Transducers</h1>
+<p>This chapter examines rotational velocity measurement devices used in electric drive feedback systems. Topics include solid-state magnetic potential sensing via <strong>Hall Effect Sensors</strong>, variable reluctance flux perturbation in <strong>Variable Reluctance Magnetic Speed Sensors</strong>, electromechanical generator feedback using <strong>Tachogenerators (DC & AC)</strong>, and motor speed control calculations.</p>
+
+<!-- SECTION 1: HALL EFFECT SENSOR -->
+<div class="sensor-card">
+  <h2>1. Hall Effect Speed & Position Sensor</h2>
+  <div class="grid-2">
+    <div>
+      <h3>Industrial Hardware Image</h3>
+      <img src="images/Hall Effect Sensor.jpg" class="img-fluid" alt="Hall Effect Speed Sensor Module">
+      <br>
+      <h4>Working Principle</h4>
+      <p>A Hall Effect sensor operates on the principle of Lorentz force acting on moving charge carriers inside a semiconductor strip. When a current $I$ flows through the element under a perpendicular magnetic flux density $B$, electrons are deflected toward one edge, producing a transverse <strong>Hall Voltage ($V_H$)</strong>:</p>
+      <div class="formula">
+        $$V_H = \frac{R_H \times I \times B}{t}$$
+      </div>
+      <p>Where $R_H$ is the Hall coefficient and $t$ is element thickness. When mounted near a rotating target wheel with embedded target teeth or permanent magnets ($N$ poles), the fluctuating magnetic field creates digital pulses. The shaft rotational speed $N_{rpm}$ is calculated from pulse frequency $f$:</p>
+      <div class="formula">
+        $$N_{rpm} = \frac{60 \times f}{P}$$
+      </div>
+      <p>Where $P$ is the number of magnetic pole pairs or gear teeth per revolution.</p>
+    </div>
+
+    <div>
+      <h3>Interactive Principle Animation</h3>
+      <div class="anim-box">
+        <svg viewBox="0 0 400 200" width="100%" height="180">
+          <!-- Rotating Target Gear -->
+          <g transform="translate(130,100)">
+            <circle cx="0" cy="0" r="50" fill="#1e293b" stroke="#38bdf8" stroke-width="2"/>
+            <!-- Teeth -->
+            <rect x="-8" y="-62" width="16" height="12" fill="#38bdf8"/>
+            <rect x="-8" y="50" width="16" height="12" fill="#38bdf8"/>
+            <rect x="-62" y="-8" width="12" height="16" fill="#38bdf8"/>
+            <rect x="50" y="-8" width="12" height="16" fill="#38bdf8"/>
+            
+            <circle cx="0" cy="0" r="10" fill="#0f172a" stroke="#94a3b8"/>
+            <animateTransform attributeName="transform" type="rotate" from="0 130 100" to="360 130 100" dur="3s" repeatCount="indefinite"/>
+          </g>
+
+          <!-- Hall Effect Probe Package -->
+          <rect x="200" y="85" width="40" height="30" fill="#f59e0b" rx="4"/>
+          <text x="206" y="104" fill="#000" font-size="9" font-weight="bold">HALL IC</text>
+          
+          <!-- Signal Wires -->
+          <line x1="240" y1="95" x2="290" y2="95" stroke="#22c55e" stroke-width="2"/>
+          <line x1="240" y1="105" x2="290" y2="105" stroke="#ef4444" stroke-width="2"/>
+
+          <!-- Oscilloscope Square Wave Display -->
+          <rect x="290" y="60" width="90" height="80" fill="#091a24" stroke="#22c55e" rx="4"/>
+          <path d="M 295 110 L 310 110 L 310 80 L 330 80 L 330 110 L 350 110 L 350 80 L 370 80 L 370 110 L 380 110" fill="none" stroke="#4ade80" stroke-width="2"/>
+          <text x="300" y="130" fill="#94a3b8" font-size="9">Digital Pulse Frequency (f)</text>
+        </svg>
+        <p style="font-size:12px; color:#94a3b8;">Ferromagnetic Gear Tooth Pulse Generation</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SECTION 2: MAGNETIC SPEED SENSOR -->
+<div class="sensor-card">
+  <h2>2. Variable Reluctance Magnetic Speed Pickup Sensor</h2>
+  <div class="grid-2">
+    <div>
+      <h3>Industrial Hardware Image</h3>
+      <img src="images/Magentic sensor.jpg" class="img-fluid" alt="Variable Reluctance Magnetic Speed Pickup Sensor">
+      <br>
+      <h4>Working Principle</h4>
+      <p>A Variable Reluctance (VR) magnetic sensor is a passive transducer consisting of a permanent magnet wrapped with a coil wire around a soft iron pole piece. When a ferrous gear tooth passes close to the sensor tip, the air gap magnetic reluctance decreases, increasing magnetic flux $\Phi$.</p>
+
+      <p>According to Faraday’s Law of Electromagnetic Induction, the changing flux induces an AC sine-wave voltage $e(t)$ across the coil output:</p>
+      <div class="formula">
+        $$e(t) = -N_{turns} \times \frac{d\Phi}{dt}$$
+      </div>
+      <p>The output signal amplitude and frequency both increase proportionally with target rotation speed $\omega$. VR sensors require no external DC power source.</p>
+    </div>
+
+    <div>
+      <h3>Interactive Pickup Coil Animation</h3>
+      <div class="anim-box">
+        <svg viewBox="0 0 400 200" width="100%" height="180">
+          <!-- Permanent Magnet & Pole Piece -->
+          <rect x="60" y="75" width="50" height="50" fill="#ef4444" rx="2"/>
+          <text x="78" y="105" fill="#fff" font-size="12" font-weight="bold">N</text>
+          
+          <rect x="110" y="85" width="70" height="30" fill="#cbd5e1"/>
+          <!-- Coil Windings -->
+          <g fill="none" stroke="#f59e0b" stroke-width="3">
+            <line x1="125" y1="75" x2="125" y2="125"/>
+            <line x1="140" y1="75" x2="140" y2="125"/>
+            <line x1="155" y1="75" x2="155" y2="125"/>
+            <line x1="170" y1="75" x2="170" y2="125"/>
+          </g>
+
+          <!-- Passing Ferromagnetic Tooth -->
+          <g transform="translate(210, 0)">
+            <rect x="0" y="40" width="30" height="120" fill="#475569" stroke="#94a3b8" stroke-width="2">
+              <animateTransform attributeName="transform" type="translate" values="60,0; -80,0; 60,0" dur="2s" repeatCount="indefinite"/>
+            </rect>
+          </g>
+
+          <!-- Sine Output Display -->
+          <rect x="280" y="50" width="105" height="100" fill="#091a24" stroke="#38bdf8" rx="6"/>
+          <path d="M 285 100 Q 297.5 60 310 100 T 335 100 T 360 100 T 380 100" fill="none" stroke="#38bdf8" stroke-width="2">
+            <animate attributeName="d" values="M 285 100 Q 297.5 60 310 100 T 335 100 T 360 100 T 380 100; M 285 100 Q 297.5 140 310 100 T 335 100 T 360 100 T 380 100; M 285 100 Q 297.5 60 310 100 T 335 100 T 360 100 T 380 100" dur="1s" repeatCount="indefinite"/>
+          </path>
+          <text x="290" y="140" fill="#94a3b8" font-size="9">Induced AC Sine Wave Voltage</text>
+        </svg>
+        <p style="font-size:12px; color:#94a3b8;">Magnetic Flux Perturbation & Induced AC Voltage</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SECTION 3: TACHOGENERATOR -->
+<div class="sensor-card">
+  <h2>3. Tachogenerator Transducer (DC & AC)</h2>
+  <div class="grid-2">
+    <div>
+      <h3>Industrial Hardware Image</h3>
+      <img src="images/Tachogenerator.jpg" class="img-fluid" alt="Industrial Precision DC Tachogenerator">
+      <br>
+      <h4>Working Principle</h4>
+      <p>A Tachogenerator (Tacho-generator) is a small electrical generator mechanically coupled to a rotating machine shaft. It converts mechanical rotational velocity directly into an analog voltage output.</p>
+
+      <p>In a <strong>DC Tachogenerator</strong>, a permanent magnet stator induces a DC voltage in the rotating armature. The output voltage $V_g$ is directly proportional to shaft speed $\omega$ ($N_{rpm}$):</p>
+      <div class="formula">
+        $$V_g = K_t \times \omega = K_t \times \left( \frac{2\pi N_{rpm}}{60} \right)$$
+      </div>
+      <p>Where $K_t$ is the tachometer constant (expressed in $\text{V/RPM}$ or $\text{V/rad/s}$). The polarity of $V_g$ indicates the direction of rotation.</p>
+    </div>
+
+    <div>
+      <h3>Interactive Generator Output Animation</h3>
+      <div class="anim-box">
+        <svg viewBox="0 0 400 200" width="100%" height="180">
+          <!-- Permanent Magnets Stator -->
+          <rect x="50" y="40" width="40" height="120" fill="#ef4444" rx="4"/>
+          <text x="63" y="105" fill="#fff" font-size="16" font-weight="bold">N</text>
+
+          <rect x="210" y="40" width="40" height="120" fill="#3b82f6" rx="4"/>
+          <text x="225" y="105" fill="#fff" font-size="16" font-weight="bold">S</text>
+
+          <!-- Rotating Armature Coil -->
+          <g transform="translate(150,100)">
+            <rect x="-35" y="-35" width="70" height="70" fill="none" stroke="#f59e0b" stroke-width="4" rx="4">
+              <animateTransform attributeName="transform" type="rotate" from="0" to="360" dur="2s" repeatCount="indefinite"/>
+            </rect>
+            <circle cx="0" cy="0" r="10" fill="#475569"/>
+          </g>
+
+          <!-- Voltmeter Signal Display -->
+          <rect x="280" y="60" width="100" height="80" fill="#091a24" stroke="#22c55e" rx="4"/>
+          <text x="295" y="85" fill="#4ade80" font-size="11" font-weight="bold">DC VOLTS</text>
+          <text x="295" y="115" fill="#38bdf8" font-size="16" font-weight="bold">
+            <animate attributeName="opacity" values="1;0.7;1" dur="0.5s" repeatCount="indefinite"/>+12.4 V
+          </text>
+        </svg>
+        <p style="font-size:12px; color:#94a3b8;">Rotary Electromechanical Armature Induction</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SECTION 4: COMPARISON TABLE -->
+<div class="sensor-card">
+  <h2>Comparative Analysis: Speed Sensors</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>Sensor Type</th>
+        <th>Output Signal Format</th>
+        <th>Zero-Speed Detection?</th>
+        <th>Advantages</th>
+        <th>Disadvantages</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>Hall Effect Sensor</strong></td>
+        <td>Digital Square Wave pulses ($0-5\text{V}$ or open collector).</td>
+        <td><strong>Yes</strong> (Can detect static zero speed).</td>
+        <td>Compact, robust, integrated signal conditioning, reliable digital noise immunity.</td>
+        <td>Requires active external DC power supply; limited operating temperature compared to VR.</td>
+      </tr>
+      <tr>
+        <td><strong>Variable Reluctance (VR) Sensor</strong></td>
+        <td>Analog AC Sine wave (amplitude & frequency increase with speed).</td>
+        <td><strong>No</strong> (Fails at near-zero speeds due to low induced voltage).</td>
+        <td>Passive (no power needed), extremely rugged, operates at very high temperatures ($> 200^\circ\text{C}$).</td>
+        <td>Signal drops to zero at low speeds; requires sensitive threshold detection circuitry.</td>
+      </tr>
+      <tr>
+        <td><strong>DC Tachogenerator</strong></td>
+        <td>Continuous analog DC voltage proportional to speed; polarity indicates direction.</td>
+        <td><strong>Yes</strong> (Linear continuous voltage output near zero).</td>
+        <td>Direct velocity feedback for analog closed-loop motor drives without ADC decoding.</td>
+        <td>Commutator brush wear and electrical spark noise; higher weight and cost.</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- SECTION 5: NUMERICAL PROBLEMS -->
+<div class="sensor-card">
+  <h2>Numerical Problems: Speed Measurement & Motor Control</h2>
+
+  <!-- Problem 1: Hall Effect Sensor & Motor Speed -->
+  <div class="numerical-card">
+    <h3>Problem 1: Hall Effect Sensor Interfacing with BLDC Motor</h3>
+    <p><strong>Scenario:</strong> A 4-pole pair ($P = 4$) Brushless DC (BLDC) motor has three internal Hall Effect sensors positioned $120^\circ$ apart. A frequency counter attached to one Hall sensor measures a pulse frequency $f = 240\text{ Hz}$. Calculate:</p>
+    <ol type="a">
+      <li>The motor rotational speed in revolutions per minute ($N_{rpm}$).</li>
+      <li>The mechanical angular velocity ($\omega$) in radians per second ($\text{rad/s}$).</li>
+    </ol>
+
+    <h4>Step-by-Step Solution:</h4>
+    <p><strong>1. Rotational Speed ($N_{rpm}$):</strong></p>
+    <div class="formula">
+      $$N_{rpm} = \frac{60 \times f}{P} = \frac{60 \times 240\text{ Hz}}{4} = 3600\text{ RPM}$$
+    </div>
+
+    <p><strong>2. Angular Velocity ($\omega$):</strong></p>
+    <div class="formula">
+      $$\omega = \frac{2\pi \times N_{rpm}}{60} = \frac{2\pi \times 3600}{60} = 120\pi = 376.99\text{ rad/s}$$
+    </div>
+  </div>
+
+  <!-- Problem 2: Variable Reluctance Magnetic Pickup -->
+  <div class="numerical-card">
+    <h3>Problem 2: Variable Reluctance Sensor on Turbine Shaft Gear</h3>
+    <p><strong>Scenario:</strong> A magnetic speed pickup sensor monitors a 60-tooth steel gear ($P = 60\text{ teeth}$) mounted on an industrial steam turbine drive shaft. An electronic digital tachometer counts the sensor pulses over a gate time window of $t_{gate} = 0.5\text{ seconds}$ and counts $N_{pulses} = 1800\text{ pulses}$. Calculate:</p>
+    <ol type="a">
+      <li>The pulse frequency $f$ generated by the pickup sensor.</li>
+      <li>The shaft speed in RPM ($N_{rpm}$).</li>
+      <li>The pulse frequency if the turbine shaft speed increases to $N_{new} = 4500\text{ RPM}$.</li>
+    </ol>
+
+    <h4>Step-by-Step Solution:</h4>
+    <p><strong>1. Signal Frequency ($f$):</strong></p>
+    <div class="formula">
+      $$f = \frac{N_{pulses}}{t_{gate}} = \frac{1800}{0.5\text{ s}} = 3600\text{ Hz}$$
+    </div>
+
+    <p><strong>2. Shaft Speed ($N_{rpm}$):</strong></p>
+    <div class="formula">
+      $$N_{rpm} = \frac{60 \times f}{P} = \frac{60 \times 3600\text{ Hz}}{60\text{ teeth}} = 3600\text{ RPM}$$
+    </div>
+
+    <p><strong>3. Frequency at $4500\text{ RPM}$ ($f_{new}$):</strong></p>
+    <div class="formula">
+      $$f_{new} = \frac{N_{new} \times P}{60} = \frac{4500 \times 60}{60} = 4500\text{ Hz}$$
+    </div>
+  </div>
+
+  <!-- Problem 3: DC Tachogenerator Drive Feedback -->
+  <div class="numerical-card">
+    <h3>Problem 3: DC Tachogenerator Feedback for PMDC Motor Drive</h3>
+    <p><strong>Scenario:</strong> A PMDC motor is coupled to a DC tachogenerator with a rated sensitivity constant $K_t = 0.05\text{ V/RPM}$ ($50\text{ mV/RPM}$). The tachogenerator output is loaded by an operational amplifier circuit with input impedance $R_L = 50\text{ k}\Omega$. The internal armature resistance of the tachogenerator is $R_g = 500\ \Omega$. When the motor runs at $N = 1800\text{ RPM}$, calculate:</p>
+    <ol type="a">
+      <li>The ideal open-circuit tachogenerator output voltage ($V_{open}$).</li>
+      <li>The actual loaded output voltage ($V_{loaded}$) across $R_L$.</li>
+      <li>The percentage measurement error caused by loading.</li>
+    </ol>
+
+    <h4>Step-by-Step Solution:</h4>
+    <p><strong>1. Ideal Open-Circuit Voltage ($V_{open}$):</strong></p>
+    <div class="formula">
+      $$V_{open} = K_t \times N_{rpm} = 0.05\text{ V/RPM} \times 1800\text{ RPM} = 90.00\text{ V}$$
+    </div>
+
+    <p><strong>2. Loaded Output Voltage ($V_{loaded}$):</strong> Applying voltage divider between $R_g$ and $R_L$:</p>
+    <div class="formula">
+      $$V_{loaded} = V_{open} \times \left( \frac{R_L}{R_g + R_L} \right) = 90.00 \times \left( \frac{50000}{500 + 50000} \right) = 90.00 \times \left( \frac{50000}{50500} \right) = 89.109\text{ V}$$
+    </div>
+
+    <p><strong>3. Percentage Loading Error:</strong></p>
+    <div class="formula">
+      $$\text{Error (\%)} = \frac{V_{loaded} - V_{open}}{V_{open}} \times 100 = \frac{89.109 - 90.00}{90.00} \times 100 = -0.99\%$$
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

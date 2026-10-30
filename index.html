@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Industrial Automation & Control Portal</title>
+
+<style>
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: Arial, Helvetica, sans-serif;
+    background: #040a0f;
+    color: #edf7fb;
+    display: flex;
+    height: 100vh;
+    overflow: hidden;
+}
+
+/* SIDEBAR NAVIGATION */
+#sidebar {
+    width: 320px;
+    background: #091a24;
+    border-right: 2px solid #234252;
+    display: flex;
+    flex-direction: column;
+    flex-shrink: 0;
+}
+
+.sidebar-header {
+    background: #0d2838;
+    padding: 20px;
+    border-bottom: 2px solid #28a9d6;
+}
+
+.sidebar-header h2 {
+    font-size: 18px;
+    color: #7dd3fc;
+    margin-bottom: 5px;
+}
+
+.sidebar-header p {
+    font-size: 12px;
+    color: #94a3b8;
+}
+
+.course-toc {
+    flex-grow: 1;
+    overflow-y: auto;
+    padding: 15px;
+}
+
+.unit-title {
+    font-size: 11px;
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: #38bdf8;
+    margin: 15px 0 8px 5px;
+}
+
+.toc-item {
+    display: block;
+    width: 100%;
+    text-align: left;
+    background: #0f2c3b;
+    color: #d1d5db;
+    border: 1px solid #23495d;
+    padding: 12px 14px;
+    border-radius: 7px;
+    margin-bottom: 8px;
+    font-size: 13px;
+    line-height: 1.4;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.toc-item:hover {
+    background: #19465c;
+    color: #ffffff;
+    border-color: #38bdf8;
+}
+
+.toc-item.active {
+    background: #0284c7;
+    color: #ffffff;
+    border-color: #38bdf8;
+    font-weight: bold;
+    box-shadow: 0 0 10px rgba(56, 189, 248, 0.3);
+}
+
+/* CONTENT VIEWPORT (IFRAME) */
+#content-area {
+    flex-grow: 1;
+    height: 100vh;
+    background: #071017;
+}
+
+iframe {
+    width: 100%;
+    height: 100%;
+    border: none;
+}
+</style>
+</head>
+
+<body>
+
+<div id="sidebar">
+    <div class="sidebar-header">
+        <h2>⚡ AUTOMATION PORTAL</h2>
+        <p>Interactive Student Courseware</p>
+    </div>
+
+    <div class="course-toc">
+
+        <div class="unit-title">Unit I – Industrial Automation Systems</div>
+
+        <button class="toc-item" onclick="loadChapter(this, 'Unit1_01_Basics_of_Industrial_Automation.html')">
+            🏭 Chapter 1: Unit1_01_Basics of Industrial Automation and Control
+        </button>
+
+         <button class="toc-item" onclick="loadChapter(this, 'Unit1_02_Need_for_Industrial_Automation.html')">
+            🏭 Chapter 2: Unit1_02_Need for Industrial Automation
+        </button>
+        
+        <button class="toc-item" onclick="loadChapter(this, 'Unit1_03_Types_of_Industrial_Automation.html')">
+            📡 Chapter 3: Unit1_03_Types of Industrial Automation: Fixed, Programmable and Flexible Automation
+        </button>
+
+       
+        <button class="toc-item active" onclick="loadChapter(this, 'Unit1_04_Benefits_Limitations_Automation.html')">
+            📘 Chapter 4: Unit1_04_Benefits and Limitations of Industrial Automation
+        </button>
+
+         <button class="toc-item active" onclick="loadChapter(this, 'Unit1_05_Introduction to industrial control systems.html')">
+            📘 Chapter 5: Unit1_05_Introduction to industrial control systems
+        </button>
+         
+
+         <button class="toc-item active" onclick="loadChapter(this, 'Unit1_06_Effect of P and PI Controllers on the closed loop response.html')">
+            📘 Chapter 6: Unit1_06_Effect of P and PI Controllers on the closed loop response
+        </button>
+
+        <button class="toc-item active" onclick="loadChapter(this, 'Unit1_07_feedforward_cascade_control.html')">
+            📘 Chapter 7: Unit1_07_feedforward_cascade_control
+        </button>
+
+        <button class="toc-item active" onclick="loadChapter(this, 'Unit1_08_scada_dcs_plc_architecture.html')">
+            📘 Chapter 8: Unit1_08_scada_dcs_plc_architecture
+        </button>
+
+         
+
+
+        <div class="unit-title">Unit II – Industrial Systems</div>
+
+        <button class="toc-item active" onclick="loadChapter(this, 'UnitII_09_Proximity_sensors.html')">
+            📘 Chapter 9: UnitII_09_Proximity_sensors
+        </button>
+          
+          <button class="toc-item active" onclick="loadChapter(this, 'UnitII_10_potentiometers.html')">
+            📘 Chapter 10: UnitII_10_potentiometers
+        </button>
+         
+           <button class="toc-item active" onclick="loadChapter(this, 'UnitII_11_ultrasonic_lvdt.html')">
+            📘 Chapter 11: UnitII_11_ultrasonic_lvdt
+        </button>
+      <button class="toc-item active" onclick="loadChapter(this, 'UnitII_12_speed_sensors.html')">
+            📘 Chapter 12:UnitII_12_speed_sensors
+        </button>
+ <button class="toc-item active" onclick="loadChapter(this, 'UnitII_13_Motion_sensor.html')">
+            📘 Chapter 13:UnitII_13_Motion_sensor
+
+        </button>
+<button class="toc-item active" onclick="loadChapter(this, 'UnitII_14_Electrical_sensors.html')">
+            📘 Chapter 14:UnitII_14_Electrical_sensors
+        </button>
+
+<button class="toc-item active" onclick="loadChapter(this, 'UnitII_15_temperature_sensors.html')">
+            📘 Chapter 15:UnitII_15_temperature_sensors
+        </button>
+
+         <button class="toc-item active" onclick="loadChapter(this, 'UnitII_16_pressure_strain.html')">
+            📘 Chapter 16:UnitII_16_pressure_strain
+
+        </button>
+
+         <button class="toc-item active" onclick="loadChapter(this, 'UnitII_17_level_float.html')">
+            📘 Chapter 17:UnitII_17_level_float
+
+        </button>
+
+          <button class="toc-item active" onclick="loadChapter(this, 'UnitII_18_Differential_pressure_transmitter.html')">
+            📘 Chapter 18:UnitII_18_Differential_pressure_transmitter
+
+        </button>
+
+
+         <button class="toc-item active" onclick="loadChapter(this, 'UnitII_19_vibration_accelerometer.html')">
+            📘 Chapter 19:UnitII_19_vibration_accelerometer
+
+        </button>
+
+        <button class="toc-item active" onclick="loadChapter(this, 'UnitII_20_sound_microphone.html')">
+            📘 Chapter 20:UnitII_20_sound_microphone
+
+        </button>
+
+         <button class="toc-item active" onclick="loadChapter(this, 'UnitII_21_pneumatic_control_valve.html')">
+            📘 Chapter 21:UnitII_21_pneumatic_control_valve
+
+        </button>
+
+
+          <button class="toc-item active" onclick="loadChapter(this, 'UnitII_22_motorized_servo_actuator.html')">
+            📘 Chapter 22:UnitII_22_motorized_servo_actuator
+
+        </button>
+
+         <button class="toc-item active" onclick="loadChapter(this, 'Unit_III_23_plc_architecture.html')">
+            📘 Chapter 23:Unit_III_23_plc_architecture
+        </button>
+
+         <button class="toc-item active" onclick="loadChapter(this, 'Unit_III_24_plc_programming_languages.html')">
+            📘 Chapter 24:Unit_III_24_plc_programming_languages
+        </button>
+            <button class="toc-item active" onclick="loadChapter(this, 'Unit_III_25_plc_basics_programming.html')">
+            📘 Chapter 25:Unit_III_25_plc_basics_programming
+        </button>
+
+ <button class="toc-item active" onclick="loadChapter(this, 'Unit_III_26_PLC_Simulation_Software.html')">
+            📘 Chapter 26:Unit_III_26_PLC_Simulation_Software
+        </button>
+<button class="toc-item active" onclick="loadChapter(this, 'Unit_III_27_plc_field_interfacing.html')">
+            📘 Chapter 27:Unit_III_27_plc_field_interfacing
+        </button>
+<button class="toc-item active" onclick="loadChapter(this, 'Unit_III_28_scada_systems_intro.html')">
+            📘 Chapter 28:Unit_III_28_scada_systems_intro
+        </button>
+
+<button class="toc-item active" onclick="loadChapter(this, 'Unit_IIII_29_scada_architecture_components.html')">
+            📘 Chapter 29:Unit_IIII_29_scada_architecture_components
+        </button>
+<button class="toc-item active" onclick="loadChapter(this, 'Unit_III_30_scada_communication_protocols.html')">
+            📘 Chapter 30:Unit_III_30_scada_communication_protocols
+
+        </button>
+<button class="toc-item active" onclick="loadChapter(this, 'Unit_III_31_hmi_introduction.html')">
+            📘 Chapter 31:Unit_III_31_hmi_introduction
+        </button>
+
+<button class="toc-item active" onclick="loadChapter(this, 'Unit_III_32_realtime_daq_and_control.html')">
+            📘 Chapter 32:Unit_III_32_realtime_daq_and_control
+        </button>
+<button class="toc-item active" onclick="loadChapter(this, 'Unit_III_33_SCADA_Screen.html')">
+            📘 Chapter 33:Unit_III_33_SCADA_Screen
+        </button>
+
+<button class="toc-item active" onclick="loadChapter(this, 'Unit_III_34_scada_simulator.html')">
+            📘 Chapter 34:Unit_III_34_scada_simulator
+        </button>
+<button class="toc-item active" onclick="loadChapter(this, 'Unit_IV_35_industrial_networking_and_wireless.html')">
+            📘 Chapter 35:Unit_IV_35_industrial_networking_and_wireless
+        </button>
+<button class="toc-item active" onclick="loadChapter(this, 'Unit_IV_36_iiot_basics_and_case_studies.html')">
+            📘 Chapter 36:Unit_IV_36_iiot_basics_and_case_studies
+        </button>
+ <button class="toc-item active" onclick="loadChapter(this, 'Final_code_withoutserial.html')">
+            📘 Chapter 37:PLC_Virtual_Lab_TOFF_CTD_Operators
+        </button>
+
+
+        <!-- ADD MORE CHAPTERS BELOW -->
+        <!--
+        
+        -->
+    </div>
+</div>
+
+<div id="content-area">
+    <iframe id="chapterViewer" src="feedforward_cascade_control.html"></iframe>
+</div>
+
+<script>
+function loadChapter(button, htmlFile) {
+    // 1. Update the iframe source to load the selected chapter
+    document.getElementById("chapterViewer").src = htmlFile;
+
+    // 2. Manage active button highlighting in sidebar
+    const buttons = document.querySelectorAll('.toc-item');
+    buttons.forEach(btn => btn.classList.remove('active'));
+    button.classList.add('active');
+}
+</script>
+
+</body>
+</html>

@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Chapter 29: SCADA Architecture and Components</title>
+
+<!-- MathJax Configuration and Script -->
+<script>
+  window.MathJax = {
+    tex: {
+      inlineMath: [['$', '$'], ['\\(', '\\)']],
+      displayMath: [['$$', '$$'], ['\\[', '\\]']]
+    }
+  };
+</script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+<style>
+  :root {
+    --bg-dark: #071017;
+    --panel-bg: #0d1f2d;
+    --border-color: #1e3a50;
+    --accent-blue: #38bdf8;
+    --accent-green: #22c55e;
+    --accent-amber: #f59e0b;
+    --accent-red: #ef4444;
+    --text-main: #e2e8f0;
+    --text-muted: #94a3b8;
+  }
+
+  body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: var(--bg-dark);
+    color: var(--text-main);
+    line-height: 1.6;
+    padding: 24px;
+    margin: 0;
+  }
+
+  h1, h2, h3, h4 {
+    color: var(--accent-blue);
+  }
+
+  h1 {
+    border-bottom: 2px solid var(--border-color);
+    padding-bottom: 10px;
+    margin-bottom: 20px;
+  }
+
+  .sensor-card {
+    background-color: var(--panel-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 10px;
+    padding: 24px;
+    margin-bottom: 30px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+  }
+
+  .grid-2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+  }
+
+  @media (max-width: 900px) {
+    .grid-2 { grid-template-columns: 1fr; }
+  }
+
+  .anim-box {
+    background: #040a0f;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 16px;
+    text-align: center;
+  }
+
+  .img-fluid {
+    max-width: 100%;
+    height: 180px;
+    object-fit: contain;
+    border-radius: 6px;
+    background: #040a0f;
+    padding: 10px;
+    border: 1px solid var(--border-color);
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 15px;
+  }
+
+  th, td {
+    border: 1px solid var(--border-color);
+    padding: 10px;
+    text-align: left;
+  }
+
+  th {
+    background-color: #132b3e;
+    color: var(--accent-blue);
+  }
+
+  .numerical-card {
+    background: #0a1824;
+    border-left: 4px solid var(--accent-amber);
+    padding: 18px;
+    margin-bottom: 20px;
+    border-radius: 0 8px 8px 0;
+  }
+
+  .formula {
+    background: #040a0f;
+    padding: 8px 12px;
+    border-radius: 6px;
+    color: #4ade80;
+    overflow-x: auto;
+    margin: 8px 0;
+  }
+</style>
+</head>
+<body>
+
+<h1>Chapter 29: SCADA Subsystem Architecture and Internal Components</h1>
+<p>This chapter examines the internal structural breakdown, hardware componentry, and subsystem workflows of a complete SCADA deployment. Topics include Master Terminal Unit (MTU) server clusters, Remote Terminal Unit (RTU) internal hardware architectures, Process Historians, HMI client nodes, and data storage estimation equations.</p>
+
+<!-- SECTION 1: DETAILED ARCHITECTURE & SUBSYSTEMS -->
+<div class="sensor-card">
+  <h2>1. Comprehensive SCADA Hardware & Subsystem Architecture</h2>
+  <div class="grid-2">
+    <div>
+      <h3>Hardware Hardware Image Reference</h3>
+      <img src="images/scada_components_rack.jpg" class="img-fluid" alt="Industrial SCADA Server Rack, Historian, and RTU Control Panels">
+      <br>
+      <h4>Subsystem Functional Breakdowns</h4>
+      <p>A production SCADA system relies on distinct, interconnected processing tiers designed for reliability and zero-downtime operation:</p>
+      <ul>
+        <li><strong>Master Terminal Unit (MTU / SCADA Server):</strong> The core supervisory engine. Runs polling schedulers, handles alarm state logic, executes control scripts, and serves data to client nodes. Usually configured as a dual-redundant hot-standby pair.</li>
+        <li><strong>Remote Terminal Unit (RTU):</strong> Ruggedized field microcomputers with wide operating temperature ranges, backup battery UPS systems, onboard signal conditioning, and local RTC timers for precise time-stamping ($1\text{ ms}$ resolution).</li>
+        <li><strong>Process Historian:</strong> High-performance, time-series relational or columnar database optimized for high-speed ingestion and long-term storage of process tag values.</li>
+        <li><strong>Human-Machine Interface (HMI):</strong> Graphical client stations that convert raw database tags into real-time visual process graphics, trend charts, and operator alarm panels.</li>
+      </ul>
+    </div>
+
+    <div>
+      <h3>Subsystem Data Flow & Hardware Block Diagram</h3>
+      <div class="anim-box">
+        <svg viewBox="0 0 400 230" width="100%" height="210">
+          <!-- HMI Client Node -->
+          <rect x="20" y="20" width="100" height="45" fill="#0d1f2d" stroke="#38bdf8" stroke-width="2" rx="4"/>
+          <text x="35" y="40" fill="#38bdf8" font-size="9" font-weight="bold">HMI CLIENT</text>
+          <text x="32" y="55" fill="#94a3b8" font-size="7">Operator GUI Node</text>
+
+          <!-- Redundant MTU Server Cluster -->
+          <rect x="150" y="15" width="110" height="55" fill="#0d1f2d" stroke="#22c55e" stroke-width="2" rx="4"/>
+          <text x="160" y="35" fill="#22c55e" font-size="9" font-weight="bold">PRIMARY MTU</text>
+          <text x="162" y="50" fill="#f59e0b" font-size="7">(Hot-Standby Pair)</text>
+
+          <!-- Process Historian Database -->
+          <rect x="280" y="20" width="100" height="45" fill="#0d1f2d" stroke="#f59e0b" stroke-width="2" rx="4"/>
+          <text x="290" y="40" fill="#f59e0b" font-size="9" font-weight="bold">HISTORIAN</text>
+          <text x="292" y="55" fill="#94a3b8" font-size="7">Time-Series DB</text>
+
+          <!-- Control Bus / Local LAN -->
+          <line x1="120" y1="42" x2="150" y2="42" stroke="#38bdf8" stroke-width="2"/>
+          <line x1="260" y1="42" x2="280" y2="42" stroke="#f59e0b" stroke-width="2"/>
+
+          <!-- Field Communications Highway (WAN) -->
+          <line x1="205" y1="70" x2="205" y2="130" stroke="#22c55e" stroke-width="2" stroke-dasharray="4,2"/>
+          <text x="212" y="105" fill="#22c55e" font-size="8">Telemetry / WAN</text>
+
+          <!-- RTU Internal Subsystem Structure -->
+          <rect x="60" y="130" width="290" height="85" fill="#040a0f" stroke="#1e3a50" stroke-width="2" rx="6"/>
+          <text x="70" y="145" fill="#38bdf8" font-size="9" font-weight="bold">RTU FIELD SUBSYSTEM ARCHITECTURE</text>
+
+          <!-- RTU Blocks -->
+          <rect x="75" y="155" width="60" height="45" fill="#0d1f2d" stroke="#38bdf8" stroke-width="1"/>
+          <text x="82" y="175" fill="#e2e8f0" font-size="7" font-weight="bold">Comm MCU</text>
+          <text x="83" y="188" fill="#94a3b8" font-size="6">DNP3 / Modbus</text>
+
+          <rect x="150" y="155" width="60" height="45" fill="#0d1f2d" stroke="#22c55e" stroke-width="1"/>
+          <text x="157" y="175" fill="#e2e8f0" font-size="7" font-weight="bold">CPU / RTC</text>
+          <text x="155" y="188" fill="#94a3b8" font-size="6">Local Logic</text>
+
+          <rect x="225" y="155" width="110" height="45" fill="#0d1f2d" stroke="#f59e0b" stroke-width="1"/>
+          <text x="240" y="175" fill="#e2e8f0" font-size="7" font-weight="bold">I/O Conditioning</text>
+          <text x="235" y="188" fill="#94a3b8" font-size="6">ADC / DAC / Isolation</text>
+
+          <!-- Animated Data Pulse from RTU to MTU -->
+          <circle cx="0" cy="0" r="3" fill="#22c55e">
+            <animateMotion path="M 205 130 L 205 70" dur="2s" repeatCount="indefinite"/>
+          </circle>
+        </svg>
+        <p style="font-size:12px; color:#94a3b8;">Block Architecture: MTU Server, Historian, and RTU Internal Modules</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SECTION 2: COMPARISON MATRIX -->
+<div class="sensor-card">
+  <h2>Comparative Analysis: SCADA Component Hardware Specifications</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>Subsystem Component</th>
+        <th>Primary Hardware Specs</th>
+        <th>Operating System / Software</th>
+        <th>Redundancy Strategy</th>
+        <th>Primary Function</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>Master Terminal Unit (MTU)</strong></td>
+        <td>Enterprise Rack Server (64-core CPU, 128GB RAM, ECC Memory).</td>
+        <td>Linux Enterprise / Windows Server (SCADA Engine).</td>
+        <td>Dual Hot-Standby (Heartbeat Sync).</td>
+        <td>Central supervisory engine, polling management, alarm processing.</td>
+      </tr>
+      <tr>
+        <td><strong>Remote Terminal Unit (RTU)</strong></td>
+        <td>32-bit ARM/MIPS MCU, Operating Temp: $-40^\circ\text{C}$ to $+70^\circ\text{C}$.</td>
+        <td>Real-Time OS (FreeRTOS, VxWorks, Embedded Linux).</td>
+        <td>Dual Power Supply + UPS Battery Backup.</td>
+        <td>Field data acquisition, timestamping, local autonomous control execution.</td>
+      </tr>
+      <tr>
+        <td><strong>Process Historian</strong></td>
+        <td>High-IOPS NVMe Storage Array (RAID 10), High Throughput.</td>
+        <td>Time-Series Database (e.g., InfluxDB, OSIsoft PI, TimescaleDB).</td>
+        <td>Database Clustering & Active Replication.</td>
+        <td>High-speed tag data ingestion, data compression, archival storage.</td>
+      </tr>
+      <tr>
+        <td><strong>Human-Machine Interface (HMI)</strong></td>
+        <td>Industrial PC / Multi-Monitor Workstation, GPU-accelerated.</td>
+        <td>Web-based Client / Thin-client runtime environment.</td>
+        <td>Multi-node Client Licensing (Load Balanced).</td>
+        <td>Real-time graphic display, manual setpoint adjustment, trend analysis.</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- SECTION 3: NUMERICAL PROBLEMS -->
+<div class="sensor-card">
+  <h2>Numerical Problems: Historian Storage & Redundancy Failover Sizing</h2>
+
+  <!-- Problem 1: Historian Database Storage Calculation -->
+  <div class="numerical-card">
+    <h3>Problem 1: Process Historian Data Storage & Compression Sizing</h3>
+    <p><strong>Scenario:</strong> A regional oil refinery SCADA historian monitors $N = 25,000\text{ process tags}$. Each record contains:</p>
+    <ul>
+      <li>Tag Identifier: $4\text{ bytes}$</li>
+      <li>IEEE 754 Floating Point Value: $4\text{ bytes}$</li>
+      <li>UNIX Timestamp ($1\text{ ms}$ precision): $8\text{ bytes}$</li>
+      <li>Quality Flag / Status Field: $2\text{ bytes}$</li>
+    </ul>
+    <p>Data is polled continuously at a sampling rate of 1 sample per second ($1\text{ Hz}$) per tag. The historian uses a deadband compression algorithm that successfully reduces stored records by $75\%$ ($25\%$ storage retention).</p>
+
+    <p>Calculate:</p>
+    <ol type="a">
+      <li>The uncompressed raw data ingestion rate in Megabytes per second ($\text{MB/s}$).</li>
+      <li>The actual compressed data storage required per day in Gigabytes ($\text{GB/day}$).</li>
+      <li>The total storage capacity required in Terabytes ($\text{TB}$) to retain process data for 5 years.</li>
+    </ol>
+
+    <h4>Step-by-Step Solution:</h4>
+    <p><strong>1. Calculate Record Size and Raw Data Ingestion Rate:</strong></p>
+    <div class="formula">
+      $$\text{Record Size} = 4\text{ (ID)} + 4\text{ (Value)} + 8\text{ (Timestamp)} + 2\text{ (Status)} = 18\text{ bytes/sample}$$
+    </div>
+    <div class="formula">
+      $$\text{Raw Ingestion Rate} = 25,000\text{ tags} \times 18\text{ bytes/sample} \times 1\text{ sample/s} = 450,000\text{ bytes/s}$$
+    </div>
+    <div class="formula">
+      $$\text{Raw Data Rate in MB/s} = \frac{450,000\text{ B/s}}{1,000,000\text{ B/MB}} = 0.45\text{ MB/s}$$
+    </div>
+
+    <p><strong>2. Compute Daily Compressed Storage Volume:</strong></p>
+    <div class="formula">
+      $$\text{Raw Volume per Day} = 0.45\text{ MB/s} \times 86,400\text{ seconds/day} = 38,880\text{ MB/day} = 38.88\text{ GB/day}$$
+    </div>
+    <div class="formula">
+      $$\text{Compressed Volume per Day} = 38.88\text{ GB/day} \times (1 - 0.75) = 38.88 \times 0.25 = 9.72\text{ GB/day}$$
+    </div>
+
+    <p><strong>3. Compute 5-Year Storage Capacity Requirement:</strong></p>
+    <div class="formula">
+      $$\text{Total Storage (5 Years)} = 9.72\text{ GB/day} \times (365 \times 5\text{ days}) = 9.72 \times 1825 = 17,739\text{ GB}$$
+    </div>
+    <div class="formula">
+      $$\text{Total Storage in Terabytes} = \frac{17,739\text{ GB}}{1,000\text{ GB/TB}} \approx 17.74\text{ TB}$$
+    </div>
+  </div>
+
+  <!-- Problem 2: MTU Redundant Failover Availability -->
+  <div class="numerical-card">
+    <h3>Problem 2: Dual Hot-Standby MTU Availability Calculation</h3>
+    <p><strong>Scenario:</strong> A SCADA system uses two identical MTU servers in a parallel redundant configuration. The Mean Time Between Failures (MTBF) for a single server is $\text{MTBF} = 10,000\text{ hours}$, and the Mean Time To Repair (MTTR) is $\text{MTTR} = 10\text{ hours}$.</p>
+    <p>Calculate:</p>
+    <ol type="a">
+      <li>The operational availability $A_s$ of a single non-redundant MTU server.</li>
+      <li>The total system availability $A_{sys}$ of the dual hot-standby pair.</li>
+      <li>The expected total annual downtime in minutes for the redundant system.</li>
+    </ol>
+
+    <h4>Step-by-Step Solution:</h4>
+    <p><strong>1. Calculate Single Server Availability ($A_s$):</strong></p>
+    <div class="formula">
+      $$A_s = \frac{\text{MTBF}}{\text{MTBF} + \text{MTTR}} = \frac{10,000}{10,000 + 10} = \frac{10,000}{10,010} \approx 0.999001\quad (99.9001\%)$$
+    </div>
+
+    <p><strong>2. Compute Redundant System Availability ($A_{sys}$):</strong></p>
+    <p>For a parallel configuration where at least one server must operate, the system unreliability $U_{sys}$ is the product of individual unavailabilities ($U_s = 1 - A_s$):</p>
+    <div class="formula">
+      $$U_s = 1 - 0.999001 = 0.000999$$
+    </div>
+    <div class="formula">
+      $$U_{sys} = U_s^2 = (0.000999)^2 \approx 0.000000998$$
+    </div>
+    <div class="formula">
+      $$A_{sys} = 1 - U_{sys} = 1 - 0.000000998 = 0.999999002\quad (99.9999\%)$$
+    </div>
+
+    <p><strong>3. Compute Expected Annual System Downtime:</strong></p>
+    <div class="formula">
+      $$\text{Annual Hours} = 365 \times 24 = 8,760\text{ hours}$$
+    </div>
+    <div class="formula">
+      $$\text{Downtime Hours} = 8,760\text{ h} \times U_{sys} = 8,760 \times 0.000000998 \approx 0.008742\text{ hours}$$
+    </div>
+    <div class="formula">
+      $$\text{Downtime in Minutes} = 0.008742\text{ hours} \times 60\text{ min/hour} \approx 0.525\text{ minutes/year}\quad (\approx 31.5\text{ seconds/year})$$
+    </div>
+  </div>
+</div>
+
+</body>
+</html>
